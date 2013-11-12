@@ -390,4 +390,262 @@ $.queryString.deserialize = function(str) {
 }
 
 
+function abstractField(){
+    abstractField.base.call(this);
+    this._onIsValid = $.observer();
+    this._onInvalid = $.observer();
+    this.spec($.spec(function(){ return true; }))
+        .optional();
+}
+abstractField.prototype = {
+    $read: function(){ return; },
+    $write: function(){ return; },
+    $clear: function(){ return; },
+    value: function(value){
+        if(!$.exists(value)) return this.$read();
+        this.$write(value);
+        return this;
+    },
+    clear: function(){ return this.$clear(); },
+    optional: function(){ this._optionSpec = $.fields.specs.optional; this._operand = "or"; return this; },
+    required: function(){ this._optionSpec = $.fields.specs.required; this._operand = "and"; return this; },
+    spec: function(spec){ return this.property("spec", spec); },
+    isValid: function(){
+        var b = this._optionSpec[this._operand](this.spec()).isSatisfiedBy(this.value()),
+            o = (b) ? this._onIsValid : this._onInvalid;
+        o.notify(this);
+        return b;
+    },
+    isEmpty: function(){ return $.isEmpty(this.value()); },
+    onIsValid: function(f, s, id){ this._onIsValid.add(f, s, id); return this; },
+    onInvalid: function(f, s, id){ this._onInvalid.add(f, s, id); return this; }
+ }
+$.Class.extend(abstractField, $.Class);
+
+function field(selector){
+    field.base.call(this);
+
+    var query = $(selector);
+    if(query.length > 1) $.str.format("$.field requires unique and disparate node.")
+    this.dom($.refcheck(query[0], $.str.format("$.DomClass requires valid DOM node.")))
+        .spec($.spec(function(){ return true; }))
+        .optional();
+}
+field.prototype = {
+    $read: function(){ return this.dom().value },
+    $write: function(value){ this.dom().value = value; },
+    $clear: function(){ this.dom().value = ""; return this; },
+    dom: function(dom){ return this.property("dom", dom); }
+ }
+$.Class.extend(field, abstractField);
+$.field = function(selector){ return new field(selector); }
+$.field.Class = field;
+
+function checkbox(dom){
+    checkbox.base.call(this, dom);
+}
+checkbox.prototype = {
+    $read: function(){
+        var d = this.dom();
+        return (d.checked) ? d.value : "";
+    },
+    $write: function(value){
+        var d = this.dom();
+        d.checked = (d.value == value);
+    },
+    $clear: function(){ this.uncheck(); return this; },
+    check: function(){ this.dom().checked = true; return this; },
+    uncheck: function(){ this.dom().checked = false; return this; }
+}
+$.Class.extend(checkbox, field);
+$.checkbox = function(dom){ return new checkbox(dom); }
+$.checkbox.Class = checkbox;
+
+function radioset(){
+    radioset.base.call(this);
+    this._radios = $.list();
+}
+radioset.prototype = {
+    $read: function(){
+        var rv = [];
+        this._radios.each(function(r){ if(r.checked) rv.push(r.value); });
+        return rv.toString();
+    },
+    $write: function(value){
+        var v = ($.isString(value)) ? value.split(",") : value,
+            vlist = $.list(v);
+        this._radios.each(function(r){ r.checked = vlist.contains(r.value); });
+    },
+    $clear: function(){
+        this._radios.each(function(r){ r.checked = false; });
+    },
+    add: function(dom){
+        this._radios.add(dom);
+        return this;
+    },
+    listNodes: function(){ return this._radios; } 
+}
+$.Class.extend(radioset, abstractField);
+$.radioset = function(){ return new radioset(); }
+$.radioset.Class = radioset;
+
+function select(dom){
+    select.base.call(this, dom);
+    this._opts = function(){ return $.list(this.dom().options); }
+    if(this.dom().multiple) this.multiple();
+    else this.single();
+}
+select.prototype = {
+    $read: function(){
+        var rv = [];
+        this._opts().each(function(opt){ if(opt.selected) rv.push(opt.value); });
+        return rv.toString();
+    },
+    $write: function(value){
+        return (this._multiple) ? select_writeMultiple(this, value) : select_writeSingle(this, value);
+    },
+
+    multiple: function(){ this._multiple = true; return this; },
+    single: function(){ this._multiple = false; return this; },
+	addOptgroup: function(){
+		this.dom().appendChild(document.createElement('optgroup'));
+		return this;
+	},
+    addOption: function(k, v, index, isOptGroup){
+        var dom = this.dom(),
+            option = document.createElement('option'),
+            idx = index || null,
+            opt = ($.exists(idx)) ? dom.options[idx] : null;
+        option.text = k;
+        option.value = v;
+		
+		if(isOptGroup) 
+			dom.getElementsByTagName("optgroup")[index].appendChild(option)
+		else {
+			try { dom.add(option, opt); }
+			catch(ex) { dom.add(option, idx); }
+		}
+        return this;
+    },
+    removeOption: function(index){
+      this.dom().remove(index);
+      return this;
+    }
+}
+$.Class.extend(select, field);
+$.select = function(dom){ return new select(dom); }
+$.select.Class = select;
+
+function select_writeSingle(select, value){
+    select._opts().each(function(opt){
+        opt.selected = (opt.value == value);
+    });
+    return select;
+}
+function select_writeMultiple(select, value){
+    var v = ($.isString(value)) ? value.split(",") : value,
+        vlist = $.list(v);
+    select._opts().each(function(opt){
+        opt.selected = vlist.contains(opt.value);
+    });
+    return select;
+}
+
+function form(){
+    form.base.call(this);
+    this._onSubmit = $.observer();
+    this._fields = $.hash();
+}
+form.prototype = {
+    $submit: function(){ return; },
+    name: function(name){ return this.property("name", name); },
+    fields: function(){ return this._fields; },
+    listFields: function(){ return this._fields.listValues(); },
+    findField: function(name){ return this._fields.findValue(name); },
+    isEmpty: function(){
+        var v = true;
+        this._fields.listValues().each(function(f){ if(!f.isEmpty()) v = false; });
+        return v;
+    },
+    isValid: function(){
+        var v = true;
+        this._fields.listValues().each(function(f){ if(!f.isValid()) v = false; });
+        return v;
+    },
+    submit: function(){
+        var values = this.read();
+        this._onSubmit.notify(this);
+        this.$submit(values);
+    },
+    onSubmit: function(f, s, id){ this._onSubmit.add(f, s, id); return this; },
+    add: function(n, f){ this._fields.add(n, f); return this; },
+    remove: function(n){ this._fields.remove(n); return this; },
+    clear: function(){
+        this._fields.each(function(f){ f.value.clear(); });
+        return this;
+    },
+    read: function(){
+        var dto = $.dto();
+        this._fields.each(function(o){
+            var k = o.key, v = o.value;
+            if($.exists(v.read)) dto.merge(v.read());
+            if($.exists(v.value)) dto.add(k, v.value());
+        });
+        return dto;
+    },
+    write: function(dto){
+        if(!$.exists(dto)) return this;
+        this._fields.each(function(o) {
+            var field = o.value;
+            if($.exists(field.write)) field.write(dto);
+            if($.exists(field.value)) field.value(dto.find(o.key));
+        });
+        return this;
+    },
+    saveAs: function(name){
+        this.read().saveAs(name);
+        this._name = name;
+        return this;
+    },
+    save: function(){
+        var name = this._name || $.uid("form");
+        this.saveAs(name);
+        return name;
+    },
+    erase: function(){
+        var name = this._name;
+        if($.exists(name)) $.dto.serialize(name).erase();
+        return this;
+    },
+    load: function(name){
+        if($.isString(name)) this._name = name;
+        var n = this._name;
+        return ($.exists(n)) ? this.write($.dto.serialize(n)) : this;
+    }
+}
+$.Class.extend(form, $.Class);
+$.form = function() { return new form(); }
+$.form.Class = form;
+
+$.fields = {
+    specs: (function(){
+        var value = {};
+        try {
+            value.required = $.spec(function(v){ return (!$.isNullOrEmpty(v)) && /^.+$/.test(v); }),
+            value.optional = $.spec(function(v){ return $.isNullOrEmpty(v); }),
+            
+            value.currency = $.spec(function(v){ return /^[\w\$]?(\d+|(\d{1,3}(,\d{3})*))(\.\d{2})?$/.test(v); });
+            value.date = $.spec(function(v){ return /^\d{1,2}\/\d{1,2}\/(\d{2}|\d{4})$/.test(v); });
+            value.alpha = $.spec(function(v){ return /^[A-Za-z]+$/.test(v); });
+            value.numeric = $.spec(function(v){ return /^\d+$/.test(v); });
+            value.alphaNumeric = $.spec(function(v){ return /^[A-Za-z\d]+$/.test(v); });
+            value.phone = $.spec(function(v){ return /^\d{10,11}|(((1\s)?\(\d{3}\)\s?)|((1\-)?\d{3}\-))\d{3}\-\d{4}$/.test(v); });
+            value.ssn = $.spec(function(v){ return /^(\d{9}|(\d{3}\-\d{2}\-\d{4}))$/.test(v); });
+            value.email = $.spec(function(v){ return /^\w+(\.\w+)?@\w+(\.\w+)?\.[A-Za-z0-9]{2,}$/.test(v); });
+        }
+        catch(e) { }
+        finally { return value; }
+    })()
+};
+
 })(jQuery);
