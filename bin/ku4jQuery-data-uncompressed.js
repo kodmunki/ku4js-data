@@ -426,8 +426,9 @@ function field(selector){
     field.base.call(this);
 
     var query = $(selector);
-    if(query.length > 1) $.str.format("$.field requires unique and disparate node.")
-    this.dom($.refcheck(query[0], $.str.format("$.DomClass requires valid DOM node.")))
+    if(query.length > 1) $.str.format("$.field requires unique node.");
+    if(!$.exists(query[0])) throw new Error($.str.format("$.DomClass requires valid DOM node."));
+    this.dom(query[0])
         .spec($.spec(function(){ return true; }))
         .optional();
 }
@@ -564,12 +565,12 @@ form.prototype = {
     findField: function(name){ return this._fields.findValue(name); },
     isEmpty: function(){
         var v = true;
-        this._fields.listValues().each(function(f){ if(!f.isEmpty()) v = false; });
+        $.list(this._fields.values()).each(function(f){ if(!f.isEmpty()) v = false; });
         return v;
     },
     isValid: function(){
         var v = true;
-        this._fields.listValues().each(function(f){ if(!f.isValid()) v = false; });
+        $.list(this._fields.values()).each(function(f){ if(!f.isValid()) v = false; });
         return v;
     },
     submit: function(){

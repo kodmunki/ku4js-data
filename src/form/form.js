@@ -11,12 +11,12 @@ form.prototype = {
     findField: function(name){ return this._fields.findValue(name); },
     isEmpty: function(){
         var v = true;
-        this._fields.listValues().each(function(f){ if(!f.isEmpty()) v = false; });
+        $.list(this._fields.values()).each(function(f){ if(!f.isEmpty()) v = false; });
         return v;
     },
     isValid: function(){
         var v = true;
-        this._fields.listValues().each(function(f){ if(!f.isValid()) v = false; });
+        $.list(this._fields.values()).each(function(f){ if(!f.isValid()) v = false; });
         return v;
     },
     submit: function(){
