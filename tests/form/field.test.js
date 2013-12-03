@@ -8,7 +8,7 @@ $(function(){
         ok($.field("#Field"));;
     });
     
-    var field = $.field($("#Field")[0]);
+    var field = $.field("#Field");
     
     test("value", function() {
         field.value("Test");

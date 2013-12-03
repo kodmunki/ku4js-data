@@ -427,7 +427,7 @@ function field(selector){
 
     var query = $(selector);
     if(query.length > 1) $.str.format("$.field requires unique node.");
-    if(!$.exists(query[0])) throw new Error($.str.format("$.DomClass requires valid DOM node."));
+    if(!$.exists(query[0])) throw new Error($.str.format("$.field requires selector for a valid DOM node."));
     this.dom(query[0])
         .spec($.spec(function(){ return true; }))
         .optional();
