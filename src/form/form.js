@@ -7,7 +7,7 @@ form.prototype = {
     $submit: function(){ return; },
     name: function(name){ return this.property("name", name); },
     fields: function(){ return this._fields; },
-    listFields: function(){ return this._fields.listValues(); },
+    listFields: function(){ return $.list(this._fields.values()); },
     findField: function(name){ return this._fields.findValue(name); },
     isEmpty: function(){
         var v = true;

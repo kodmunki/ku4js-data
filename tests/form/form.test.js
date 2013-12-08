@@ -19,6 +19,32 @@ $(function(){
             .add("currency", currency)
             .add("title", title);
     
+    test("list fields", function() {
+        var fieldList = form.listFields();
+        equal(fieldList.count(), 5);
+        form.listFields().each(function(field){
+            ok(field);
+        });
+    });
+
+    test("find field", function() {
+
+        form.clear();
+        firstName.value("John");
+        lastName.value("Doe");
+        date.value("11/12/2011");
+        currency.value("$50,000.00");
+        title.value("1");
+
+        equal(form.findField("firstName").value(), "John");
+        equal(form.findField("lastName").value(), "Doe");
+        equal(form.findField("date").value(), "11/12/2011");
+        equal(form.findField("currency").value(), "$50,000.00");
+        equal(form.findField("title").value(), "1");
+
+        form.clear();
+    });
+
     test("optional fields", function() {
          
         form.clear();
