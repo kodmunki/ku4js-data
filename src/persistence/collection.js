@@ -13,6 +13,8 @@ collection.prototype = {
         return this._data.findValue(ku4Id);
     },
     find: function(criteria) {
+        if(!$.exists(criteria)) return this._data.values();
+
         var entities = $.list();
         this._data.each(function(obj) {
             var entity = obj.value;

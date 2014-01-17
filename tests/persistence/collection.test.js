@@ -39,9 +39,10 @@ $(function(){
         collection.insert(data2);
         collection.insert(data3);
 
-        var test = collection.find({"name": "John"});
+        expect(4);
+        equal(collection.find().length, 3);
 
-        expect(3);
+        var test = collection.find({"name": "John"});
         equal(test.length, 2);
         equal(test[0].email, data1.email);
         equal(test[1].email, data2.email);
