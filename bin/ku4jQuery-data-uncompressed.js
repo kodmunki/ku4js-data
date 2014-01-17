@@ -442,8 +442,8 @@ $.Class.extend(field, abstractField);
 $.field = function(selector){ return new field(selector); }
 $.field.Class = field;
 
-function checkbox(dom){
-    checkbox.base.call(this, dom);
+function checkbox(selector){
+    checkbox.base.call(this, selector);
 }
 checkbox.prototype = {
     $read: function(){
@@ -490,8 +490,8 @@ $.Class.extend(radioset, abstractField);
 $.radioset = function(){ return new radioset(); }
 $.radioset.Class = radioset;
 
-function select(dom){
-    select.base.call(this, dom);
+function select(selector){
+    select.base.call(this, selector);
     this._opts = function(){ return $.list(this.dom().options); }
     if(this.dom().multiple) this.multiple();
     else this.single();
@@ -648,5 +648,98 @@ $.fields = {
         finally { return value; }
     })()
 };
+
+function collection(name, obj) {
+    if(!$.exists(name)) throw new Error($.str.format("$.collection requires a valid unique name. name = {0}", name));
+    this._name = name;
+    this._data = $.dto(obj);
+}
+collection.prototype = {
+    name: function() { return this._name; },
+    isEmpty: function() { return this._data.isEmpty(); },
+    count: function() { return this._data.count(); },
+    store: function(store) { this._store = store; return this; },
+    save: function() { this._store.write(this); return this; },
+    findByKu4Id: function(ku4Id) {
+        return this._data.findValue(ku4Id);
+    },
+    find: function(criteria) {
+        var entities = $.list();
+        this._data.each(function(obj) {
+            var entity = obj.value;
+            if($.dto(entity).contains(criteria)) entities.add(entity);
+        });
+        return entities.toArray();
+    },
+    insert: function(entity) {
+        var ku4Id = $.uid(),
+            dto = $.dto(entity);
+        if(!$.exists(entity._ku4Id)) dto.merge({"_ku4Id": ku4Id});
+
+        var data = dto.toObject();
+        this._data.add(ku4Id, data);
+        return data;
+    },
+    remove: function(criteria) {
+        if(!$.exists(criteria)) this._data.clear();
+        else this._data.each(function(obj) {
+            var entity = obj.value;
+            if($.dto(entity).contains(criteria)) this._data.remove(entity._ku4Id);
+        }, this);
+        return this;
+    },
+    update: function(current, updates) {
+        var _updates = $.dto(updates).remove("_ku4Id");
+        if(!$.exists(current) || !$.exists(updates)) return;
+        else this._data.each(function(obj) {
+            var entity = obj.value;
+            if($.dto(entity).contains(current)) {
+                var newValue = $.dto(entity).merge(_updates).toObject();
+                this._data.update(obj.key, newValue);
+            }
+        }, this);
+        return this;
+    },
+    __delete: function() {
+        this._store.remove(this);
+        return this;
+    },
+    serialize: function() {
+        var name = this._name,
+            data = this._data.toObject();
+        return $.dto({ "name": name, "data": data }).toJson();
+    }
+}
+$.ku4collection = function(name, obj) { return new collection(name, obj); }
+$.ku4collection.deserialize = function(serialized) {
+    var obj = $.dto.parseJson(serialized).toObject();
+    return new collection(obj.name, obj.data); }
+
+function store() { }
+store.prototype = {
+    read: function(collectionName) {
+        var collection = localStorage.getItem(collectionName);
+        return ($.exists(collection))
+            ? $.ku4collection.deserialize(collection).store(this)
+            : $.ku4collection(collectionName).store(this);
+    },
+    write: function(collection) {
+        localStorage.setItem(collection.name(), collection.serialize());
+        return this;
+    },
+    remove: function(collection) {
+        localStorage.removeItem(collection.name());
+        return this;
+    },
+    __delete: function() {
+        localStorage.clear();
+        return this;
+    }
+}
+
+$.ku4store = function() {
+    if(!$.exists(localStorage)) throw new Error("This browser does not support $.store");
+    else return new store();
+}
 
 })(jQuery);

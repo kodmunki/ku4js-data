@@ -1,5 +1,5 @@
-function checkbox(dom){
-    checkbox.base.call(this, dom);
+function checkbox(selector){
+    checkbox.base.call(this, selector);
 }
 checkbox.prototype = {
     $read: function(){

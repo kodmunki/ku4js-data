@@ -1,5 +1,5 @@
-function select(dom){
-    select.base.call(this, dom);
+function select(selector){
+    select.base.call(this, selector);
     this._opts = function(){ return $.list(this.dom().options); }
     if(this.dom().multiple) this.multiple();
     else this.single();
