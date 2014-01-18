@@ -7,6 +7,12 @@ $(function(){
 
     module("dto");
 
+    test("create", function() {
+        expect(2);
+        ok(dto1);
+        ok(dto1.isTypeOf($.dto.Class));
+    });
+
     test("methods", function() {
         var rep1 = dto1.replicate().add("new", "new"),
             rep2 = dto2.replicate().add("new", "new"),

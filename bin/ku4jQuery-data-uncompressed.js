@@ -231,6 +231,7 @@ $.cookie = function(params){
                 .domain(o.domain)
                 .isSecure(o.isSecure);
 }
+$.cookie.Class = cookie;
 
 $.cookie.erase = function(name){
     $.cookie.load(name).erase();
@@ -313,6 +314,8 @@ dto.prototype = {
 $.Class.extend(dto, $.hash.Class);
 
 $.dto = function(obj){ return new dto(obj); }
+$.dto.Class = dto;
+
 $.dto.parseJson = function(str) { return $.dto($.json.deserialize(str)); }
 $.dto.parseQueryString = function(str) { return $.dto($.queryString.deserialize(str)); }
 $.dto.serialize = function(name) {

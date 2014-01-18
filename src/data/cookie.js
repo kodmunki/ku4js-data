@@ -34,6 +34,7 @@ $.cookie = function(params){
                 .domain(o.domain)
                 .isSecure(o.isSecure);
 }
+$.cookie.Class = cookie;
 
 $.cookie.erase = function(name){
     $.cookie.load(name).erase();
