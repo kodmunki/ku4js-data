@@ -597,8 +597,9 @@ form.prototype = {
         });
         return dto;
     },
-    write: function(dto){
-        if(!$.exists(dto)) return this;
+    write: function(obj){
+        if(!$.exists(obj)) return this;
+        var dto = ($.exists(obj.toObject)) ? obj : $.dto(obj)
         this._fields.each(function(o) {
             var field = o.value;
             if($.exists(field.write)) field.write(dto);
