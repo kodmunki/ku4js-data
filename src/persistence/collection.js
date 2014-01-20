@@ -1,5 +1,6 @@
 function collection(name, obj) {
-    if(!$.exists(name)) throw new Error($.str.format("$.collection requires a valid unique name. name = {0}", name));
+    if(!$.exists(name))
+        throw $.ku4exception("$.collection", $.str.format("Invalid name={0}. Must be unique", name));
     this._name = name;
     this._data = $.dto(obj);
 }

@@ -2,8 +2,10 @@ function field(selector){
     field.base.call(this);
 
     var query = $(selector);
-    if(query.length > 1) $.str.format("$.field requires unique node.");
-    if(!$.exists(query[0])) throw new Error($.str.format("$.field requires selector for a valid DOM node."));
+    if(query.length > 1)
+        throw $.ku4exception("$.field", $.str.format("Invalid DOM selector= {0}. Requires unique node", selector));
+    if(!$.exists(query[0]))
+        throw $.ku4exception("$.field", $.str.format("Invalid DOM selector= {0}", selector));
     this.dom(query[0])
         .spec($.spec(function(){ return true; }))
         .optional();

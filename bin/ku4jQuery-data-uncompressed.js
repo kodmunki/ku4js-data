@@ -429,8 +429,10 @@ function field(selector){
     field.base.call(this);
 
     var query = $(selector);
-    if(query.length > 1) $.str.format("$.field requires unique node.");
-    if(!$.exists(query[0])) throw new Error($.str.format("$.field requires selector for a valid DOM node."));
+    if(query.length > 1)
+        throw $.ku4exception("$.field", $.str.format("Invalid DOM selector= {0}. Requires unique node", selector));
+    if(!$.exists(query[0]))
+        throw $.ku4exception("$.field", $.str.format("Invalid DOM selector= {0}", selector));
     this.dom(query[0])
         .spec($.spec(function(){ return true; }))
         .optional();
@@ -654,7 +656,8 @@ $.fields = {
 };
 
 function collection(name, obj) {
-    if(!$.exists(name)) throw new Error($.str.format("$.collection requires a valid unique name. name = {0}", name));
+    if(!$.exists(name))
+        throw $.ku4exception("$.collection", $.str.format("Invalid name={0}. Must be unique", name));
     this._name = name;
     this._data = $.dto(obj);
 }
