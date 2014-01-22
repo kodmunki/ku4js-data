@@ -87,21 +87,21 @@ $(function(){
     });
 
     test("update", function() {
-        var collection = $.ku4collection("testCollection");
-        collection.insert({
-            "name": "John",
-            "email": "john@email.com"
-        });
-        collection.insert({
-            "name": "John",
-            "email": "john1@email.com"
-        });
-        collection.insert({
-            "name": "Jane",
-            "email": "jane@email.com"
-        });
+        var collection = $.ku4collection("testCollection"),
+            data1 = collection.insert({
+                "name": "John",
+                "email": "john@email.com"
+            }),
+            data2 = collection.insert({
+                "name": "John",
+                "email": "john1@email.com"
+            }),
+            data3 = collection.insert({
+                "name": "Jane",
+                "email": "jane@email.com"
+            });
 
-        expect(4);
+        expect(7);
 
         var entity = collection.find({"name": "John"})[0];
         equal(entity.email, "john@email.com");
@@ -111,6 +111,12 @@ $(function(){
         equal(collection.find({"name": "John"}).length, 0);
         equal(collection.find({"name": "Bob"}).length, 2);
         equal(collection.find({"name": "Bob"})[0].email, "john@email.com");
+
+        collection.update({"_ku4Id": data1._ku4Id}, {name: "Tester", email: "tester.test@email.com"});
+        var entity2 = collection.find({"_ku4Id": data1._ku4Id})[0];
+        equal(entity2._ku4Id, data1._ku4Id);
+        equal(entity2.name, "Tester");
+        equal(entity2.email, "tester.test@email.com");
 
     });
 

@@ -698,7 +698,7 @@ collection.prototype = {
         return this;
     },
     update: function(current, updates) {
-        var _updates = $.dto(updates).remove("_ku4Id");
+        var _updates = $.dto(updates).replicate().remove("_ku4Id");
         if(!$.exists(current) || !$.exists(updates)) return;
         else this._data.each(function(obj) {
             var entity = obj.value;
