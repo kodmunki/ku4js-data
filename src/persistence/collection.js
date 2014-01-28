@@ -13,15 +13,18 @@ collection.prototype = {
     findByKu4Id: function(ku4Id) {
         return this._data.findValue(ku4Id);
     },
-    find: function(criteria) {
-        if(!$.exists(criteria)) return this._data.values();
+    find: function(query) {
+        if(!$.exists(query)) return this._data.values();
 
-        var entities = $.list();
-        this._data.each(function(obj) {
-            var entity = obj.value;
-            if($.dto(entity).contains(criteria)) entities.add(entity);
-        });
-        return entities.toArray();
+        var $in = query.$in,
+            $orderby = query.$orderby,
+            criteria = ($.exists(query.$criteria)) ? query.$criteria : query,
+            obj = $.dto(criteria).remove("$in").remove("$orderby").toObject(),
+            results = ($.exists($in))
+                ? collection_in(this._data, $in)
+                : collection_find(this._data, obj);
+
+        return ($.exists($orderby)) ? collection_orderby(results, $orderby) : results;
     },
     insert: function(entity) {
         var ku4Id = $.uid(),
@@ -62,7 +65,36 @@ collection.prototype = {
         return $.dto({ "name": name, "data": data }).toJson();
     }
 }
-$.ku4collection = function(name, obj) { return new collection(name, obj); }
+$.ku4collection = function(name, obj) { return new collection(name, obj); };
 $.ku4collection.deserialize = function(serialized) {
     var obj = $.dto.parseJson(serialized).toObject();
-    return new collection(obj.name, obj.data); }
+    return new collection(obj.name, obj.data);
+};
+
+function collection_find(data, criteria) {
+    var entities = $.list();
+    data.each(function(obj) {
+        var entity = obj.value;
+        if($.dto(entity).contains(criteria)) entities.add(entity);
+    });
+    return entities.toArray();
+}
+
+function collection_in(data, criteria) {
+    var key = $.obj.keys(criteria)[0],
+        ins = $.list(criteria[key]),
+        results = [];
+   ins.each(function(value) {
+        results = results.concat(collection_find(data, $.hash().add(key, value).toObject()));
+    });
+    return results;
+}
+
+function collection_orderby(arry, criteria) {
+    var key = $.obj.keys(criteria)[0],
+        val = criteria[key],
+        func = function(a, b) {
+            return (a[key] < b[key]) ? -val : val;
+        };
+    return arry.sort(func);
+}

@@ -48,6 +48,116 @@ $(function(){
         equal(test[1].email, data2.email);
     });
 
+    test("find with $criteria", function() {
+        var collection = $.ku4collection("testCollection"),
+            data1 = {
+                "name": "John",
+                "email": "email@email.com"
+            },
+            data2 = {
+                "name": "John",
+                "email": "john@email.com"
+            },
+            data3 = {
+                "name": "Jane",
+                "email": "email@email.com"
+            };
+        collection.insert(data1);
+        collection.insert(data2);
+        collection.insert(data3);
+
+        expect(4);
+        equal(collection.find().length, 3);
+
+        var test = collection.find({$criteria:{"name": "John"}});
+        equal(test.length, 2);
+        equal(test[0].email, data1.email);
+        equal(test[1].email, data2.email);
+    });
+
+    test("orderby ascending", function() {
+        var collection = $.ku4collection("testCollection"),
+            data1 = {
+                "name": "John",
+                "email": "john.a@email.com"
+            },
+            data2 = {
+                "name": "John",
+                "email": "john.c@email.com"
+            },
+            data3 = {
+                "name": "John",
+                "email": "john.b@email.com"
+            };
+        collection.insert(data1);
+        collection.insert(data2);
+        collection.insert(data3);
+
+        expect(5);
+        equal(collection.find().length, 3);
+
+        var test = collection.find({"name": "John", "$orderby": {"email": 1}});
+        equal(test.length, 3);
+        equal(test[0].email, data1.email);
+        equal(test[1].email, data3.email);
+        equal(test[2].email, data2.email);
+    });
+
+    test("orderby descending", function() {
+        var collection = $.ku4collection("testCollection"),
+            data1 = {
+                "name": "John",
+                "email": "john.a@email.com"
+            },
+            data2 = {
+                "name": "John",
+                "email": "john.c@email.com"
+            },
+            data3 = {
+                "name": "John",
+                "email": "john.b@email.com"
+            };
+        collection.insert(data1);
+        collection.insert(data2);
+        collection.insert(data3);
+
+        expect(5);
+        equal(collection.find().length, 3);
+
+        var test = collection.find({"name": "John", "$orderby": {"email": -1}});
+        equal(test.length, 3);
+        equal(test[0].email, data2.email);
+        equal(test[1].email, data3.email);
+        equal(test[2].email, data1.email);
+    });
+
+    test("find in", function() {
+        var collection = $.ku4collection("testCollection"),
+            data1 = {
+                "name": "John",
+                "email": "john.a@email.com"
+            },
+            data2 = {
+                "name": "Jim",
+                "email": "john.c@email.com"
+            },
+            data3 = {
+                "name": "Jane",
+                "email": "john.b@email.com"
+            };
+        collection.insert(data1);
+        collection.insert(data2);
+        collection.insert(data3);
+
+        expect(4);
+        equal(collection.find().length, 3);
+
+        var test = collection.find({"$in": {"name": ["John", "Jane"]}, "$orderby": {"name": 1}});
+        equal(test.length, 2);
+        equal(test[0].email, data3.email);
+        equal(test[1].email, data1.email);
+    });
+
     test("insert", function() {
         var collection = $.ku4collection("testCollection");
         expect(3);
