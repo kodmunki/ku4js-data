@@ -19,10 +19,12 @@ collection.prototype = {
         var $in = query.$in,
             $orderby = query.$orderby,
             criteria = ($.exists(query.$criteria)) ? query.$criteria : query,
-            obj = $.dto(criteria).remove("$in").remove("$orderby").toObject(),
+            dto = $.dto(criteria).remove("$in").remove("$orderby"),
             results = ($.exists($in))
                 ? collection_in(this._data, $in)
-                : collection_find(this._data, obj);
+                : (dto.isEmpty())
+                    ? this._data.values()
+                    : collection_find(this._data, dto.toObject());
 
         return ($.exists($orderby)) ? collection_orderby(results, $orderby) : results;
     },

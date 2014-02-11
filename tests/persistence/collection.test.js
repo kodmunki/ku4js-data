@@ -75,6 +75,34 @@ $(function(){
         equal(test[1].email, data2.email);
     });
 
+    test("orderby ascending empty query", function() {
+        var collection = $.ku4collection("testCollection"),
+            data1 = {
+                "name": "John",
+                "email": "john.a@email.com"
+            },
+            data2 = {
+                "name": "John",
+                "email": "john.c@email.com"
+            },
+            data3 = {
+                "name": "John",
+                "email": "john.b@email.com"
+            };
+        collection.insert(data1);
+        collection.insert(data2);
+        collection.insert(data3);
+
+        expect(5);
+        equal(collection.find().length, 3);
+
+        var test = collection.find({"$orderby": {"email": 1}});
+        equal(test.length, 3);
+        equal(test[0].email, data1.email);
+        equal(test[1].email, data3.email);
+        equal(test[2].email, data2.email);
+    });
+
     test("orderby ascending", function() {
         var collection = $.ku4collection("testCollection"),
             data1 = {
@@ -131,6 +159,7 @@ $(function(){
         equal(test[2].email, data1.email);
     });
 
+    //$in call does not seem to be working for the caseStatus example
     test("find in", function() {
         var collection = $.ku4collection("testCollection"),
             data1 = {
