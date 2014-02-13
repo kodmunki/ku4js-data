@@ -164,15 +164,30 @@ $(function(){
         var collection = $.ku4collection("testCollection"),
             data1 = {
                 "name": "John",
-                "email": "john.a@email.com"
+                "email": "john.a@email.com",
+                "street1": "Street A11",
+                "street2": "Street A22",
+                "city": "City 1",
+                "state": "AA",
+                "zip": 11111
             },
             data2 = {
                 "name": "Jim",
-                "email": "john.c@email.com"
+                "email": "john.c@email.com",
+                "street1": "Street B11",
+                "street2": "Street B22",
+                "city": "City 2",
+                "state": "BB",
+                "zip": 22222
             },
             data3 = {
                 "name": "Jane",
-                "email": "john.b@email.com"
+                "email": "john.b@email.com",
+                "street1": "Street C11",
+                "street2": "Street C22",
+                "city": "City 3",
+                "state": "CC",
+                "zip": 33333
             };
         collection.insert(data1);
         collection.insert(data2);
@@ -181,10 +196,10 @@ $(function(){
         expect(4);
         equal(collection.find().length, 3);
 
-        var test = collection.find({"$in": {"name": ["John", "Jane"]}, "$orderby": {"name": 1}});
+        var test = collection.find({"$in": {"name": ["John", "Jane"]}});
         equal(test.length, 2);
-        equal(test[0].email, data3.email);
-        equal(test[1].email, data1.email);
+        equal(test[0].email, data1.email);
+        equal(test[1].email, data3.email);
     });
 
     test("insert", function() {
