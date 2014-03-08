@@ -11,7 +11,7 @@ $(function(){
         lastName = $.field($("#LastName")[0]).spec($.fields.specs.alpha),
         date = $.field($("#Birthday")[0]).spec($.fields.specs.date),
         currency = $.field($("#Salary")[0]).spec($.fields.specs.currency),
-        title = $.select($("#Title")[0]).spec($.spec(function(v){ return /[0-2]/.test(v)})),
+        title = $.select($("#Title")[0]).multiple().spec($.spec(function(v){ return /[0-2]/.test(v)})),
         form = $.form()
             .add("firstName", firstName)
             .add("lastName", lastName)
@@ -110,7 +110,7 @@ $(function(){
             .add("lastName", "Doedett")
             .add("date", "1/1/2012")
             .add("currency", "$80,000.00")
-            .add("title", "0");
+            .add("title", "0,1,2");
         
         form.write(dto);
         
@@ -118,7 +118,7 @@ $(function(){
         equal(dto.find("lastName"), "Doedett");
         equal(dto.find("date"), "1/1/2012");
         equal(dto.find("currency"), "$80,000.00");
-        equal(dto.find("title"), "0");
+        equal(dto.find("title"), "0,1,2");
     });
     
     test("save", function() {
