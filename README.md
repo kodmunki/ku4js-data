@@ -5,7 +5,7 @@ kodmunki™ utilities for jQuery data.
 
 This library includes Query String and JSON parsers, Data Transfer Objects, ajax services, and persistent, validatable, and transferable forms
 
--- Dependencies --
+#Dependencies
 * ku4jQuery-kernel - https://github.com/kodmunki/ku4jQuery-kernel
 
 #kodmunki™ build process
