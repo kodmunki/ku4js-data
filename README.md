@@ -29,7 +29,7 @@ this process:
 ---
 
 #Documentation
-The following is documentation for each class in the ku4jQuery-kernel library organized by common domain to follow the
+The following is documentation for each class in the ku4jQuery-data library organized by common domain to follow the
 directory structure found in /src. All constructors are empty unless otherwise noted.
 
 ##Ajax
