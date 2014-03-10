@@ -35,7 +35,40 @@ directory structure found in /src. All constructors are empty unless otherwise n
 ##Ajax
 
 ###serivce
-_Documentation Coming Soon_
+| API | Return | Description |
+| --- | --- | --- |
+| processId | uid |  |
+| GET | this |  |
+| POST | this |  |
+| PUT | this |  |
+| HEAD | this |  |
+| OPTIONS | this |  |
+| DELETE | this |  |
+| TRACE | this |  |
+| CONNECT | this |  |
+| xhr |  |  |
+| xss |  |  |
+| sync |  |  |
+| async |  |  |
+| text |  |  |
+| xml |  |  |
+| verb |  |  |
+| uri |  |  |
+| contentType |  |  |
+| responseType |  |  |
+| strategy |  |  |
+| maxAttempts |  |  |
+| isLocal |  |  |
+| isAsync |  |  |
+| isLocked |  |  |
+| isBusy |  |  |
+| lock |  |  |
+| unlock |  |  |
+| onSuccess |  |  |
+| onError |  |  |
+| onComplete |  |  |
+| removeListener |  |  |
+| clearListeners |  |  |
 
 ##Data
 
@@ -43,7 +76,14 @@ _Documentation Coming Soon_
 _Documentation Coming Soon_
 
 ###dto
-_Documentation Coming Soon_
+
+| API | Return | Description |
+| --- | --- | --- |
+| toJson() | String | Returns the dto key, value pairs as a JSON string. |
+| toQueryString() | String | Returns the dto key, value pairs as a Query String |
+| saveAs(name:_String_) | this | Saves the dto key, value pairs to a cookie with name. |
+| save() | String | Saves the dto key, value pairs to a cookie with name. |
+| erase() | this | Erases the current dto from the cookie. |
 
 ###json
 _Documentation Coming Soon_
