@@ -1,61 +1,358 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
-
   <head>
-    <meta charset='utf-8' />
-    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
-    <meta name="description" content="ku4jquery-data : kodmunki™ utilities for jQuery data" />
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>ku4jquery-data by kodmunki</title>
 
-    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
-
-    <title>ku4jquery-data</title>
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
   </head>
-
   <body>
+    <div class="wrapper">
+      <header>
+        <h1>ku4jquery-data</h1>
+        <p>kodmunki™ utilities for jQuery data</p>
 
-    <!-- HEADER -->
-    <div id="header_wrap" class="outer">
-        <header class="inner">
-          <a id="forkme_banner" href="https://github.com/kodmunki/ku4jQuery-data">View on GitHub</a>
+        <p class="view"><a href="https://github.com/kodmunki/ku4jQuery-data">View the Project on GitHub <small>kodmunki/ku4jQuery-data</small></a></p>
 
-          <h1 id="project_title">ku4jquery-data</h1>
-          <h2 id="project_tagline">kodmunki™ utilities for jQuery data</h2>
 
-            <section id="downloads">
-              <a class="zip_download_link" href="https://github.com/kodmunki/ku4jQuery-data/zipball/master">Download this project as a .zip file</a>
-              <a class="tar_download_link" href="https://github.com/kodmunki/ku4jQuery-data/tarball/master">Download this project as a tar.gz file</a>
-            </section>
-        </header>
-    </div>
-
-    <!-- MAIN CONTENT -->
-    <div id="main_content_wrap" class="outer">
-      <section id="main_content" class="inner">
+        <ul>
+          <li><a href="https://github.com/kodmunki/ku4jQuery-data/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/kodmunki/ku4jQuery-data/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/kodmunki/ku4jQuery-data">View On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
         <h1>
 <a name="ku4jquery-data" class="anchor" href="#ku4jquery-data"><span class="octicon octicon-link"></span></a>ku4jQuery-data</h1>
 
 <p>kodmunki™ utilities for jQuery data.</p>
 
-<p>This library includes Query String and JSON parsers, Data Transfer Objects, ajax services, and persistent, validatable, and transerable forms</p>
+<p>This library includes Query String and JSON parsers, Data Transfer Objects, ajax services, and persistent, validatable, and transferable forms</p>
 
-<p>-- Dependencies --</p>
+<h1>
+<a name="dependencies" class="anchor" href="#dependencies"><span class="octicon octicon-link"></span></a>Dependencies</h1>
 
 <ul>
 <li>ku4jQuery-kernel - <a href="https://github.com/kodmunki/ku4jQuery-kernel">https://github.com/kodmunki/ku4jQuery-kernel</a>
 </li>
-</ul>
-      </section>
-    </div>
+</ul><h1>
+<a name="kodmunki-build-process" class="anchor" href="#kodmunki-build-process"><span class="octicon octicon-link"></span></a>kodmunki™ build process</h1>
 
-    <!-- FOOTER  -->
-    <div id="footer_wrap" class="outer">
-      <footer class="inner">
-        <p class="copyright">ku4jquery-data maintained by <a href="https://github.com/kodmunki">kodmunki</a></p>
-        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
+<p>This build process is dependent upon yuicompressor and a specific directory structure:</p>
+
+<ul>
+<li>root
+*:_build (This build script and the yuicompressor)
+
+<ul>
+<li>bin (The compiled scripts will appear here)</li>
+<li>src (All script files go here)</li>
+</ul>
+</li>
+</ul><p>The following variables found in setup () are
+expected to be changed by the developer running
+this process:</p>
+
+<ul>
+<li>LIBRARY (The library to build for or {} for none)</li>
+<li>PROJNAME (The name of your project)</li>
+<li>STARTMSG (A message to echo at start of build)</li>
+<li>ENDMSG (A message to echo at end of build)</li>
+</ul><hr><h1>
+<a name="documentation" class="anchor" href="#documentation"><span class="octicon octicon-link"></span></a>Documentation</h1>
+
+<p>The following is documentation for each class in the ku4jQuery-data library organized by common domain to follow the
+directory structure found in /src. All constructors are empty unless otherwise noted.</p>
+
+<h2>
+<a name="ajax" class="anchor" href="#ajax"><span class="octicon octicon-link"></span></a>Ajax</h2>
+
+<h3>
+<a name="serivce" class="anchor" href="#serivce"><span class="octicon octicon-link"></span></a>serivce</h3>
+
+<table>
+<thead><tr>
+<th>API</th>
+<th>Return</th>
+<th>Description</th>
+</tr></thead>
+<tbody>
+<tr>
+<td>processId</td>
+<td>uid</td>
+<td></td>
+</tr>
+<tr>
+<td>GET</td>
+<td>this</td>
+<td></td>
+</tr>
+<tr>
+<td>POST</td>
+<td>this</td>
+<td></td>
+</tr>
+<tr>
+<td>PUT</td>
+<td>this</td>
+<td></td>
+</tr>
+<tr>
+<td>HEAD</td>
+<td>this</td>
+<td></td>
+</tr>
+<tr>
+<td>OPTIONS</td>
+<td>this</td>
+<td></td>
+</tr>
+<tr>
+<td>DELETE</td>
+<td>this</td>
+<td></td>
+</tr>
+<tr>
+<td>TRACE</td>
+<td>this</td>
+<td></td>
+</tr>
+<tr>
+<td>CONNECT</td>
+<td>this</td>
+<td></td>
+</tr>
+<tr>
+<td>xhr</td>
+<td>this</td>
+<td></td>
+</tr>
+<tr>
+<td>xss</td>
+<td>this</td>
+<td></td>
+</tr>
+<tr>
+<td>sync</td>
+<td>this</td>
+<td></td>
+</tr>
+<tr>
+<td>async</td>
+<td>this</td>
+<td></td>
+</tr>
+<tr>
+<td>text</td>
+<td>this</td>
+<td></td>
+</tr>
+<tr>
+<td>xml</td>
+<td>this</td>
+<td></td>
+</tr>
+<tr>
+<td>verb</td>
+<td>this</td>
+<td></td>
+</tr>
+<tr>
+<td>uri</td>
+<td>this</td>
+<td></td>
+</tr>
+<tr>
+<td>contentType</td>
+<td>this</td>
+<td></td>
+</tr>
+<tr>
+<td>responseType</td>
+<td>this</td>
+<td></td>
+</tr>
+<tr>
+<td>strategy</td>
+<td>this</td>
+<td></td>
+</tr>
+<tr>
+<td>maxAttempts</td>
+<td>this</td>
+<td></td>
+</tr>
+<tr>
+<td>isLocal</td>
+<td>Boolean</td>
+<td></td>
+</tr>
+<tr>
+<td>isAsync</td>
+<td>Boolean</td>
+<td></td>
+</tr>
+<tr>
+<td>isLocked</td>
+<td>Boolean</td>
+<td></td>
+</tr>
+<tr>
+<td>isBusy</td>
+<td>Boolean</td>
+<td></td>
+</tr>
+<tr>
+<td>lock</td>
+<td>this</td>
+<td></td>
+</tr>
+<tr>
+<td>unlock</td>
+<td>this</td>
+<td></td>
+</tr>
+<tr>
+<td>onSuccess</td>
+<td>this</td>
+<td></td>
+</tr>
+<tr>
+<td>onError</td>
+<td>this</td>
+<td></td>
+</tr>
+<tr>
+<td>onComplete</td>
+<td>this</td>
+<td></td>
+</tr>
+<tr>
+<td>removeListener</td>
+<td>this</td>
+<td></td>
+</tr>
+<tr>
+<td>clearListeners</td>
+<td>this</td>
+<td></td>
+</tr>
+</tbody>
+</table><h2>
+<a name="data" class="anchor" href="#data"><span class="octicon octicon-link"></span></a>Data</h2>
+
+<h3>
+<a name="cookie" class="anchor" href="#cookie"><span class="octicon octicon-link"></span></a>cookie</h3>
+
+<p><em>Documentation Coming Soon</em></p>
+
+<h3>
+<a name="dto" class="anchor" href="#dto"><span class="octicon octicon-link"></span></a>dto</h3>
+
+<table>
+<thead><tr>
+<th>API</th>
+<th>Return</th>
+<th>Description</th>
+</tr></thead>
+<tbody>
+<tr>
+<td>toJson()</td>
+<td>String</td>
+<td>Returns the dto key, value pairs as a JSON string.</td>
+</tr>
+<tr>
+<td>toQueryString()</td>
+<td>String</td>
+<td>Returns the dto key, value pairs as a Query String</td>
+</tr>
+<tr>
+<td>saveAs(name:<em>String</em>)</td>
+<td>this</td>
+<td>Saves the dto key, value pairs to a cookie with name.</td>
+</tr>
+<tr>
+<td>save()</td>
+<td>String</td>
+<td>Saves the dto key, value pairs to a cookie with name.</td>
+</tr>
+<tr>
+<td>erase()</td>
+<td>this</td>
+<td>Erases the current dto from the cookie.</td>
+</tr>
+</tbody>
+</table><h3>
+<a name="json" class="anchor" href="#json"><span class="octicon octicon-link"></span></a>json</h3>
+
+<p><em>Documentation Coming Soon</em></p>
+
+<h3>
+<a name="querystring" class="anchor" href="#querystring"><span class="octicon octicon-link"></span></a>queryString</h3>
+
+<p><em>Documentation Coming Soon</em></p>
+
+<h2>
+<a name="form" class="anchor" href="#form"><span class="octicon octicon-link"></span></a>Form</h2>
+
+<h3>
+<a name="field" class="anchor" href="#field"><span class="octicon octicon-link"></span></a>field</h3>
+
+<p><em>Documentation Coming Soon</em></p>
+
+<h3>
+<a name="form-1" class="anchor" href="#form-1"><span class="octicon octicon-link"></span></a>form</h3>
+
+<p><em>Documentation Coming Soon</em></p>
+
+<h3>
+<a name="specs" class="anchor" href="#specs"><span class="octicon octicon-link"></span></a>specs</h3>
+
+<p><em>Documentation Coming Soon</em></p>
+
+<h3>
+<a name="fields" class="anchor" href="#fields"><span class="octicon octicon-link"></span></a>Fields</h3>
+
+<h4>
+<a name="checkbox" class="anchor" href="#checkbox"><span class="octicon octicon-link"></span></a>checkbox</h4>
+
+<p><em>Documentation Coming Soon</em></p>
+
+<h4>
+<a name="radioset" class="anchor" href="#radioset"><span class="octicon octicon-link"></span></a>radioset</h4>
+
+<p><em>Documentation Coming Soon</em></p>
+
+<h4>
+<a name="select" class="anchor" href="#select"><span class="octicon octicon-link"></span></a>select</h4>
+
+<p><em>Documentation Coming Soon</em></p>
+
+<h2>
+<a name="persistence" class="anchor" href="#persistence"><span class="octicon octicon-link"></span></a>Persistence</h2>
+
+<h3>
+<a name="collection" class="anchor" href="#collection"><span class="octicon octicon-link"></span></a>collection</h3>
+
+<p><em>Documentation Coming Soon</em></p>
+
+<h3>
+<a name="store" class="anchor" href="#store"><span class="octicon octicon-link"></span></a>store</h3>
+
+<p><em>Documentation Coming Soon</em></p>
+      </section>
+      <footer>
+        <p>This project is maintained by <a href="https://github.com/kodmunki">kodmunki</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
       </footer>
     </div>
-
+    <script src="javascripts/scale.fix.js"></script>
     
-
   </body>
 </html>
