@@ -46,29 +46,29 @@ directory structure found in /src. All constructors are empty unless otherwise n
 | DELETE | this |  |
 | TRACE | this |  |
 | CONNECT | this |  |
-| xhr |  |  |
-| xss |  |  |
-| sync |  |  |
-| async |  |  |
-| text |  |  |
-| xml |  |  |
-| verb |  |  |
-| uri |  |  |
-| contentType |  |  |
-| responseType |  |  |
-| strategy |  |  |
-| maxAttempts |  |  |
-| isLocal |  |  |
-| isAsync |  |  |
-| isLocked |  |  |
-| isBusy |  |  |
-| lock |  |  |
-| unlock |  |  |
-| onSuccess |  |  |
-| onError |  |  |
-| onComplete |  |  |
-| removeListener |  |  |
-| clearListeners |  |  |
+| xhr | this |  |
+| xss | this |  |
+| sync | this |  |
+| async | this |  |
+| text | this |  |
+| xml | this |  |
+| verb | this |  |
+| uri | this |  |
+| contentType | this |  |
+| responseType | this |  |
+| strategy | this |  |
+| maxAttempts | this |  |
+| isLocal | Boolean |  |
+| isAsync | Boolean |  |
+| isLocked | Boolean |  |
+| isBusy | Boolean |  |
+| lock | this |  |
+| unlock | this |  |
+| onSuccess | this |  |
+| onError | this |  |
+| onComplete | this |  |
+| removeListener | this |  |
+| clearListeners | this |  |
 
 ##Data
 
