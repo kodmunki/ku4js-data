@@ -350,7 +350,12 @@ $.json.serialize = function(obj) {
 $.json.deserialize = function(str) {
     if ($.isObject(str)) return str;
     if ($.isString(str))
-        try { return eval("(" + json_deserializeString(str) + ")"); }
+        try {
+            var obj = eval("(" + json_deserializeString(str) + ")");
+            if(!$.exists(obj)) return obj;
+            if($.isNullOrEmpty(obj.tagName)) return obj;
+            return str;
+        }
         catch (e) { return str; }
     return undefined;
 }
