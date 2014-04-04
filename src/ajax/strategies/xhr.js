@@ -12,17 +12,20 @@ xhr.prototype = {
     },
     call: function(params, settings){
         this._xhr = xhr_createXhr();
-        var context = this.context(),
+        var paramsExist = $.exists(params),
+            context = this.context(),
             isPost = context.isPost(),
-            xhr = this._xhr,
-            paramsExist = $.exists(params);
-            format = (isPost || !paramsExist) ? "{0}" : "{0}?{1}",
+            hasQuery = !isPost && paramsExist,
+            noCache = context._noCache,
+            cacheParam = $.str.format("__ku4nocache={0}", $.uid()),
             postParams = (isPost) ? params : null,
-            paramLength = (paramsExist) ? params.length : 0;
+            paramLength = (paramsExist) ? params.length : 0,
+            format = (hasQuery && noCache) ? "{0}?{1}&{2}" : hasQuery ? "{0}?{1}" : noCache ? "{0}?{2}" : "{0}",
+            xhr = this._xhr,
             me = this;
-            
+
         if(!$.exists(xhr)) context.error(new Error("Ajax not supported")); 
-        xhr.open(context.verb(), $.str.format(format, context.uri(), params), context.isAsync());
+        xhr.open(context.verb(), $.str.format(format, context.uri(), params, cacheParam), context.isAsync());
         
         if(isPost){
             var contentType = (!settings.contentType) ? "application/x-www-form-urlencoded" : settings.contentType;

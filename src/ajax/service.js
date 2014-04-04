@@ -5,6 +5,7 @@ function service(){
     this._onError = $.observer();
     this._onComplete = $.observer();
     this._lock = $.lock();
+    this._noCache = false;
     this._isLocal = false;
     
     this.GET().text().xhr().async().unlock();
@@ -17,6 +18,8 @@ service.prototype = {
     uri: function(uri){ return this.property("uri", uri); },
     contentType: function(contentType){ return this.property("contentType", contentType); },
     maxAttempts: function(maxAttempts){ return this.property("maxAttempts", maxAttempts); },
+    cache: function(){ this._noCache = false; return this; },
+    noCache: function(){ this._noCache = true; return this; },
     isLocal: function(isLocal){ return this.property("isLocal", isLocal); },
     strategy: function(strategy){
         if($.exists(strategy)) strategy.context(this);

@@ -6,6 +6,7 @@ function service(){
     this._onError = $.observer();
     this._onComplete = $.observer();
     this._lock = $.lock();
+    this._noCache = false;
     this._isLocal = false;
     
     this.GET().text().xhr().async().unlock();
@@ -18,6 +19,8 @@ service.prototype = {
     uri: function(uri){ return this.property("uri", uri); },
     contentType: function(contentType){ return this.property("contentType", contentType); },
     maxAttempts: function(maxAttempts){ return this.property("maxAttempts", maxAttempts); },
+    cache: function(){ this._noCache = false; return this; },
+    noCache: function(){ this._noCache = true; return this; },
     isLocal: function(isLocal){ return this.property("isLocal", isLocal); },
     strategy: function(strategy){
         if($.exists(strategy)) strategy.context(this);
@@ -108,17 +111,20 @@ xhr.prototype = {
     },
     call: function(params, settings){
         this._xhr = xhr_createXhr();
-        var context = this.context(),
+        var paramsExist = $.exists(params),
+            context = this.context(),
             isPost = context.isPost(),
-            xhr = this._xhr,
-            paramsExist = $.exists(params);
-            format = (isPost || !paramsExist) ? "{0}" : "{0}?{1}",
+            hasQuery = !isPost && paramsExist,
+            noCache = context._noCache,
+            cacheParam = $.str.format("__ku4nocache={0}", $.uid()),
             postParams = (isPost) ? params : null,
-            paramLength = (paramsExist) ? params.length : 0;
+            paramLength = (paramsExist) ? params.length : 0,
+            format = (hasQuery && noCache) ? "{0}?{1}&{2}" : hasQuery ? "{0}?{1}" : noCache ? "{0}?{2}" : "{0}",
+            xhr = this._xhr,
             me = this;
-            
+
         if(!$.exists(xhr)) context.error(new Error("Ajax not supported")); 
-        xhr.open(context.verb(), $.str.format(format, context.uri(), params), context.isAsync());
+        xhr.open(context.verb(), $.str.format(format, context.uri(), params, cacheParam), context.isAsync());
         
         if(isPost){
             var contentType = (!settings.contentType) ? "application/x-www-form-urlencoded" : settings.contentType;
