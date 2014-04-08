@@ -50,7 +50,8 @@ xhr.prototype = {
                 context.error(response).complete(response);
             }
         }
-        xhr.send(postParams);
+        if($.exists(postParams)) xhr.send(postParams);
+        else xhr.send();
     }
 }
 $.Class.extend(xhr, $.Class);
