@@ -22,15 +22,15 @@ dto.prototype = {
         return this;
     },
     replicate: function(){ return $.dto($.replicate(this.$h)); }
-}
+};
 $.Class.extend(dto, $.hash.Class);
 
-$.dto = function(obj){ return new dto(obj); }
+$.dto = function(obj){ return new dto(obj); };
 $.dto.Class = dto;
 
-$.dto.parseJson = function(str) { return $.dto($.json.deserialize(str)); }
-$.dto.parseQueryString = function(str) { return $.dto($.queryString.deserialize(str)); }
+$.dto.parseJson = function(str) { return $.dto($.json.deserialize(str)); };
+$.dto.parseQueryString = function(str) { return $.dto($.queryString.deserialize(str)); };
 $.dto.serialize = function(name) {
     try { return new dto($.cookie.deserialize($.cookie.find(name))).name(name); }
     catch(e) { return null; }
-}
+};

@@ -13,27 +13,36 @@ $.json.serialize = function(obj) {
                 ? '"' + "undefined" + '"'
                 : ($.isNumber(o))
                 ? o
+                : ($.isDate(o))
+                ? '"' + $.dayPoint.parse(o).toJson() + '"'
                 : ($.isString(o))
-                    ? '"' + json_serializeString(o) + '"'
-                    : $.json.serialize(o);
+                ? '"' + json_serializeString(o) + '"'
+                : $.json.serialize(o);
         r[r.length] = (($.isObject(obj) && !$.isArray(obj))
             ? ("\"" + n + "\"" + ":")
             : "") + v;
     }
     return $.str.format(f, r);
-}
+};
 $.json.deserialize = function(str) {
     if ($.isObject(str)) return str;
     if ($.isString(str))
         try {
             var obj = eval("(" + json_deserializeString(str) + ")");
             if(!$.exists(obj)) return obj;
-            if($.isNullOrEmpty(obj.tagName)) return obj;
+            if($.isNullOrEmpty(obj.tagName)) {
+                for (var n in obj) {
+                    var value = obj[n];
+                    if(/\d{4}\-\d{2}\-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z/.test(obj[n]))
+                        obj[n] = $.dayPoint.parse(value).toDate();
+                }
+                return obj;
+            }
             return str;
         }
         catch (e) { return str; }
     return undefined;
-}
+};
 
 function json_serializeString(str) {
     return str

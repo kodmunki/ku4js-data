@@ -13,7 +13,7 @@ $(function(){
         ok(dto1.isTypeOf($.dto.Class));
     });
 
-    test("methods", function() {
+    test("replicate", function() {
         var rep1 = dto1.replicate().add("new", "new"),
             rep2 = dto2.replicate().add("new", "new"),
             rep3 = dto3.replicate().add("new", "new");
