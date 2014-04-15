@@ -36,7 +36,7 @@ collection.prototype = {
 
         var data = dto.toObject();
         this._data.add(ku4Id, data);
-        return this;
+        return data;
     },
     remove: function(criteria) {
         if(!$.exists(criteria)) this._data.clear();
@@ -79,11 +79,11 @@ collection.prototype = {
         $.list(thisResults).each(function(item) {
             var otherRecord = lookupTable.find(item[onKey]),
                 newRecord = $.hash();
+            if(!$.exists(otherRecord)) return;
             $.hash(item).each(function(obj) {
                 newRecord.add(thisName + "." + obj.key, obj.value);
             });
-            var aRecord = ($.exists(otherRecord)) ? newRecord.merge(otherRecord) : newRecord;
-            result.add($.uid(), aRecord.toObject());
+            result.add($.uid(), newRecord.merge(otherRecord).toObject());
         });
 
         return $.ku4collection(thisName + "." + otherName, result.toObject());
