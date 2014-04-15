@@ -58,12 +58,11 @@ collection.prototype = {
         return this;
     },
     join: function(other, onKey, equalKey) {
-        var thisCollection = this,
-            thisResults = this.find(),
+        var thisResults = this.find(),
             thisName = this.name(),
-            otherColletion = other,
+            otherCollection = other,
             otherResults = other.find(),
-            otherName = otherColletion.name(),
+            otherName = otherCollection.name(),
             lookupTable = $.hash(),
             result = $.hash();
 
@@ -82,7 +81,8 @@ collection.prototype = {
             $.hash(item).each(function(obj) {
                 newRecord.add(thisName + "." + obj.key, obj.value);
             });
-            result.add(item[onKey], newRecord.merge(otherRecord).toObject());
+            var aRecord = ($.exists(otherRecord)) ? newRecord.merge(otherRecord) : newRecord;
+            result.add($.uid(), aRecord.toObject());
         });
 
         return $.ku4collection(thisName + "." + otherName, result.toObject());
