@@ -57,6 +57,36 @@ collection.prototype = {
         }, this);
         return this;
     },
+    join: function(other, onKey, equalKey) {
+        var thisCollection = this,
+            thisResults = this.find(),
+            thisName = this.name(),
+            otherColletion = other,
+            otherResults = other.find(),
+            otherName = otherColletion.name(),
+            lookupTable = $.hash(),
+            result = $.hash();
+
+        $.list(otherResults).each(function(item) {
+            var record = $.hash(item),
+                newRecord = $.hash();
+            record.each(function(obj) {
+                newRecord.add(otherName + "." + obj.key, obj.value);
+            });
+            lookupTable.add(item[equalKey], newRecord.toObject());
+        });
+
+        $.list(thisResults).each(function(item) {
+            var otherRecord = lookupTable.find(item[onKey]),
+                newRecord = $.hash();
+            $.hash(item).each(function(obj) {
+                newRecord.add(thisName + "." + obj.key, obj.value);
+            });
+            result.add(item[onKey], newRecord.merge(otherRecord).toObject());
+        });
+
+        return $.ku4collection(thisName + "." + otherName, result.toObject());
+    },
     __delete: function() {
         this._store.remove(this);
         return this;

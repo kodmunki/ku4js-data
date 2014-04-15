@@ -274,6 +274,52 @@ $(function(){
 
     });
 
+    test("join", function() {
+        var collection1 = $.ku4collection("collection1", {
+                "kuid1": {
+                    "id": 100,
+                    "name": "myName1"
+                },
+                "kuid2": {
+                    "id": 200,
+                    "name": "myName2"
+                },
+                "kuid3": {
+                    "id": 300,
+                    "name": "myName3"
+                }
+            }),
+            collection2 = $.ku4collection("collection2", {
+                "kuid1": {
+                    "id": 110,
+                    "cid": 100,
+                    "name": "otherName1"
+                },
+                "kuid2": {
+                    "id": 120,
+                    "cid": 200,
+                    "name": "otherName1"
+                },
+                "kuid3": {
+                    "id": 130,
+                    "cid": 300,
+                    "name": "otherName3"
+                }
+            });
+
+        var result = collection1.join(collection2, "id", "cid").find({
+            "collection1.name": "myName2",
+            "collection2.name": "otherName1"
+        })[0];
+
+        expect(4);
+        equal(result["collection1.id"], 200);
+        equal(result["collection2.id"], 120);
+        equal(result["collection1.name"], "myName2");
+        equal(result["collection2.name"], "otherName1");
+
+    });
+
     test("serialize", function() {
         var collection = $.ku4collection("testCollection"),
             entity = collection.insert({
