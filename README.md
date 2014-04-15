@@ -116,7 +116,15 @@ _Documentation Coming Soon_
 ##Persistence
 
 ###collection
-_Documentation Coming Soon_
+| API | Return | Description |
+| --- | --- | --- |
+| find(query) | Array | Returns an array containing the results of the query. |
+| insert(entity) | object | String | Inserts the entity into the collection |
+| update(criteria, updates) | this | Updates all entities that satisfy the criteria with the data in updates. |
+| remove(criteria) | this | Removes all entities that satisfy the criteria. |
+| join(otherCollection, on, equals) | collection | Joins this collection with otherCollection on collection[on] == otherCollection[equals] |
+| init(array) | this | Clears this collection and initializes it with the entities in the array. |
+| save() | this | Saves this collection to localStorage (as available). |
 
 ###store
 _Documentation Coming Soon_
