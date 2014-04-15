@@ -681,6 +681,7 @@ function collection(name, obj) {
         throw $.ku4exception("$.collection", $.str.format("Invalid name={0}. Must be unique", name));
     this._name = name;
     this._data = $.dto(obj);
+    this._store = $.ku4store();
 }
 collection.prototype = {
     name: function() { return this._name; },
@@ -713,7 +714,7 @@ collection.prototype = {
 
         var data = dto.toObject();
         this._data.add(ku4Id, data);
-        return data;
+        return this;
     },
     remove: function(criteria) {
         if(!$.exists(criteria)) this._data.clear();
@@ -764,6 +765,18 @@ collection.prototype = {
         });
 
         return $.ku4collection(thisName + "." + otherName, result.toObject());
+    },
+    init: function(list) {
+        this.__delete();
+        $.list(list).each(function(entity) {
+            var ku4Id = $.uid(),
+                dto = $.dto(entity);
+            if(!$.exists(entity._ku4Id)) dto.merge({"_ku4Id": ku4Id});
+
+            var data = dto.toObject();
+            this._data.add(ku4Id, data);
+        }, this);
+        return this;
     },
     __delete: function() {
         this._store.remove(this);
