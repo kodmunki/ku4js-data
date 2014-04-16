@@ -737,34 +737,27 @@ collection.prototype = {
         return this;
     },
     join: function(other, onKey, equalKey) {
-        var thisResults = this.find(),
+        var thisResults = $.list(this.find()),
+            otherResults = $.list(other.find()),
             thisName = this.name(),
-            otherCollection = other,
-            otherResults = other.find(),
-            otherName = otherCollection.name(),
-            lookupTable = $.hash(),
-            result = $.hash();
+            otherName = other.name(),
+            join = $.hash();
 
-        $.list(otherResults).each(function(item) {
-            var record = $.hash(item),
-                newRecord = $.hash();
-            record.each(function(obj) {
-                newRecord.add(otherName + "." + obj.key, obj.value);
+        function addRecord(thisResult, otherResult) {
+            var record = $.hash();
+            $.hash(thisResult).each(function(obj) { record.add(thisName + "." + obj.key, obj.value); });
+            $.hash(otherResult).each(function(obj) { record.add(otherName + "." + obj.key, obj.value); });
+            join.add($.uid(), record.toObject());
+        }
+
+        thisResults.each(function(thisResult) {
+            otherResults.each(function(otherResult) {
+                if(thisResult[onKey] === otherResult[equalKey]) {
+                    addRecord(thisResult, otherResult)
+                }
             });
-            lookupTable.add(item[equalKey], newRecord.toObject());
         });
-
-        $.list(thisResults).each(function(item) {
-            var otherRecord = lookupTable.find(item[onKey]),
-                newRecord = $.hash();
-            if(!$.exists(otherRecord)) return;
-            $.hash(item).each(function(obj) {
-                newRecord.add(thisName + "." + obj.key, obj.value);
-            });
-            result.add($.uid(), newRecord.merge(otherRecord).toObject());
-        });
-
-        return $.ku4collection(thisName + "." + otherName, result.toObject());
+        return $.ku4collection(thisName + "." + otherName, join.toObject());
     },
     init: function(list) {
         this.__delete();

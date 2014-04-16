@@ -300,23 +300,36 @@ $(function(){
                     "cid": 200,
                     "name": "otherName1"
                 },
+                //Duplicate cid 300 in lookup table
                 "kuid3": {
                     "id": 130,
+                    "cid": 300,
+                    "name": "otherName3"
+                },
+                "kuid4": {
+                    "id": 230,
                     "cid": 300,
                     "name": "otherName3"
                 }
             });
 
-        var result = collection1.join(collection2, "id", "cid").find({
-            "collection1.name": "myName2",
-            "collection2.name": "otherName1"
-        })[0];
+        var join = collection1.join(collection2, "id", "cid"),
+            result = join.find({
+                "collection1.name": "myName3",
+                "collection2.name": "otherName3"
+            });
 
-        expect(4);
-        equal(result["collection1.id"], 200);
-        equal(result["collection2.id"], 120);
-        equal(result["collection1.name"], "myName2");
-        equal(result["collection2.name"], "otherName1");
+        expect(10);
+        equal(join.count(), 4);
+        equal(result.length, 2);
+        equal(result[0]["collection1.id"], 300);
+        equal(result[0]["collection2.id"], 130);
+        equal(result[0]["collection1.name"], "myName3");
+        equal(result[0]["collection2.name"], "otherName3");
+        equal(result[1]["collection1.id"], 300);
+        equal(result[1]["collection2.id"], 230);
+        equal(result[1]["collection1.name"], "myName3");
+        equal(result[1]["collection2.name"], "otherName3");
 
     });
 
