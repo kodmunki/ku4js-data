@@ -8,6 +8,7 @@ $(function(){
         ok($.ku4collection("testCollection"));
     });
 
+    /*
     test("findByKu4Id", function() {
         var collection = $.ku4collection("testCollection"),
             data = {
@@ -20,6 +21,7 @@ $(function(){
         equal(data.name, test.name);
         equal(data.email, test.email);
     });
+    */
 
     test("find", function() {
         var collection = $.ku4collection("testCollection"),
@@ -241,21 +243,21 @@ $(function(){
     });
 
     test("update", function() {
-        var collection = $.ku4collection("testCollection"),
-            data1 = collection.insert({
+        var collection = $.ku4collection("testCollection").init([
+            {
                 "name": "John",
                 "email": "john@email.com"
-            }),
-            data2 = collection.insert({
+            },
+            {
                 "name": "John",
                 "email": "john1@email.com"
-            }),
-            data3 = collection.insert({
+            },
+            {
                 "name": "Jane",
                 "email": "jane@email.com"
-            });
+            }]);
 
-        expect(7);
+        expect(6);
 
         var entity = collection.find({"name": "John"})[0];
         equal(entity.email, "john@email.com");
@@ -266,52 +268,50 @@ $(function(){
         equal(collection.find({"name": "Bob"}).length, 2);
         equal(collection.find({"name": "Bob"})[0].email, "john@email.com");
 
-        collection.update({"_ku4Id": data1._ku4Id}, {name: "Tester", email: "tester.test@email.com"});
-        var entity2 = collection.find({"_ku4Id": data1._ku4Id})[0];
-        equal(entity2._ku4Id, data1._ku4Id);
+        collection.update({"email": "john@email.com"}, {name: "Tester", email: "tester.test@email.com"});
+        var entity2 = collection.find({"name": "Tester"})[0];
         equal(entity2.name, "Tester");
         equal(entity2.email, "tester.test@email.com");
 
     });
 
     test("join", function() {
-        var collection1 = $.ku4collection("collection1", {
-                "kuid1": {
+        var collection1 = $.ku4collection("collection1").init([
+                {
                     "id": 100,
                     "name": "myName1"
                 },
-                "kuid2": {
+                {
                     "id": 200,
                     "name": "myName2"
                 },
-                "kuid3": {
+                {
                     "id": 300,
                     "name": "myName3"
                 }
-            }),
-            collection2 = $.ku4collection("collection2", {
-                "kuid1": {
+            ]),
+            collection2 = $.ku4collection("collection2").init([
+                {
                     "id": 110,
                     "cid": 100,
                     "name": "otherName1"
                 },
-                "kuid2": {
+                {
                     "id": 120,
                     "cid": 200,
                     "name": "otherName1"
                 },
-                //Duplicate cid 300 in lookup table
-                "kuid3": {
+                {
                     "id": 130,
                     "cid": 300,
                     "name": "otherName3"
                 },
-                "kuid4": {
+                {
                     "id": 230,
                     "cid": 300,
                     "name": "otherName3"
                 }
-            });
+            ]);
 
         var join = collection1.join(collection2, "id", "cid"),
             result = join.find({
@@ -334,39 +334,28 @@ $(function(){
     });
 
     test("serialize", function() {
-        var collection = $.ku4collection("testCollection"),
-            entity = collection.insert({
+        var collection = $.ku4collection("testCollection").insert({
                 "name": "John",
                 "email": "john@email.com"
             }),
-            data = $.dto().add(entity._ku4Id, entity).toObject(),
-            serialized = $.dto({
-                "name": "testCollection",
-                "data": data
-            }).toJson();
-        expect(1);
-        deepEqual(collection.serialize(), serialized);
+            regex = /\{"name":"testCollection"\,"data":\{"[A-z0-9]{32}":\{"name":"John"\,"email":"john@email.com"\}\}\}/;
+        ok(regex.test(collection.serialize()));
     });
 
     test("deserialize", function() {
-        var collection = $.ku4collection("testCollection"),
-            entity = collection.insert({
+        var data = {
                 "name": "John",
                 "email": "john@email.com"
-            }),
-            data = $.dto().add(entity._ku4Id, entity).toObject(),
-            serialized = $.dto({
-                "name": "testCollection",
-                "data": data
-            }).toJson();
-        expect(4);
-        deepEqual(collection.serialize(), serialized);
+            },
+            collection = $.ku4collection("testCollection").insert(data),
+            regex = /\{"name":"testCollection"\,"data":\{"[A-z0-9]{32}":\{"name":"John"\,"email":"john@email.com"\}\}\}/,
+            serialized = collection.serialize(),
+            deserialized = $.ku4collection.deserialize(serialized),
+            entity = deserialized.find()[0];
 
-        var newCollection = $.ku4collection.deserialize(serialized),
-            test = newCollection.findByKu4Id(entity._ku4Id);
-
-        equal(entity._ku4Id, test._ku4Id);
-        equal(entity.name, test.name);
-        equal(entity.email, test.email);
+        expect(3);
+        ok(regex.test(collection.serialize()));
+        equal(entity.name, data.name);
+        equal(entity.email, data.email);
     });
 });

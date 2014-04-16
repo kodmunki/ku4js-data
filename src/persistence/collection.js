@@ -31,23 +31,21 @@ collection.prototype = {
     },
     insert: function(entity) {
         var ku4Id = $.uid(),
-            dto = $.dto(entity);
-        if(!$.exists(entity._ku4Id)) dto.merge({"_ku4Id": ku4Id});
-
-        var data = dto.toObject();
+            dto = $.dto(entity),
+            data = dto.toObject();
         this._data.add(ku4Id, data);
-        return data;
+        return this;
     },
     remove: function(criteria) {
         if(!$.exists(criteria)) this._data.clear();
         else this._data.each(function(obj) {
             var entity = obj.value;
-            if($.dto(entity).contains(criteria)) this._data.remove(entity._ku4Id);
+            if($.dto(entity).contains(criteria)) this._data.remove(obj.key);
         }, this);
         return this;
     },
     update: function(current, updates) {
-        var _updates = $.dto(updates).replicate().remove("_ku4Id");
+        var _updates = $.dto(updates).replicate();
         if(!$.exists(current) || !$.exists(updates)) return;
         else this._data.each(function(obj) {
             var entity = obj.value;
@@ -84,12 +82,7 @@ collection.prototype = {
     init: function(list) {
         this.__delete();
         $.list(list).each(function(entity) {
-            var ku4Id = $.uid(),
-                dto = $.dto(entity);
-            if(!$.exists(entity._ku4Id)) dto.merge({"_ku4Id": ku4Id});
-
-            var data = dto.toObject();
-            this._data.add(ku4Id, data);
+            this.insert(entity);
         }, this);
         return this;
     },
