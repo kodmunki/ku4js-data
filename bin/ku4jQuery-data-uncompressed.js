@@ -1194,7 +1194,7 @@ execCollection.prototype = {
     isEmpty: function() { return this._collection.isEmpty(); },
     count: function() { return this._collection.count(); },
     store: function(store) { this._collection.store(store); return this; },
-    save: function() { this_.collection.save(); return this; },
+    save: function() { this._collection.save(); return this; },
     init: function(list) {
         this._collection.init(list);
         return this;
