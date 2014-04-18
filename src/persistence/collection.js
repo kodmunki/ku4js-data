@@ -95,14 +95,14 @@ collection.prototype = {
     serialize: function() {
         var name = this._name,
             data = this._data.toObject(),
-            value = $.dto({ "name": name, "data": data }).toJson();
+            value = $.json.serialize({ "name": name, "data": data });
 
         return value;
     }
 }
 $.ku4collection = function(name, obj) { return new collection(name, obj); };
 $.ku4collection.deserialize = function(serialized) {
-    var obj = $.dto.parseJson(serialized).toObject();
+    var obj = $.json.deserialize(serialized);
     return new collection(obj.name, obj.data);
 };
 

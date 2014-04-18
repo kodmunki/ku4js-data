@@ -3,8 +3,8 @@ store.prototype = {
     read: function(collectionName) {
         var collection = localStorage.getItem(collectionName);
         return ($.exists(collection))
-            ? $.ku4collection.deserialize(collection).store(this)
-            : $.ku4collection(collectionName).store(this);
+            ? $.ku4collection.deserialize(collection)
+            : $.ku4collection(collectionName);
     },
     write: function(collection) {
         localStorage.setItem(collection.name(), collection.serialize());
@@ -25,8 +25,8 @@ tempStore.prototype = {
     read: function(collectionName) {
         var collection = __ku4tempStore.find(collectionName);
         return ($.exists(collection))
-            ? $.ku4collection.deserialize(collection).store(this)
-            : $.ku4collection(collectionName).store(this);
+            ? $.ku4collection.deserialize(collection)
+            : $.ku4collection(collectionName);
     },
     write: function(collection) {
         __ku4tempStore.update(collection.name(), collection.serialize());
