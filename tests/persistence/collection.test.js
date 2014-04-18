@@ -5,26 +5,11 @@ $(function(){
 
     test("new", function() {
         expect(1);
-        ok($.ku4collection("testCollection"));
+        ok($.ku4collection("test"));
     });
-
-    /*
-    test("findByKu4Id", function() {
-        var collection = $.ku4collection("testCollection"),
-            data = {
-                "name": "John",
-                "email": "email@email.com"
-            },
-            entity = collection.insert(data),
-            test = collection.findByKu4Id(entity._ku4Id);
-        expect(2);
-        equal(data.name, test.name);
-        equal(data.email, test.email);
-    });
-    */
 
     test("find", function() {
-        var collection = $.ku4collection("testCollection"),
+        var collection = $.ku4collection("test"),
             data1 = {
                 "name": "John",
                 "email": "email@email.com"
@@ -36,13 +21,18 @@ $(function(){
             data3 = {
                 "name": "Jane",
                 "email": "email@email.com"
+            },
+            data4 = {
+                "name": "Jane",
+                "email": "email@email.com"
             };
         collection.insert(data1);
         collection.insert(data2);
         collection.insert(data3);
+        collection.insert(data4);
 
         expect(4);
-        equal(collection.find().length, 3);
+        equal(collection.find().length, 4);
 
         var test = collection.find({"name": "John"});
         equal(test.length, 2);
@@ -51,7 +41,7 @@ $(function(){
     });
 
     test("find with $criteria", function() {
-        var collection = $.ku4collection("testCollection"),
+        var collection = $.ku4collection("test"),
             data1 = {
                 "name": "John",
                 "email": "email@email.com"
@@ -78,7 +68,7 @@ $(function(){
     });
 
     test("orderby ascending empty query", function() {
-        var collection = $.ku4collection("testCollection"),
+        var collection = $.ku4collection("test"),
             data1 = {
                 "name": "John",
                 "email": "john.a@email.com"
@@ -106,7 +96,7 @@ $(function(){
     });
 
     test("orderby ascending", function() {
-        var collection = $.ku4collection("testCollection"),
+        var collection = $.ku4collection("test"),
             data1 = {
                 "name": "John",
                 "email": "john.a@email.com"
@@ -134,7 +124,7 @@ $(function(){
     });
 
     test("orderby descending", function() {
-        var collection = $.ku4collection("testCollection"),
+        var collection = $.ku4collection("test"),
             data1 = {
                 "name": "John",
                 "email": "john.a@email.com"
@@ -163,7 +153,7 @@ $(function(){
 
     //$in call does not seem to be working for the caseStatus example
     test("find in", function() {
-        var collection = $.ku4collection("testCollection"),
+        var collection = $.ku4collection("test"),
             data1 = {
                 "name": "John",
                 "email": "john.a@email.com",
@@ -205,7 +195,7 @@ $(function(){
     });
 
     test("insert", function() {
-        var collection = $.ku4collection("testCollection");
+        var collection = $.ku4collection("test");
         expect(3);
 
         ok(collection.isEmpty());
@@ -219,7 +209,7 @@ $(function(){
     });
 
     test("remove", function() {
-        var collection = $.ku4collection("testCollection"),
+        var collection = $.ku4collection("test"),
             data1 = {
                 "name": "John",
                 "email": "email@email.com"
@@ -243,7 +233,7 @@ $(function(){
     });
 
     test("update", function() {
-        var collection = $.ku4collection("testCollection").init([
+        var collection = $.ku4collection("test").init([
             {
                 "name": "John",
                 "email": "john@email.com"
@@ -334,28 +324,42 @@ $(function(){
     });
 
     test("serialize", function() {
-        var collection = $.ku4collection("testCollection").insert({
-                "name": "John",
-                "email": "john@email.com"
-            }),
-            regex = /\{"name":"testCollection"\,"data":\{"[A-z0-9]{32}":\{"name":"John"\,"email":"john@email.com"\}\}\}/;
+        var collection = $.ku4collection("test")
+                .insert({
+                    "name": "Serial",
+                    "email": "Seri@lize.com"
+                })
+                .insert({
+                    "name": "Serial",
+                    "email": "Seri@lize.com"
+                }),
+            regex = /\{"name":"test"\,"data":\{"[A-z0-9]{32}":\{"name":"Serial"\,"email":"Seri@lize.com"\}\,"[A-z0-9]{32}":\{"name":"Serial"\,"email":"Seri@lize.com"\}\}\}/;
+
+        expect(1)
         ok(regex.test(collection.serialize()));
     });
 
     test("deserialize", function() {
-        var data = {
-                "name": "John",
-                "email": "john@email.com"
+        var data1 = {
+                "name": "Serial",
+                "email": "Seri@lize.com"
             },
-            collection = $.ku4collection("testCollection").insert(data),
-            regex = /\{"name":"testCollection"\,"data":\{"[A-z0-9]{32}":\{"name":"John"\,"email":"john@email.com"\}\}\}/,
+            data2 = {
+                "name": "Serial",
+                "email": "Seri@lize.com"
+            },
+            collection = $.ku4collection("test").init([data1, data2]),
+            regex = /\{"name":"test"\,"data":\{"[A-z0-9]{32}":\{"name":"Serial"\,"email":"Seri@lize.com"\}\,"[A-z0-9]{32}":\{"name":"Serial"\,"email":"Seri@lize.com"\}\}\}/,
             serialized = collection.serialize(),
             deserialized = $.ku4collection.deserialize(serialized),
-            entity = deserialized.find()[0];
+            results = deserialized.find();
 
-        expect(3);
+        expect(6);
         ok(regex.test(collection.serialize()));
-        equal(entity.name, data.name);
-        equal(entity.email, data.email);
+        equal(results.length, 2);
+        equal(results[0].name, data1.name);
+        equal(results[0].email, data1.email);
+        equal(results[1].name, data2.name);
+        equal(results[1].email, data2.email);
     });
 });

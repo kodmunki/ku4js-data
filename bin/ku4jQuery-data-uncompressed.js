@@ -223,7 +223,7 @@ cookie.prototype = {
                 isSecure: this._isSecure } );
         return this;
     }
-}
+};
 $.Class.extend(cookie, $.Class);
 
 $.cookie = function(params){
@@ -237,18 +237,18 @@ $.cookie = function(params){
                 .path(o.path)
                 .domain(o.domain)
                 .isSecure(o.isSecure);
-}
+};
 $.cookie.Class = cookie;
 
 $.cookie.erase = function(name){
     $.cookie.load(name).erase();
-}
+};
 
 $.cookie.load = function(name){
     var o = ($.isObject(name)) ? name : { name: name };
         p = cookie_defaultParams.replicate().merge(o).toObject()
     return $.cookie(p);
-}
+};
 
 $.cookie.find = function(name){
     var c = document.cookie.split("; "), i = c.length;
@@ -257,7 +257,7 @@ $.cookie.find = function(name){
         if (cke[0] === name) return c[i];
     }
     return null;
-}
+};
 
 $.cookie.serialize = function(obj, params) {
     var pms = params || {},
@@ -273,7 +273,7 @@ $.cookie.serialize = function(obj, params) {
         D = (!d) ? "" : cookie_buildInfoPair("; domain", escape(d)),
         S = (!s) ? "" : "; secure";
     return I + E + P + D + S;
-}
+};
 
 $.cookie.deserialize = function(cookie) {
     try {
@@ -284,7 +284,7 @@ $.cookie.deserialize = function(cookie) {
         return $.json.deserialize(unescape(kv.value));
     }
     catch(e){ throw $.exception("arg", $.str.format("Cannot deserialize {0}", cookie)); }
-}
+};
 
 var cookie_defaultParams = $.hash({name:$.uid("COOKIE"),
                 expires: $.dayPoint.today().nextYear().toDate(),
@@ -330,89 +330,462 @@ $.dto.serialize = function(name) {
     catch(e) { return null; }
 };
 
-if(!$.exists($.json)) $.json = {};
-$.json.serialize = function(obj) {
-    if ($.isNull(obj)) return null;
-    if ($.isUndefined(obj)) return undefined;
-    if (!$.isArray(obj) && !$.isObject(obj))
-        return obj.toString();
-    var r = [],
-        f = ($.isArray(obj)) ? "[{0}]" : "{{0}}";
-    for (var n in obj) {
-        var o = obj[n];
-        if ($.isFunction(o)) continue;
-        var v = ($.isUndefined(o))
-                ? '"' + "undefined" + '"'
-                : ($.isNumber(o))
-                ? o
-                : ($.isDate(o))
-                ? '"' + $.dayPoint.parse(o).toJson() + '"'
-                : ($.isString(o))
-                ? '"' + json_serializeString(o) + '"'
-                : $.json.serialize(o);
-        r[r.length] = (($.isObject(obj) && !$.isArray(obj))
-            ? ("\"" + n + "\"" + ":")
-            : "") + v;
-    }
-    return $.str.format(f, r);
-};
-$.json.deserialize = function(str) {
-    if ($.isObject(str)) return str;
-    if ($.isString(str))
-        try {
-            var obj = eval("(" + json_deserializeString(str) + ")");
-            if(!$.exists(obj)) return obj;
-            if($.isNullOrEmpty(obj.tagName)) {
-                for (var n in obj) {
-                    var value = obj[n];
-                    if(/\d{4}\-\d{2}\-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z/.test(obj[n]))
-                        obj[n] = $.dayPoint.parse(value).toDate();
-                }
-                return obj;
-            }
-            return str;
+function baseJsonSerializer(serializer) {
+    this._serializer = serializer;
+}
+baseJsonSerializer.prototype = {
+    $canSerialize: function(obj) { return false; },
+    $canDeserialize: function(obj) { return false; },
+    $serialize: function(obj) { return; },
+    $deserialize: function(str) { return; },
+    serialize: function(obj) {
+        if(this.$canSerialize(obj)) return this.$serialize(obj);
+        else {
+            var serializer = this._serializer;
+            return ($.exists(serializer)) ? serializer.serialize(obj) : undefined;
         }
-        catch (e) { return str; }
-    return undefined;
+    },
+    deserialize: function(str) {
+        if(this.$canDeserialize(str))
+            return this.$deserialize(str);
+        else {
+            var serializer = this._serializer;
+            return ($.exists(serializer)) ? serializer.deserialize(str) : undefined;
+        }
+    }
 };
 
-function json_serializeString(str) {
-    return str
-        .replace(/\\/g,"\\\\")
-        .replace(/\"/g,"\\\"")
-        .replace(/\//g,"\/")
-        .replace(/\f/g,"\\f")
-        .replace(/\n/g,"\\n")
-        .replace(/\r/g,"\\r")
-        .replace(/\t/g,"\\t");
+function arrayJsonSerializer(serializer) {
+    arrayJsonSerializer.base.call(this, serializer);
 }
-function json_deserializeString(str) {
-    return str
-        .replace(/\\\//g,"/")
-        .replace(/\\\\f/g,"\\f")
-        .replace(/\\\\n/g,"\\n")
-        .replace(/\\\\r/g,"\\r")
-        .replace(/\\\\t/g,"\\t");
-}
+arrayJsonSerializer.prototype = {
+    $canSerialize: function(obj) { return $.isArray(obj); },
+    $canDeserialize: function(str) {
+        return $.isArray(str) || ($.isString(str) && /^\[.*\]$/.test(str));
+    },
+    $serialize: function(obj) {
+        var serialized = $.list();
+        $.list(obj).each(function(item){
+            var value = this.serialize(item);
+            if(!$.isUndefined(value))
+                serialized.add(value);
+        }, this);
+        return $.str.format("[{0}]", serialized.toArray());
+    },
+    $deserialize: function(str) {
+        if($.isArray(str)) return str;
+        if(/\[\s*\]/.test(str)) return [];
+        else {
+            var values = str.replace(/^\[/, "").replace(/\]$/, "").split(","),
+                deserialized = $.list();
 
-if(!$.exists($.queryString)) $.queryString = {};
-$.queryString.serialize = function(obj) {
-    var r = "",
-        e = encodeURIComponent;
-    for (var n in obj)
-        r += $.str.format("&{0}={1}", e(n), e($.json.serialize(obj[n])));
-    return r.replace(/^\&/, "");
-}
-$.queryString.deserialize = function(str) {
-    var q = str.replace(/.*\?/, ""), o = {}, kvs = q.split("&");
-    if(!/\??\w+=\w+/.test(str)) return null;
-    for (var n in kvs) {
-        var d = decodeURIComponent, kv = (kvs[n]).split("=");
-        o[d(kv[0])] = $.json.deserialize(d(kv[1]));
+            $.list(values).each(function (item) {
+                var value = this.deserialize(item);
+                if(!$.isUndefined(value))
+                    deserialized.add(value);
+            }, this);
+
+            return deserialized.toArray();
+        }
     }
-    return o;
-}
+};
+$.Class.extend(arrayJsonSerializer, baseJsonSerializer);
+$.ku4arrayJsonSerializer = function(serializer){ return new arrayJsonSerializer(serializer); };
 
+function booleanJsonSerializer(serializer) {
+    booleanJsonSerializer.base.call(this, serializer);
+}
+booleanJsonSerializer.prototype = {
+    $canSerialize: function(obj) { return /boolean/.test(typeof obj); },
+    $canDeserialize: function(str) { return $.isBool(str) || ($.isString(str)  && /^true|false$/.test(str)); },
+    $serialize: function(obj) { return obj.toString(); },
+    $deserialize: function(str) { return $.isBool(str) ? str : /^true$/.test(str); }
+};
+$.Class.extend(booleanJsonSerializer, baseJsonSerializer);
+$.ku4booleanJsonSerializer = function(serializer){ return new booleanJsonSerializer(serializer); };
+
+function dateJsonSerializer(serializer) {
+    dateJsonSerializer.base.call(this, serializer);
+}
+dateJsonSerializer.prototype = {
+    $canSerialize: function(obj) { return $.isDate(obj); },
+    $canDeserialize: function(str) { return $.isDate(str) || ($.isString(str) && /^\d{4}\-\d{2}\-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z$/.test(str)); },
+    $serialize: function(obj) { return '"' + $.dayPoint.parse(obj).toJson() + '"'; },
+    $deserialize: function(str) { return ($.isDate(str)) ? str : $.dayPoint.parse(str).toDate(); }
+};
+$.Class.extend(dateJsonSerializer, baseJsonSerializer);
+$.ku4dateJsonSerializer = function(serializer){ return new dateJsonSerializer(serializer); };
+
+function ku4JsonSerializer() {
+    var nullSerializer = $.ku4nullJsonSerializer(),
+        stringSerializer = $.ku4stringJsonSerializer(nullSerializer),
+        booleanSerializer = $.ku4booleanJsonSerializer(stringSerializer),
+        numberSerializer = $.ku4numberJsonSerializer(booleanSerializer),
+        dateSerializer = $.ku4dateJsonSerializer(numberSerializer),
+        arraySerializer = $.ku4arrayJsonSerializer(dateSerializer),
+        objectSerializer = $.ku4objectJsonSerializer(arraySerializer),
+        arrayCollectionSerializer = $.ku4arrayJsonSerializer(objectSerializer),
+        objectCollectionSerializer = $.ku4objectJsonSerializer(arrayCollectionSerializer);
+
+    ku4JsonSerializer.base.call(this, objectCollectionSerializer);
+}
+$.Class.extend(ku4JsonSerializer, baseJsonSerializer);
+$.ku4JsonSerializer = function(){ return new ku4JsonSerializer(); };
+
+if(!$.exists($.json)) $.json = {
+    serialize: function(obj) {
+        return $.ku4JsonSerializer().serialize(obj);
+    },
+    deserialize: function(str) {
+        try { return $.ku4JsonSerializer().deserialize(eval("(" + str + ")")); }
+        catch(e) { return; }
+
+    }
+};
+
+function nullJsonSerializer(serializer) {
+    nullJsonSerializer.base.call(this, serializer);
+}
+nullJsonSerializer.prototype = {
+    $canSerialize: function(obj) { return obj === null; },
+    $canDeserialize: function(str) { return $.isNull(str) || ($.isString(str) && /^null$/.test(str)); },
+    $serialize: function(obj) { return '"' + obj + '"'; },
+    $deserialize: function(str) { return null; }
+};
+$.Class.extend(nullJsonSerializer, baseJsonSerializer);
+$.ku4nullJsonSerializer = function(serializer){ return new nullJsonSerializer(serializer); };
+
+function numberJsonSerializer(serializer) {
+    numberJsonSerializer.base.call(this, serializer);
+}
+numberJsonSerializer.prototype = {
+    $canSerialize: function(obj) { return /number/.test(typeof obj); },
+    $canDeserialize: function(str) { return $.isNumber(str) || ($.isString(str) && /^[0-9]+(\.([0-9]+)?)?$/.test(str)); },
+    $serialize: function(obj) { return obj.toString(); },
+    $deserialize: function(str) { return $.isNumber(str) ? str : (/\./.test(str)) ? parseFloat(str) : parseInt(str); }
+};
+$.Class.extend(numberJsonSerializer, baseJsonSerializer);
+$.ku4numberJsonSerializer = function(serializer){ return new numberJsonSerializer(serializer); };
+
+function objectJsonSerializer(serializer) {
+    objectJsonSerializer.base.call(this, serializer);
+}
+objectJsonSerializer.prototype = {
+    $canSerialize: function(obj) { return $.isObject(obj); },
+    $canDeserialize: function(str) {
+        if ($.isObject(str)) return str;
+        try {
+            var value = eval("(" + str + ")");
+            return $.isObject(value);
+        }
+        catch(e) { return false; }
+    },
+    $serialize: function(obj) {
+        var serialized = $.list();
+        $.hash(obj).each(function(item){
+            var value = this.serialize(item.value);
+            if(!$.isUndefined(value))
+                serialized.add($.str.format('"{0}":{1}', item.key, value));
+        }, this);
+        return $.str.format("{{0}}", serialized.toArray());
+    },
+    $deserialize: function(str) {
+        if($.isString(str) && /^\{\s*\}$/.test(str)) return {};
+        else {
+            var values = ($.isString(str)) ? eval("(" + str + ")") : str,
+                deserialized = $.hash();
+
+            $.hash(values).each(function(item) {
+                var value = this.deserialize(item.value);
+                if (!$.isUndefined(value))
+                    deserialized.add(item.key, value);
+            }, this);
+
+            return deserialized.toObject();
+        }
+    }
+};
+$.Class.extend(objectJsonSerializer, baseJsonSerializer);
+$.ku4objectJsonSerializer = function(serializer){ return new objectJsonSerializer(serializer); };
+
+function stringJsonSerializer(serializer) {
+    stringJsonSerializer.base.call(this, serializer);
+}
+stringJsonSerializer.prototype = {
+    $canSerialize: function(obj) { return $.isString(obj); },
+    $canDeserialize: function(str) {
+        try {
+            if($.isString(str) && /[\+\-\*\\\\(\)\{\}/]/.test(str)) return true;
+            var value = eval("(" + str + ")");
+            return $.exists(value) &&
+                   $.isString(str) &&
+                   !($.isBool(value) ||
+                     $.isNumber(value) ||
+                     $.isDate(value) ||
+                     $.isArray(value) ||
+                     $.isObject(value));
+        }
+        catch(e) { return $.isString(str); }
+    },
+    $serialize: function(obj) {
+        var str = obj.replace(/\\/g,"\\\\")
+                     .replace(/\"/g,"\\\"")
+                     .replace(/\//g,"\/")
+                     .replace(/\f/g,"\\f")
+                     .replace(/\n/g,"\\n")
+                     .replace(/\r/g,"\\r")
+                     .replace(/\t/g,"\\t");
+        return '"' + str + '"';
+    },
+    $deserialize: function(str) {
+        str.replace(/\\\//g,"/")
+           .replace(/\\\\f/g,"\\f")
+           .replace(/\\\\n/g,"\\n")
+           .replace(/\\\\r/g,"\\r")
+           .replace(/\\\\t/g,"\\t");
+
+        try {
+            var value = eval("(" + str + ")");
+            return $.isString(value) ? value : $.isString(str) ? str : undefined;
+        }
+        catch(e) { return $.isString(str) ? str : undefined; }
+    }
+};
+$.Class.extend(stringJsonSerializer, baseJsonSerializer);
+$.ku4stringJsonSerializer = function(serializer){ return new stringJsonSerializer(serializer); };
+
+function baseQueryStringSerializer(serializer) {
+    this._serializer = serializer;
+}
+baseQueryStringSerializer.prototype = {
+    $canSerialize: function(obj) { return false; },
+    $canDeserialize: function(obj) { return false; },
+    $serialize: function(obj) { return; },
+    $deserialize: function(str) { return; },
+    serialize: function(obj) {
+        if(this.$canSerialize(obj)) return this.$serialize(obj);
+        else {
+            var serializer = this._serializer;
+            return ($.exists(serializer)) ? serializer.serialize(obj) : undefined;
+        }
+    },
+    deserialize: function(str) {
+        if(this.$canDeserialize(str))
+            return this.$deserialize(str);
+        else {
+            var serializer = this._serializer;
+            return ($.exists(serializer)) ? serializer.deserialize(str) : undefined;
+        }
+    }
+};
+
+function arrayQueryStringSerializer(serializer) {
+    arrayQueryStringSerializer.base.call(this, serializer);
+}
+arrayQueryStringSerializer.prototype = {
+    $canSerialize: function(obj) { return $.isArray(obj); },
+    $canDeserialize: function(str) { return $.isArray(str) || ($.isString(str) && /^\[.*\]$/.test(str)); },
+    $serialize: function(obj) {
+        var serialized = $.list();
+        $.list(obj).each(function(item){
+            var value = this.serialize(item);
+            if(!$.isUndefined(value))
+                serialized.add(value);
+        }, this);
+        return $.str.format("[{0}]", serialized.toArray());
+    },
+    $deserialize: function(str) {
+        if($.isArray(str)) return str;
+        if(/\[\s*\]/.test(str)) return [];
+        else {
+            var values = str.replace(/^\[/, "").replace(/\]$/, "").split(","),
+                deserialized = $.list();
+
+            $.list(values).each(function (item) {
+                var value = this.deserialize(item);
+                if(!$.isUndefined(value))
+                    deserialized.add(value);
+            }, this);
+
+            return deserialized.toArray();
+        }
+    }
+};
+$.Class.extend(arrayQueryStringSerializer, baseQueryStringSerializer);
+$.ku4arrayQueryStringSerializer = function(serializer){ return new arrayQueryStringSerializer(serializer); };
+
+function booleanQueryStringSerializer(serializer) {
+    booleanQueryStringSerializer.base.call(this, serializer);
+}
+booleanQueryStringSerializer.prototype = {
+    $canSerialize: function(obj) { return /boolean/.test(typeof obj); },
+    $canDeserialize: function(str) { return $.isBool(str) || ($.isString(str)  && /^true|false$/.test(str)); },
+    $serialize: function(obj) { return obj.toString(); },
+    $deserialize: function(str) { return $.isBool(str) ? str : /^true$/.test(str); }
+};
+$.Class.extend(booleanQueryStringSerializer, baseQueryStringSerializer);
+$.ku4booleanQueryStringSerializer = function(serializer){ return new booleanQueryStringSerializer(serializer); };
+
+function dateQueryStringSerializer(serializer) {
+    dateQueryStringSerializer.base.call(this, serializer);
+}
+dateQueryStringSerializer.prototype = {
+    $canSerialize: function(obj) { return $.isDate(obj); },
+    $canDeserialize: function(str) { return $.isDate(str) || ($.isString(str) && /^\d{4}\-\d{2}\-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z$/.test(str)); },
+    $serialize: function(obj) { return $.dayPoint.parse(obj).toJson(); },
+    $deserialize: function(str) { return ($.isDate(str)) ? str : $.dayPoint.parse(str).toDate(); }
+};
+$.Class.extend(dateQueryStringSerializer, baseQueryStringSerializer);
+$.ku4dateQueryStringSerializer = function(serializer){ return new dateQueryStringSerializer(serializer); };
+
+function ku4QueryStringSerializer() {
+    var nullSerializer = $.ku4nullQueryStringSerializer(),
+        stringSerializer = $.ku4stringQueryStringSerializer(nullSerializer),
+        booleanSerializer = $.ku4booleanQueryStringSerializer(stringSerializer),
+        numberSerializer = $.ku4numberQueryStringSerializer(booleanSerializer),
+        dateSerializer = $.ku4dateQueryStringSerializer(numberSerializer),
+        arraySerializer = $.ku4arrayQueryStringSerializer(dateSerializer),
+        objectSerializer = $.ku4objectQueryStringSerializer(arraySerializer),
+        arrayCollectionSerializer = $.ku4arrayQueryStringSerializer(objectSerializer),
+        objectCollectionSerializer = $.ku4objectQueryStringSerializer(arrayCollectionSerializer);
+
+    ku4QueryStringSerializer.base.call(this, objectCollectionSerializer);
+}
+$.Class.extend(ku4QueryStringSerializer, baseQueryStringSerializer);
+$.ku4QueryStringSerializer = function(){ return new ku4QueryStringSerializer(); };
+
+if(!$.exists($.queryString)) $.queryString = {
+    serialize: function(obj) {
+        var queryString = "";
+        $.hash(obj).each(function(item){
+            var value = $.ku4QueryStringSerializer().serialize(item.value);
+            if($.isUndefined(value)) return;
+            queryString += $.str.format("&{0}={1}", encodeURIComponent(item.key), encodeURIComponent(value));
+        });
+        return queryString.replace(/^\&/, "");
+    },
+    deserialize: function(str) {
+        var values= str.split("&"),
+            hash = $.hash();
+        $.list(values).each(function(item){
+            if($.isUndefined(item)) return;
+            var kv = item.split("="),
+                kv0 = kv[0],
+                kv1 = kv[1];
+
+            if($.isUndefined(kv0) || $.isUndefined(kv1)) return;
+            var key = decodeURIComponent(kv0),
+                value = $.ku4QueryStringSerializer().deserialize(decodeURIComponent(kv1));
+
+            if($.isUndefined(key) || $.isUndefined(value)) return;
+            hash.add(key, value);
+        });
+        return hash.toObject();
+    }
+};
+
+function nullQueryStringSerializer(serializer) {
+    nullQueryStringSerializer.base.call(this, serializer);
+}
+nullQueryStringSerializer.prototype = {
+    $canSerialize: function(obj) { return obj === null; },
+    $canDeserialize: function(str) { return $.isNull(str) || ($.isString(str) && /^null$/.test(str)); },
+    $serialize: function(obj) { return obj + ""; },
+    $deserialize: function(str) { return null; }
+};
+$.Class.extend(nullQueryStringSerializer, baseQueryStringSerializer);
+$.ku4nullQueryStringSerializer = function(serializer){ return new nullQueryStringSerializer(serializer); };
+
+function numberQueryStringSerializer(serializer) {
+    numberQueryStringSerializer.base.call(this, serializer);
+}
+numberQueryStringSerializer.prototype = {
+    $canSerialize: function(obj) { return /number/.test(typeof obj); },
+    $canDeserialize: function(str) { return $.isNumber(str) || ($.isString(str) && /^[0-9]+(\.([0-9]+)?)?$/.test(str)); },
+    $serialize: function(obj) { return obj.toString(); },
+    $deserialize: function(str) { return $.isNumber(str) ? str : (/\./.test(str)) ? parseFloat(str) : parseInt(str); }
+};
+$.Class.extend(numberQueryStringSerializer, baseQueryStringSerializer);
+$.ku4numberQueryStringSerializer = function(serializer){ return new numberQueryStringSerializer(serializer); };
+
+function objectQueryStringSerializer(serializer) {
+    objectQueryStringSerializer.base.call(this, serializer);
+}
+objectQueryStringSerializer.prototype = {
+    $canSerialize: function(obj) {
+        return $.exists(obj) &&
+               $.isObject(obj) &&
+                !($.isBool(obj) ||
+                  $.isNumber(obj) ||
+                  $.isDate(obj) ||
+                  $.isArray(obj) ||
+                  $.isString(obj) ||
+                  $.isFunction(obj));
+    },
+    $canDeserialize: function(str) {
+        return $.exists(str) &&
+               $.isObject(str) &&
+               !($.isBool(str) ||
+                 $.isNumber(str) ||
+                 $.isDate(str) ||
+                 $.isArray(str) ||
+                 $.isString(str)) ||
+               ($.isString(str) && /^\{.*\}$/.test(str));
+    },
+    $serialize: function(obj) {
+        var serialized = $.list();
+        $.hash(obj).each(function(item){
+            var value = this.serialize(item.value);
+            if(!$.isUndefined(value)) {
+                var _value = ($.isString(value)) ? '"' + value + '"' : value;
+                serialized.add($.str.format('"{0}":{1}', item.key, _value));
+            }
+        }, this);
+        return $.str.format("{{0}}", serialized.toArray());
+    },
+    $deserialize: function(str) {
+        if($.isObject(str)) return str;
+        if($.isString(str) && /\{\s*\}/.test(str)) return {};
+        else {
+            var values = eval("(" + str + ")"),
+                deserialized = $.hash();
+
+            $.hash(values).each(function(item) {
+                var value = this.deserialize(item.value);
+                if (!$.isUndefined(value))
+                    deserialized.add(item.key, value);
+            }, this);
+
+            return deserialized.toObject();
+        }
+    }
+};
+$.Class.extend(objectQueryStringSerializer, baseQueryStringSerializer);
+$.ku4objectQueryStringSerializer = function(serializer){ return new objectQueryStringSerializer(serializer); };
+
+function stringQueryStringSerializer(serializer) {
+    stringQueryStringSerializer.base.call(this, serializer);
+}
+stringQueryStringSerializer.prototype = {
+    $canSerialize: function(obj) { return $.isString(obj); },
+    $canDeserialize: function(str) {
+        try {
+            if(/[\+\-\*\\\/]/.test(str)) return true;
+            var value = eval("(" + str + ")");
+            return $.exists(value) &&
+                   !($.isBool(value) ||
+                     $.isNumber(value) ||
+                     $.isDate(value) ||
+                     $.isArray(value) ||
+                     $.isObject(value));
+        }
+        catch(e) { return $.isString(str); }
+    },
+    $serialize: function(obj) { return obj; },
+    $deserialize: function(str) { return str; }
+};
+$.Class.extend(stringQueryStringSerializer, baseQueryStringSerializer);
+$.ku4stringQueryStringSerializer = function(serializer){ return new stringQueryStringSerializer(serializer); };
 
 function abstractField(){
     abstractField.base.call(this);
@@ -770,8 +1143,10 @@ collection.prototype = {
     },
     serialize: function() {
         var name = this._name,
-            data = this._data.toObject();
-        return $.dto({ "name": name, "data": data }).toJson();
+            data = this._data.toObject(),
+            value = $.dto({ "name": name, "data": data }).toJson();
+
+        return value;
     }
 }
 $.ku4collection = function(name, obj) { return new collection(name, obj); };

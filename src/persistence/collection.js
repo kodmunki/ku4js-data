@@ -92,8 +92,10 @@ collection.prototype = {
     },
     serialize: function() {
         var name = this._name,
-            data = this._data.toObject();
-        return $.dto({ "name": name, "data": data }).toJson();
+            data = this._data.toObject(),
+            value = $.dto({ "name": name, "data": data }).toJson();
+
+        return value;
     }
 }
 $.ku4collection = function(name, obj) { return new collection(name, obj); };

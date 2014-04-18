@@ -19,7 +19,7 @@ cookie.prototype = {
                 isSecure: this._isSecure } );
         return this;
     }
-}
+};
 $.Class.extend(cookie, $.Class);
 
 $.cookie = function(params){
@@ -33,18 +33,18 @@ $.cookie = function(params){
                 .path(o.path)
                 .domain(o.domain)
                 .isSecure(o.isSecure);
-}
+};
 $.cookie.Class = cookie;
 
 $.cookie.erase = function(name){
     $.cookie.load(name).erase();
-}
+};
 
 $.cookie.load = function(name){
     var o = ($.isObject(name)) ? name : { name: name };
         p = cookie_defaultParams.replicate().merge(o).toObject()
     return $.cookie(p);
-}
+};
 
 $.cookie.find = function(name){
     var c = document.cookie.split("; "), i = c.length;
@@ -53,7 +53,7 @@ $.cookie.find = function(name){
         if (cke[0] === name) return c[i];
     }
     return null;
-}
+};
 
 $.cookie.serialize = function(obj, params) {
     var pms = params || {},
@@ -69,7 +69,7 @@ $.cookie.serialize = function(obj, params) {
         D = (!d) ? "" : cookie_buildInfoPair("; domain", escape(d)),
         S = (!s) ? "" : "; secure";
     return I + E + P + D + S;
-}
+};
 
 $.cookie.deserialize = function(cookie) {
     try {
@@ -80,7 +80,7 @@ $.cookie.deserialize = function(cookie) {
         return $.json.deserialize(unescape(kv.value));
     }
     catch(e){ throw $.exception("arg", $.str.format("Cannot deserialize {0}", cookie)); }
-}
+};
 
 var cookie_defaultParams = $.hash({name:$.uid("COOKIE"),
                 expires: $.dayPoint.today().nextYear().toDate(),
