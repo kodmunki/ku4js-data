@@ -323,6 +323,40 @@ $(function(){
 
     });
 
+    test("exec", function(){
+        var collection = $.ku4collection("test").exec(function(item){ return { "id": 1, "address": item.email } }),
+            data1 = {
+                "name": "John",
+                "email": "email@email.com"
+            },
+            data2 = {
+                "name": "John",
+                "email": "john@email.com"
+            },
+            data3 = {
+                "name": "Jane",
+                "email": "email@email.com"
+            },
+            data4 = {
+                "name": "Jane",
+                "email": "email@email.com"
+            };
+        collection.insert(data1);
+        collection.insert(data2);
+        collection.insert(data3);
+        collection.insert(data4);
+
+        expect(6);
+        equal(collection.find().length, 4);
+
+        var test = collection.find({"name": "John"});
+        equal(test.length, 2);
+        equal(test[0].id, 1);
+        equal(test[0].address, data1.email);
+        equal(test[1].id, 1);
+        equal(test[1].address, data2.email);
+    });
+
     test("serialize", function() {
         var collection = $.ku4collection("test")
                 .insert({

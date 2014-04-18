@@ -1062,8 +1062,12 @@ collection.prototype = {
     count: function() { return this._data.count(); },
     store: function(store) { this._store = store; return this; },
     save: function() { this._store.write(this); return this; },
-    findByKu4Id: function(ku4Id) {
-        return this._data.findValue(ku4Id);
+    init: function(list) {
+        this.__delete();
+        $.list(list).each(function(entity) {
+            this.insert(entity);
+        }, this);
+        return this;
     },
     find: function(query) {
         if(!$.exists(query)) return this._data.values();
@@ -1130,12 +1134,10 @@ collection.prototype = {
         });
         return $.ku4collection(thisName + "." + otherName, join.toObject());
     },
-    init: function(list) {
-        this.__delete();
-        $.list(list).each(function(entity) {
-            this.insert(entity);
-        }, this);
-        return this;
+    exec: function(func) {
+        if(!$.isFunction(func))
+            throw $.ku4exception("$.collection", $.str.format("Invalid function={0}. exec method requires a function.", name));
+        return new execCollection(this, func);
     },
     __delete: function() {
         this._store.remove(this);
@@ -1182,6 +1184,55 @@ function collection_orderby(arry, criteria) {
         };
     return arry.sort(func);
 }
+
+function execCollection(collection, func) {
+    this._collection = collection;
+    this._exec = func || function(value) { return value; };
+}
+execCollection.prototype = {
+    name: function() { return this._collection.name(); },
+    isEmpty: function() { return this._collection.isEmpty(); },
+    count: function() { return this._collection.count(); },
+    store: function(store) { this._collection.store(store); return this; },
+    save: function() { this_.collection.save(); return this; },
+    init: function(list) {
+        this._collection.init(list);
+        return this;
+    },
+    find: function(query) {
+        var values = this._collection.find(query),
+            results = $.list();
+        $.list(values).each(function(item){
+            results.add(this._exec(item));
+        }, this);
+        return results.toArray();
+    },
+    insert: function(entity) {
+        this._collection.insert(entity);
+        return this;
+    },
+    remove: function(criteria) {
+        this._collection.remove(criteria);
+        return this;
+    },
+    update: function(current, updates) {
+        this._collection.update(current, updates);
+        return this;
+    },
+    join: function(other, onKey, equalKey) {
+        return new execCollection(this._collection.join(other, onKey, equalKey));
+    },
+    exec: function(func) {
+        return this._collection.exec(func);
+    },
+    __delete: function() {
+        this._collection.__delete();
+        return this;
+    },
+    serialize: function() {
+        return this._collection.serialize();
+    }
+};
 
 function store() { }
 store.prototype = {

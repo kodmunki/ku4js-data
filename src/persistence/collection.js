@@ -11,8 +11,12 @@ collection.prototype = {
     count: function() { return this._data.count(); },
     store: function(store) { this._store = store; return this; },
     save: function() { this._store.write(this); return this; },
-    findByKu4Id: function(ku4Id) {
-        return this._data.findValue(ku4Id);
+    init: function(list) {
+        this.__delete();
+        $.list(list).each(function(entity) {
+            this.insert(entity);
+        }, this);
+        return this;
     },
     find: function(query) {
         if(!$.exists(query)) return this._data.values();
@@ -79,12 +83,10 @@ collection.prototype = {
         });
         return $.ku4collection(thisName + "." + otherName, join.toObject());
     },
-    init: function(list) {
-        this.__delete();
-        $.list(list).each(function(entity) {
-            this.insert(entity);
-        }, this);
-        return this;
+    exec: function(func) {
+        if(!$.isFunction(func))
+            throw $.ku4exception("$.collection", $.str.format("Invalid function={0}. exec method requires a function.", name));
+        return new execCollection(this, func);
     },
     __delete: function() {
         this._store.remove(this);
