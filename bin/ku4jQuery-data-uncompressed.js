@@ -361,7 +361,8 @@ $.json.deserialize = function(str) {
         try {
             var obj = eval("(" + json_deserializeString(str) + ")");
             if(!$.exists(obj)) return obj;
-            if($.isNullOrEmpty(obj.tagName)) {
+            if($.isNullOrEmpty(obj.tagName) &&
+                ($.isObject(obj) || $.isArray(obj))) {
                 for (var n in obj) {
                     var value = obj[n];
                     if(/\d{4}\-\d{2}\-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z/.test(obj[n]))
@@ -369,9 +370,12 @@ $.json.deserialize = function(str) {
                 }
                 return obj;
             }
-            return str;
+            console.log("STR == ", obj)
+            return (/\d{4}\-\d{2}\-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z/.test(obj))
+                    ? $.dayPoint.parse(obj).toDate()
+                    : obj;
         }
-        catch (e) { return str; }
+        catch (e) { console.log(e); return str; }
     return undefined;
 };
 
@@ -396,21 +400,33 @@ function json_deserializeString(str) {
 
 if(!$.exists($.queryString)) $.queryString = {};
 $.queryString.serialize = function(obj) {
-    var r = "",
-        e = encodeURIComponent;
-    for (var n in obj)
-        r += $.str.format("&{0}={1}", e(n), e($.json.serialize(obj[n])));
-    return r.replace(/^\&/, "");
-}
+    var result = "";
+    $.hash(obj).each(function(item){
+        var value = item.value,
+            serializeValue = $.isDate(value) ? $.dayPoint.parse(value).toJson() : value;
+        result += $.str.format("&{0}={1}", encodeURIComponent(item.key), encodeURIComponent($.json.serialize(serializeValue)));
+    });
+    return result.replace(/^\&/, "");
+};
 $.queryString.deserialize = function(str) {
-    var q = str.replace(/.*\?/, ""), o = {}, kvs = q.split("&");
-    if(!/\??\w+=\w+/.test(str)) return null;
-    for (var n in kvs) {
-        var d = decodeURIComponent, kv = (kvs[n]).split("=");
-        o[d(kv[0])] = $.json.deserialize(d(kv[1]));
-    }
-    return o;
-}
+    if(!/\??\w+=\w+/.test(str)) return;
+    var queryString = str.replace(/.*\?/, ""),
+        keyValuePairs = queryString.split("&"),
+        result = $.hash();
+
+    $.list(keyValuePairs).each(function(item) {
+        var pair = item.split("="),
+            key = pair[0],
+            value = pair[1],
+            deserializeValue = (/^null$|^true$|^false$|^\d+(\.\d+?)?$|^\[.*\]$|^\{.*\}$/.test(value))
+                                ? value
+                                : '"' + value + '"';
+
+        result.add(decodeURIComponent(key), $.json.deserialize(decodeURIComponent(deserializeValue)));
+    });
+
+    return result.toObject();
+};
 
 function abstractField(){
     abstractField.base.call(this);

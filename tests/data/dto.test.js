@@ -35,8 +35,8 @@ $(function(){
             testDeserialized = {a:null, b:undefined, man:{sex:"m", age:25, married:true, children:["Tom","Dick","Jane"],contact:{"home":9998887777}},"date":new Date(1,1,2011),"multiline":"Here is\\ / a multiline\f\nparagraph\rfor\ttesting","html":"<html class=\"css-class\"></html>"};
 
         expect(2);
-        deepEqual($.dto.parseJson(testSerialized).toObject(), $.hash(testDeserialized).remove("b").toObject());
-        equal($.dto(testDeserialized).toJson(), testSerialized);
+        equal($.dto(testDeserialized).toJson(), testSerialized, "Serialize");
+        deepEqual($.dto.parseJson(testSerialized).toObject(), $.hash(testDeserialized).remove("b").toObject(), "Deserialize");
     });
 
     test("parseQueryString", function() {
@@ -44,7 +44,7 @@ $(function(){
             testDeserialized = {sex:"m", test: "test", age:25, married:true, "_uri":"here/to/there.go", "date1": "2014-3-25", "date2": new Date(2014, 1, 1), "number": 23.45, "_undefined": undefined, "_null": null};
 
         expect(2);
-        deepEqual($.dto.parseQueryString(testSerialized).toObject(), $.hash(testDeserialized).remove("_undefined").toObject());
-        equal($.dto(testDeserialized).toJson(), testSerialized);
+        equal($.dto(testDeserialized).toQueryString(), testSerialized, "Serialize");
+        deepEqual($.dto.parseQueryString(testSerialized).toObject(), $.hash(testDeserialized).remove("_undefined").toObject(), "Deserialize");
     });
 });
