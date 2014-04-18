@@ -370,12 +370,11 @@ $.json.deserialize = function(str) {
                 }
                 return obj;
             }
-            console.log("STR == ", obj)
             return (/\d{4}\-\d{2}\-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z/.test(obj))
                     ? $.dayPoint.parse(obj).toDate()
                     : obj;
         }
-        catch (e) { console.log(e); return str; }
+        catch (e) { return str; }
     return undefined;
 };
 
