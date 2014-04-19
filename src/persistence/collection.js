@@ -67,6 +67,7 @@ collection.prototype = {
             otherResults = $.list(other.find()),
             thisName = this.name(),
             otherName = other.name(),
+            func = ($.isFunction(onKey)) ? onKey : function(t, o) { return t[onKey] === o[equalKey]},
             join = $.hash();
 
         function addRecord(thisResult, otherResult) {
@@ -78,7 +79,7 @@ collection.prototype = {
 
         thisResults.each(function(thisResult) {
             otherResults.each(function(otherResult) {
-                if(thisResult[onKey] === otherResult[equalKey]) {
+                if(func(thisResult, otherResult)) {
                     addRecord(thisResult, otherResult)
                 }
             });

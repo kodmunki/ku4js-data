@@ -319,7 +319,61 @@ $(function(){
         equal(result[1]["collection2.id"], 230);
         equal(result[1]["collection1.name"], "myName3");
         equal(result[1]["collection2.name"], "otherName3");
+    });
 
+     test("join with function", function() {
+        var collection1 = $.ku4collection("collection1").init([
+                {
+                    "id": 100,
+                    "name": "myName1"
+                },
+                {
+                    "id": 200,
+                    "name": "myName2"
+                },
+                {
+                    "id": 300,
+                    "name": "myName3"
+                }
+            ]),
+            collection2 = $.ku4collection("collection2").init([
+                {
+                    "id": 110,
+                    "cid": 100,
+                    "name": "otherName1"
+                },
+                {
+                    "id": 120,
+                    "cid": 200,
+                    "name": "otherName1"
+                },
+                {
+                    "id": 130,
+                    "cid": 300,
+                    "name": "otherName2"
+                },
+                {
+                    "id": 230,
+                    "cid": 300,
+                    "name": "otherName3"
+                }
+            ]);
+
+        var join = collection1.join(collection2, function(c1, c2) {
+                var regexp = /Name3/;
+                return  c1.id === c2.cid &&
+                        regexp.test(c1.name) &&
+                        regexp.test(c2.name);
+            }),
+            result = join.find();
+
+        expect(6);
+        equal(join.count(), 1);
+        equal(result.length, 1);
+        equal(result[0]["collection1.id"], 300);
+        equal(result[0]["collection2.id"], 230);
+        equal(result[0]["collection1.name"], "myName3");
+        equal(result[0]["collection2.name"], "otherName3");
     });
 
     test("exec", function(){
