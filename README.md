@@ -135,7 +135,7 @@ The first method of querying is the most simple. It is a direct query in which y
 the objects in the collection that exactly match my query." To do this you pass an object containing the keys that you
 would like to query and have values equal to that, that you are expecting. For example
 ```javascript
-myCollection.find({"name": "myName}).;
+myCollection.find({"name": "myName"}).;
 ```
 This specifies that you would like to get back all records that have a "name" with value "myName".
 
@@ -164,6 +164,22 @@ myCollection.find({"$spec": $.spec(function(item) {
 ```
 For those unfamiliar with spec, this may look like an unnecessary step and you can simply stick to functions.
 For those who have harnessed the power of specs know that you can safely pass them in a $spec find.
+
+#####$orderby Find
+This allows you to order your results in ascending or descending order. To ascend you pass 1 to descend you pass -1. You
+will pass the 1 or -1 as a value of the key on which you want to order by.
+```javascript
+myCollection.find({"$orderby": {"price": -1}});
+```
+
+#####Complex Find
+You can use all of the various finds together as well! But they will run in a specified order. First a simple find or
+an $in runs. Then the $spec will run on the results of the simple find or $in results. Finally, $orderby will run to
+sort the results accordingly. For example, let's say we have a collection of cars and we want to find all cars of make:
+BMW, Volvo, or Honda that have a price between 30000 and 60000 and we want to order them
+```javascript
+myCollection.find({"$in": {"make": ["BMW", "Volvo", "Honda"]}, "$spec": function(item){ return item.price > 30000 && item.price < 60000; }, "$orderby": {"price": -1}});
+```
 
 ###store
 _Documentation Coming Soon_
