@@ -130,21 +130,29 @@ _Documentation Coming Soon_
 The find method is the means by which you can query your collections. There are many ways to query a collection from
 simple to complex. These methods are described below:
 
-* Simple Find | The first method of querying is the most simple. It is a direct query in which you are saying, "Give me
+* **Simple Find** | The first method of querying is the most simple. It is a direct query in which you are saying, "Give me
 the objects in the collection that exactly match my query." To do this you pass an object containing the keys that you
-would like to query and have values equal to that, that you are expecting. For example {"name": "myName}. This specifies
-that you would like to get back all records that have a "name" with value "myName".
-* $in Find | This find allows you to specify that you are intersted in values that exist in a set. For example you may
-have a collection of people, all of which have firstName. You could then pass, say {"$in": ["Alex", "Joe", "Erin"]} this
-query will return all records where the firstName is "Alex" or "Joe" or "Erin".
-* $spec Find | This find allows you to specify a policy that must be satisfied for the item to be included in the results.
+would like to query and have values equal to that, that you are expecting. For example
+    myCollection.find({"name": "myName}).;
+This specifies that you would like to get back all records that have a "name" with value "myName".
+
+* **$in Find** | This find allows you to specify that you are intersted in values that exist in a set. For example you may
+have a collection of people, all of which have firstName. You could then pass, say
+    myCollection.find({"$in": ["Alex", "Joe", "Erin"]});
+this query will return all records where the firstName is "Alex" or "Joe" or "Erin".
+
+* **$spec Find** | This find allows you to specify a policy that must be satisfied for the item to be included in the results.
 Let's say, for example, that you have a collection of cars. These cars all have doors and a price. If you want to find
 all cars that have 4 doors and are less than $30,000.00 you could pass
-{"$spec": function(item) { return item.doors == 4 && item.price < 300000; }}.
+    myCollection.find({"$spec": function(item) {
+     return item.doors == 4 && item.price < 300000;
+    }});
 You can also pass a $.spec if you are using ku4jQuery-kernel. If this is the case you would simply pass
-{"$spec": $.spec(function(item) { return item.doors == 4 && item.price < 300000; })}. For those unfamiliar with spec, this
-may look like an unnecessary step and you can simply stick to functions. For those who have harnessed the power of specs
-know that you can safely pass them in a $spec find.
+    myCollection.find({"$spec": $.spec(function(item) {
+     return item.doors == 4 && item.price < 300000;
+    })}.
+For those unfamiliar with spec, this may look like an unnecessary step and you can simply stick to functions.
+For those who have harnessed the power of specs know that you can safely pass them in a $spec find.
 
 ###store
 _Documentation Coming Soon_
