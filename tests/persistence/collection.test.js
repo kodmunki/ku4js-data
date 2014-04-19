@@ -151,7 +151,6 @@ $(function(){
         equal(test[2].email, data1.email);
     });
 
-    //$in call does not seem to be working for the caseStatus example
     test("find in", function() {
         var collection = $.ku4collection("test"),
             data1 = {
@@ -355,6 +354,52 @@ $(function(){
         equal(test[0].address, data1.email);
         equal(test[1].id, 1);
         equal(test[1].address, data2.email);
+    });
+
+   test("spec", function() {
+        var collection = $.ku4collection("test"),
+            data1 = {
+                "name": "John",
+                "email": "john.a@email.com",
+                "street1": "Street A11",
+                "street2": "Street A22",
+                "city": "City 1",
+                "state": "AA",
+                "zip": 11111
+            },
+            data2 = {
+                "name": "Jim",
+                "email": "john.c@email.com",
+                "street1": "Street B11",
+                "street2": "Street B22",
+                "city": "City 2",
+                "state": "BB",
+                "zip": 22222
+            },
+            data3 = {
+                "name": "Jane",
+                "email": "john.b@email.com",
+                "street1": "Street C11",
+                "street2": "Street C22",
+                "city": "City 3",
+                "state": "CC",
+                "zip": 33333
+            };
+        collection.insert(data1);
+        collection.insert(data2);
+        collection.insert(data3);
+
+        expect(6);
+        equal(collection.find().length, 3);
+
+        var test1 = collection.find({"$spec": $.spec(function(item) { return item.zip < 30000})});
+        equal(test1.length, 2);
+        equal(test1[0].email, data1.email);
+        equal(test1[1].email, data2.email);
+
+        var test2 = collection.find({"$spec": $.spec(function(item) { return item.zip > 30000})});
+        equal(test2.length, 1);
+        equal(test2[0].email, data3.email);
     });
 
     test("serialize", function() {

@@ -713,15 +713,17 @@ collection.prototype = {
         if(!$.exists(query)) return this._data.values();
 
         var $in = query.$in,
+            $spec = query.$spec,
             $orderby = query.$orderby,
             criteria = ($.exists(query.$criteria)) ? query.$criteria : query,
-            dto = $.dto(criteria).remove("$in").remove("$orderby"),
+            dto = $.dto(criteria).remove("$in").remove("$spec").remove("$orderby"),
             results = ($.exists($in))
                 ? collection_in(this._data, $in)
                 : (dto.isEmpty())
                     ? this._data.values()
                     : collection_find(this._data, dto.toObject());
 
+        if($.exists($spec)) results = collection_spec(results, $spec);
         return ($.exists($orderby)) ? collection_orderby(results, $orderby) : results;
     },
     insert: function(entity) {
@@ -814,6 +816,15 @@ function collection_in(data, criteria) {
         results = results.concat(collection_find(data, $.hash().add(key, value).toObject()));
     });
     return results;
+}
+
+function collection_spec(arry, spec) {
+    var results = $.list(),
+        _spec = ($.exists(spec.isSatisfiedBy)) ? spec : $.spec(spec);
+    $.list(arry).each(function(item){
+        if(_spec.isSatisfiedBy(item)) results.add(item);
+    });
+    return results.toArray();
 }
 
 function collection_orderby(arry, criteria) {
