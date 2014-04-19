@@ -123,6 +123,7 @@ _Documentation Coming Soon_
 | update(criteria, updates) | this | Updates all entities that satisfy the criteria with the data in updates. |
 | remove(criteria) | this | Removes all entities that satisfy the criteria. |
 | join(otherCollection, on, equals) | collection | Joins this collection with otherCollection on collection[on] == otherCollection[equals] |
+| exec(function) | collection | Runs the function for each item in the results passing the result as the argument to the function. Then function should return a value as that value will be the value in the find results. |
 | init(array) | this | Clears this collection and initializes it with the entities in the array. |
 | save() | this | Saves this collection to localStorage (as available). |
 
