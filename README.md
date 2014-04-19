@@ -177,7 +177,7 @@ myCollection.find({"$orderby": {"price": -1}});
 You can use all of the various finds together as well! But they will run in a specified order. First a simple find or
 an $in runs. Then the $spec will run on the results of the simple find or $in results. Finally, $orderby will run to
 sort the results accordingly. For example, let's say we have a collection of cars and we want to find all cars of make:
-BMW, Volvo, or Honda that have a price between 30000 and 60000 and we want to order them
+BMW, Volvo, or Honda that have a price between 30000 and 60000 and we want to order them.
 ```javascript
 myCollection.find({
  "$in": {"make": ["BMW", "Volvo", "Honda"]},
