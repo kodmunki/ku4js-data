@@ -139,7 +139,7 @@ myCollection.find({"name": "myName}).;
 This specifies that you would like to get back all records that have a "name" with value "myName".
 
 * **$in Find** | This find allows you to specify that you are intersted in values that exist in a set. For example you may
-have a collection of people, all of which have firstName. You could then pass, say
+have a collection of people, all of which have a firstName. You could then find all of the people in a set by doing the following:
 ```javascript
 myCollection.find({"$in": ["Alex", "Joe", "Erin"]});
 ```
@@ -147,13 +147,13 @@ this query will return all records where the firstName is "Alex" or "Joe" or "Er
 
 * **$spec Find** | This find allows you to specify a policy that must be satisfied for the item to be included in the results.
 Let's say, for example, that you have a collection of cars. These cars all have doors and a price. If you want to find
-all cars that have 4 doors and are less than $30,000.00 you could pass
+all cars that have 4 doors and are less than $30,000.00 you could do the following:
 ```javascript
 myCollection.find({"$spec": function(item) {
   return item.doors == 4 && item.price < 300000;
 }});
 ```
-You can also pass a $.spec if you are using ku4jQuery-kernel. If this is the case you would simply pass
+You can also pass a $.spec if you are using ku4jQuery-kernel.
 ```javascript
 myCollection.find({"$spec": $.spec(function(item) {
   return item.doors == 4 && item.price < 300000;
