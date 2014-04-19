@@ -130,7 +130,8 @@ _Documentation Coming Soon_
 The find method is the means by which you can query your collections. There are many ways to query a collection from
 simple to complex. These methods are described below:
 
-* **Simple Find** | The first method of querying is the most simple. It is a direct query in which you are saying, "Give me
+#####Simple Find
+The first method of querying is the most simple. It is a direct query in which you are saying, "Give me
 the objects in the collection that exactly match my query." To do this you pass an object containing the keys that you
 would like to query and have values equal to that, that you are expecting. For example
 ```javascript
@@ -138,14 +139,16 @@ myCollection.find({"name": "myName}).;
 ```
 This specifies that you would like to get back all records that have a "name" with value "myName".
 
-* **$in Find** | This find allows you to specify that you are intersted in values that exist in a set. For example you may
+#####$in Find
+This find allows you to specify that you are intersted in values that exist in a set. For example you may
 have a collection of people, all of which have a firstName. You could then find all of the people in a set by doing the following
 which will return all records where the firstName is "Alex" or "Joe" or "Erin".
 ```javascript
 myCollection.find({"$in": ["Alex", "Joe", "Erin"]});
 ```
 
-* **$spec Find** | This find allows you to specify a policy that must be satisfied for the item to be included in the results.
+#####$spec Find
+This find allows you to specify a policy that must be satisfied for the item to be included in the results.
 Let's say, for example, that you have a collection of cars. These cars all have doors and a price. If you want to find
 all cars that have 4 doors and are less than $30,000.00 you could do the following:
 ```javascript
