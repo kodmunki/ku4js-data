@@ -1,15 +1,15 @@
 $(function(){
     function notOk(s, m) {equal(s,false,m);}
 
-    module("collection Test");
+    module("execCollection Test");
 
     test("new", function() {
         expect(1);
-        ok($.ku4collection("test"));
+        ok($.ku4collection("test").exec(function(item) { return item; }));
     });
 
     test("find", function() {
-        var collection = $.ku4collection("test"),
+        var collection = $.ku4collection("test").exec(function(item) { return item; }),
             data1 = {
                 "name": "John",
                 "email": "email@email.com"
@@ -41,7 +41,7 @@ $(function(){
     });
 
     test("find with $criteria", function() {
-        var collection = $.ku4collection("test"),
+        var collection = $.ku4collection("test").exec(function(item) { return item; }),
             data1 = {
                 "name": "John",
                 "email": "email@email.com"
@@ -68,7 +68,7 @@ $(function(){
     });
 
     test("orderby ascending empty query", function() {
-        var collection = $.ku4collection("test"),
+        var collection = $.ku4collection("test").exec(function(item) { return item; }),
             data1 = {
                 "name": "John",
                 "email": "john.a@email.com"
@@ -96,7 +96,7 @@ $(function(){
     });
 
     test("orderby ascending", function() {
-        var collection = $.ku4collection("test"),
+        var collection = $.ku4collection("test").exec(function(item) { return item; }),
             data1 = {
                 "name": "John",
                 "email": "john.a@email.com"
@@ -124,7 +124,7 @@ $(function(){
     });
 
     test("orderby descending", function() {
-        var collection = $.ku4collection("test"),
+        var collection = $.ku4collection("test").exec(function(item) { return item; }),
             data1 = {
                 "name": "John",
                 "email": "john.a@email.com"
@@ -152,7 +152,7 @@ $(function(){
     });
 
     test("find in", function() {
-        var collection = $.ku4collection("test"),
+        var collection = $.ku4collection("test").exec(function(item) { return item; }),
             data1 = {
                 "name": "John",
                 "email": "john.a@email.com",
@@ -194,7 +194,7 @@ $(function(){
     });
 
     test("insert", function() {
-        var collection = $.ku4collection("test");
+        var collection = $.ku4collection("test").exec(function(item) { return item; });
         expect(3);
 
         ok(collection.isEmpty());
@@ -208,7 +208,7 @@ $(function(){
     });
 
     test("remove", function() {
-        var collection = $.ku4collection("test"),
+        var collection = $.ku4collection("test").exec(function(item) { return item; }),
             data1 = {
                 "name": "John",
                 "email": "email@email.com"
@@ -232,7 +232,7 @@ $(function(){
     });
 
     test("update", function() {
-        var collection = $.ku4collection("test").init([
+        var collection = $.ku4collection("test").exec(function(item) { return item; }).init([
             {
                 "name": "John",
                 "email": "john@email.com"
@@ -377,7 +377,7 @@ $(function(){
     });
 
     test("exec", function(){
-        var collection = $.ku4collection("test").exec(function(item){ return { "id": 1, "address": item.email } }),
+        var collection = $.ku4collection("test").exec(function(item) { return item; }).exec(function(item){ return { "id": 1, "address": item.email } }),
             data1 = {
                 "name": "John",
                 "email": "email@email.com"
@@ -410,8 +410,8 @@ $(function(){
         equal(test[1].address, data2.email);
     });
 
-    test("spec", function() {
-        var collection = $.ku4collection("test"),
+   test("spec", function() {
+        var collection = $.ku4collection("test").exec(function(item) { return item; }),
             data1 = {
                 "name": "John",
                 "email": "john.a@email.com",
@@ -457,7 +457,7 @@ $(function(){
     });
 
     test("serialize", function() {
-        var collection = $.ku4collection("test")
+        var collection = $.ku4collection("test").exec(function(item) { return item; })
                 .insert({
                     "name": "Serial",
                     "email": "Seri@lize.com"
@@ -481,7 +481,7 @@ $(function(){
                 "name": "Serial",
                 "email": "Seri@lize.com"
             },
-            collection = $.ku4collection("test").init([data1, data2]),
+            collection = $.ku4collection("test").exec(function(item) { return item; }).init([data1, data2]),
             regex = /\{"name":"test"\,"data":\{"[A-z0-9]{32}":\{"name":"Serial"\,"email":"Seri@lize.com"\}\,"[A-z0-9]{32}":\{"name":"Serial"\,"email":"Seri@lize.com"\}\}\}/,
             serialized = collection.serialize(),
             deserialized = $.ku4collection.deserialize(serialized),

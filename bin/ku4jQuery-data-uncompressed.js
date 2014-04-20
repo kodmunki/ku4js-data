@@ -703,11 +703,7 @@ collection.prototype = {
     store: function(store) { this._store = store; return this; },
     save: function() { this._store.write(this); return this; },
     init: function(list) {
-        this.__delete();
-        $.list(list).each(function(entity) {
-            this.insert(entity);
-        }, this);
-        return this;
+        return this.__delete().insertList(list);
     },
     find: function(query) {
         if(!$.exists(query)) return this._data.values();
@@ -731,6 +727,10 @@ collection.prototype = {
             dto = $.dto(entity),
             data = dto.toObject();
         this._data.add(ku4Id, data);
+        return this;
+    },
+    insertList: function(list) {
+        $.list(list).each(function(entity) { this.insert(entity); }, this);
         return this;
     },
     remove: function(criteria) {
@@ -783,7 +783,7 @@ collection.prototype = {
         return new execCollection(this, func);
     },
     __delete: function() {
-        this._store.remove(this);
+        this.remove()._store.remove(this);
         return this;
     },
     serialize: function() {
@@ -793,7 +793,7 @@ collection.prototype = {
 
         return value;
     }
-}
+};
 $.ku4collection = function(name, obj) { return new collection(name, obj); };
 $.ku4collection.deserialize = function(serialized) {
     var obj = $.json.deserialize(serialized);
