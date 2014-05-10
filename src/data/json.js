@@ -24,26 +24,25 @@ $.json.serialize = function(obj) {
     return $.str.format(f, r);
 };
 $.json.deserialize = function(str) {
-    if ($.isObject(str)) return str;
-    if ($.isString(str))
-        try {
-            var obj = eval("(" + json_deserializeString(str) + ")");
-            if(!$.exists(obj)) return obj;
-            if($.isNullOrEmpty(obj.tagName) &&
-                ($.isObject(obj) || $.isArray(obj))) {
-                for (var n in obj) {
-                    var value = obj[n];
-                    if(/\d{4}\-\d{2}\-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z/.test(obj[n]))
-                        obj[n] = $.dayPoint.parse(value).toDate();
+    try {
+        var obj = ($.isString(str)) ? eval("(" + json_deserializeString(str) + ")") : str;
+        if(!$.exists(obj)) return obj;
+        if($.isNullOrEmpty(obj.tagName) &&
+            ($.isObject(obj) || $.isArray(obj))) {
+            for (var n in obj) {
+                var value = obj[n];
+                if ($.isObject(value) || $.isArray(value)) obj[n] = $.json.deserialize(value);
+                if(/\d{4}\-\d{2}\-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z/.test(value) && $.dayPoint.canParse(value)) {
+                    obj[n] = $.dayPoint.parse(value).toDate();
                 }
-                return obj;
             }
-            return (/\d{4}\-\d{2}\-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z/.test(obj))
-                    ? $.dayPoint.parse(obj).toDate()
-                    : obj;
+            return obj;
         }
-        catch (e) { return str; }
-    return undefined;
+        return (/\d{4}\-\d{2}\-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z/.test(obj))
+                ? $.dayPoint.parse(obj).toDate()
+                : obj;
+    }
+    catch (e) { return str; }
 };
 
 function json_serializeString(str) {

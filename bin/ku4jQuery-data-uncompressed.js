@@ -294,12 +294,16 @@ var cookie_defaultParams = $.hash({name:$.uid("COOKIE"),
 var cookie_buildInfoPair = function(k, v) { return k + "=" + v; };
 
 function dto(obj) {
+    this._isArray = ($.isArray(obj) || obj instanceof $.list.Class);
     dto.base.call(this, obj);
 }
 dto.prototype = {
     name: function(name){ return this.set("name", name); },
-    toJson: function() { return $.json.serialize(this.$h); },
+    toJson: function() {
+        return $.json.serialize(this.toObject());
+    },
     toQueryString: function() { return $.queryString.serialize(this.$h); },
+
     saveAs: function(name) {
         if(!name) throw $.exception("arg", "$.dto.saveAs requires a name");
         $.cookie(name).save(this.$h);
@@ -316,7 +320,8 @@ dto.prototype = {
         if($.exists(name)) $.cookie.erase(name);
         return this;
     },
-    replicate: function(){ return $.dto($.replicate(this.$h)); }
+    replicate: function(){ return $.dto($.replicate(this.$h)); },
+    toObject: function() { return (this._isArray) ? this.values() : this.$h; }
 };
 $.Class.extend(dto, $.hash.Class);
 
@@ -356,26 +361,25 @@ $.json.serialize = function(obj) {
     return $.str.format(f, r);
 };
 $.json.deserialize = function(str) {
-    if ($.isObject(str)) return str;
-    if ($.isString(str))
-        try {
-            var obj = eval("(" + json_deserializeString(str) + ")");
-            if(!$.exists(obj)) return obj;
-            if($.isNullOrEmpty(obj.tagName) &&
-                ($.isObject(obj) || $.isArray(obj))) {
-                for (var n in obj) {
-                    var value = obj[n];
-                    if(/\d{4}\-\d{2}\-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z/.test(obj[n]))
-                        obj[n] = $.dayPoint.parse(value).toDate();
+    try {
+        var obj = ($.isString(str)) ? eval("(" + json_deserializeString(str) + ")") : str;
+        if(!$.exists(obj)) return obj;
+        if($.isNullOrEmpty(obj.tagName) &&
+            ($.isObject(obj) || $.isArray(obj))) {
+            for (var n in obj) {
+                var value = obj[n];
+                if ($.isObject(value) || $.isArray(value)) obj[n] = $.json.deserialize(value);
+                if(/\d{4}\-\d{2}\-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z/.test(value) && $.dayPoint.canParse(value)) {
+                    obj[n] = $.dayPoint.parse(value).toDate();
                 }
-                return obj;
             }
-            return (/\d{4}\-\d{2}\-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z/.test(obj))
-                    ? $.dayPoint.parse(obj).toDate()
-                    : obj;
+            return obj;
         }
-        catch (e) { return str; }
-    return undefined;
+        return (/\d{4}\-\d{2}\-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z/.test(obj))
+                ? $.dayPoint.parse(obj).toDate()
+                : obj;
+    }
+    catch (e) { return str; }
 };
 
 function json_serializeString(str) {

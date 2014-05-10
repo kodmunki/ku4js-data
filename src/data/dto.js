@@ -1,10 +1,14 @@
 function dto(obj) {
+    this._isArray = ($.isArray(obj) || obj instanceof $.list.Class);
     dto.base.call(this, obj);
 }
 dto.prototype = {
     name: function(name){ return this.set("name", name); },
-    toJson: function() { return $.json.serialize(this.$h); },
+    toJson: function() {
+        return $.json.serialize(this.toObject());
+    },
     toQueryString: function() { return $.queryString.serialize(this.$h); },
+
     saveAs: function(name) {
         if(!name) throw $.exception("arg", "$.dto.saveAs requires a name");
         $.cookie(name).save(this.$h);
@@ -21,7 +25,8 @@ dto.prototype = {
         if($.exists(name)) $.cookie.erase(name);
         return this;
     },
-    replicate: function(){ return $.dto($.replicate(this.$h)); }
+    replicate: function(){ return $.dto($.replicate(this.$h)); },
+    toObject: function() { return (this._isArray) ? this.values() : this.$h; }
 };
 $.Class.extend(dto, $.hash.Class);
 
