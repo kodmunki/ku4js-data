@@ -4,9 +4,7 @@ function dto(obj) {
 }
 dto.prototype = {
     name: function(name){ return this.set("name", name); },
-    toJson: function() {
-        return $.json.serialize(this.toObject());
-    },
+    toJson: function() { return $.json.serialize(this.toObject()); },
     toQueryString: function() { return $.queryString.serialize(this.$h); },
 
     saveAs: function(name) {
@@ -26,7 +24,10 @@ dto.prototype = {
         return this;
     },
     replicate: function(){ return $.dto($.replicate(this.$h)); },
-    toObject: function() { return (this._isArray) ? this.values() : this.$h; }
+    toObject: function() { return (this._isArray) ? this.values() : this.$h; },
+    filter: function() {
+        return $.dto(dto.base.prototype.filter.apply(this, arguments));
+    }
 };
 $.Class.extend(dto, $.hash.Class);
 

@@ -321,7 +321,10 @@ dto.prototype = {
         return this;
     },
     replicate: function(){ return $.dto($.replicate(this.$h)); },
-    toObject: function() { return (this._isArray) ? this.values() : this.$h; }
+    toObject: function() { return (this._isArray) ? this.values() : this.$h; },
+    filter: function() {
+        return new dto(dto.base.prototype.filter.apply(this, arguments));
+    }
 };
 $.Class.extend(dto, $.hash.Class);
 

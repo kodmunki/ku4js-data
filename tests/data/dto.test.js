@@ -30,6 +30,22 @@ $(function(){
         ok(rep1.containsKey("new"));
     });
 
+    test("filter", function() {
+        var dto = $.dto({
+            "zero": 0,
+            "empty": "",
+            "date": new Date(2013, 1, 1)
+        }).filter("zero", "date");
+    
+        expect(6);
+        ok(dto.containsKey("zero"), "containsKey(\"zero\")");
+        ok(dto.containsKey("date"), "containsKey(\"date\")");
+        equal(dto.count(), 2, "count");
+        equal(dto.find("zero"), 0);
+        deepEqual(dto.find("date"), new Date(2013, 1, 1));
+        equal(dto.toJson(), "{\"zero\":0,\"date\":\"2013-02-01T06:00:00.000Z\"}");
+    });
+
     test("parseJson", function() {
         var testSerialized = '{"a":null,"man":{"sex":"m","age":25,"married":true,"children":["Tom","Dick","Jane"],"contact":{"home":9998887777}},"date":"1906-08-04T05:00:00.000Z","multiline":"Here is\\\\ \/ a multiline\\f\\nparagraph\\rfor\\ttesting","html":"<html class=\\\"css-class\\\"></html>"}',
             testDeserialized = {a:null, b:undefined, man:{sex:"m", age:25, married:true, children:["Tom","Dick","Jane"],contact:{"home":9998887777}},"date":new Date(1,1,2011),"multiline":"Here is\\ / a multiline\f\nparagraph\rfor\ttesting","html":"<html class=\"css-class\"></html>"};
