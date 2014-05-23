@@ -1,4 +1,4 @@
-(function(l){ $=l;
+(function(l){
 function service(){
     service.base.call(this);
     this._processId = $.uid("svc");
@@ -941,4 +941,4 @@ $.ku4store = function() {
     else return new store();
 };
 
-})(jQuery);
+})();

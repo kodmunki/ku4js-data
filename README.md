@@ -1,12 +1,12 @@
-ku4jQuery-data
+ku4js-data
 ==============
 
-kodmunki™ utilities for jQuery data.
+kodmunki™ utilities for JavaScript data.
 
 This library includes Query String and JSON parsers, Data Transfer Objects, ajax services, and persistent, validatable, and transferable forms
 
 #Dependencies
-* ku4jQuery-kernel - https://github.com/kodmunki/ku4jQuery-kernel
+* ku4js-kernel - https://github.com/kodmunki/ku4js-kernel
 
 #kodmunki™ build process
 
@@ -21,7 +21,6 @@ The following variables found in setup () are
 expected to be changed by the developer running
 this process:
 
-* LIBRARY (The library to build for or {} for none)
 * PROJNAME (The name of your project)
 * STARTMSG (A message to echo at start of build)
 * ENDMSG (A message to echo at end of build)
@@ -29,7 +28,7 @@ this process:
 ---
 
 #Documentation
-The following is documentation for each class in the ku4jQuery-data library organized by common domain to follow the
+The following is documentation for each class in the ku4js-data library organized by common domain to follow the
 directory structure found in /src. All constructors are empty unless otherwise noted.
 
 ##Ajax
@@ -158,7 +157,7 @@ myCollection.find({"$spec": function(item) {
   return item.doors == 4 && item.price < 300000;
 }});
 ```
-You can also pass a $.spec if you are using ku4jQuery-kernel.
+You can also pass a $.spec if you are using ku4js-kernel.
 ```javascript
 myCollection.find({"$spec": $.spec(function(item) {
   return item.doors == 4 && item.price < 300000;

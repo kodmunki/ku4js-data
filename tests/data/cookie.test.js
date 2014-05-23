@@ -8,9 +8,8 @@ $(function(){
     module("cookie");
 
     test("create", function() {
-        expect(2);
+        expect(1);
         ok(cookie);
-        ok(cookie.isTypeOf($.cookie.Class));
     });
     
     test("save", function() {

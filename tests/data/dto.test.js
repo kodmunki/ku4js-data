@@ -8,9 +8,8 @@ $(function(){
     module("dto");
 
     test("create", function() {
-        expect(2);
+        expect(1);
         ok(dto1);
-        ok(dto1.isTypeOf($.dto.Class));
     });
 
     test("replicate", function() {
