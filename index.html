@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <title>ku4jQuery-data by kodmunki</title>
+    <title>ku4js-data by kodmunki</title>
 
     <link rel="stylesheet" href="stylesheets/styles.css">
     <link rel="stylesheet" href="stylesheets/pygment_trac.css">
@@ -15,23 +15,23 @@
   <body>
     <div class="wrapper">
       <header>
-        <h1>ku4jQuery-data</h1>
-        <p>kodmunki™ utilities for jQuery data</p>
+        <h1>ku4js-data</h1>
+        <p>kodmunki™ utilities for JavaScript data</p>
 
-        <p class="view"><a href="https://github.com/kodmunki/ku4jQuery-data">View the Project on GitHub <small>kodmunki/ku4jQuery-data</small></a></p>
+        <p class="view"><a href="https://github.com/kodmunki/ku4js-data">View the Project on GitHub <small>kodmunki/ku4js-data</small></a></p>
 
 
         <ul>
-          <li><a href="https://github.com/kodmunki/ku4jQuery-data/zipball/master">Download <strong>ZIP File</strong></a></li>
-          <li><a href="https://github.com/kodmunki/ku4jQuery-data/tarball/master">Download <strong>TAR Ball</strong></a></li>
-          <li><a href="https://github.com/kodmunki/ku4jQuery-data">View On <strong>GitHub</strong></a></li>
+          <li><a href="https://github.com/kodmunki/ku4js-data/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/kodmunki/ku4js-data/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/kodmunki/ku4js-data">View On <strong>GitHub</strong></a></li>
         </ul>
       </header>
       <section>
         <h1>
-<a name="ku4jquery-data" class="anchor" href="#ku4jquery-data"><span class="octicon octicon-link"></span></a>ku4jQuery-data</h1>
+<a name="ku4js-data" class="anchor" href="#ku4js-data"><span class="octicon octicon-link"></span></a>ku4js-data</h1>
 
-<p>kodmunki™ utilities for jQuery data.</p>
+<p>kodmunki™ utilities for JavaScript data.</p>
 
 <p>This library includes Query String and JSON parsers, Data Transfer Objects, ajax services, and persistent, validatable, and transferable forms</p>
 
@@ -39,7 +39,7 @@
 <a name="dependencies" class="anchor" href="#dependencies"><span class="octicon octicon-link"></span></a>Dependencies</h1>
 
 <ul>
-<li>ku4jQuery-kernel - <a href="https://github.com/kodmunki/ku4jQuery-kernel">https://github.com/kodmunki/ku4jQuery-kernel</a>
+<li>ku4js-kernel - <a href="https://github.com/kodmunki/ku4js-kernel">https://github.com/kodmunki/ku4js-kernel</a>
 </li>
 </ul><h1>
 <a name="kodmunki-build-process" class="anchor" href="#kodmunki-build-process"><span class="octicon octicon-link"></span></a>kodmunki™ build process</h1>
@@ -60,14 +60,13 @@ expected to be changed by the developer running
 this process:</p>
 
 <ul>
-<li>LIBRARY (The library to build for or {} for none)</li>
 <li>PROJNAME (The name of your project)</li>
 <li>STARTMSG (A message to echo at start of build)</li>
 <li>ENDMSG (A message to echo at end of build)</li>
 </ul><hr><h1>
 <a name="documentation" class="anchor" href="#documentation"><span class="octicon octicon-link"></span></a>Documentation</h1>
 
-<p>The following is documentation for each class in the ku4jQuery-data library organized by common domain to follow the
+<p>The following is documentation for each class in the ku4js-data library organized by common domain to follow the
 directory structure found in /src. All constructors are empty unless otherwise noted.</p>
 
 <h2>
@@ -433,7 +432,7 @@ all cars that have 4 doors and are less than $30,000.00 you could do the followi
 <span class="p">}});</span>
 </pre></div>
 
-<p>You can also pass a $.spec if you are using ku4jQuery-kernel.</p>
+<p>You can also pass a $.spec if you are using ku4js-kernel.</p>
 
 <div class="highlight highlight-javascript"><pre><span class="nx">myCollection</span><span class="p">.</span><span class="nx">find</span><span class="p">({</span><span class="s2">"$spec"</span><span class="o">:</span> <span class="nx">$</span><span class="p">.</span><span class="nx">spec</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">item</span><span class="p">)</span> <span class="p">{</span>
   <span class="k">return</span> <span class="nx">item</span><span class="p">.</span><span class="nx">doors</span> <span class="o">==</span> <span class="mi">4</span> <span class="o">&amp;&amp;</span> <span class="nx">item</span><span class="p">.</span><span class="nx">price</span> <span class="o">&lt;</span> <span class="mi">300000</span><span class="p">;</span>
