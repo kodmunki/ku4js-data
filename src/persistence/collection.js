@@ -10,7 +10,7 @@ collection.prototype = {
     isEmpty: function() { return this._data.isEmpty(); },
     count: function() { return this._data.count(); },
     store: function(store) { this._store = store; return this; },
-    save: function() { this._store.write(this); return this; },
+    save: function(callback) { this._store.write(this, callback); return this; },
     init: function(list) {
         return this.__delete().insertList(list);
     },
@@ -91,16 +91,16 @@ collection.prototype = {
             throw $.ku4exception("$.collection", $.str.format("Invalid function={0}. exec method requires a function.", name));
         return new execCollection(this, func);
     },
-    __delete: function() {
+    __delete: function(callback) {
         this.remove()._store.remove(this);
         return this;
     },
+    toObject: function() { return this._data.toObject(); },
     serialize: function() {
         var name = this._name,
-            data = this._data.toObject(),
-            value = $.json.serialize({ "name": name, "data": data });
+            data = this.toObject();
 
-        return value;
+        return $.json.serialize({ "name": name, "data": data });
     }
 };
 $.ku4collection = function(name, obj) { return new collection(name, obj); };

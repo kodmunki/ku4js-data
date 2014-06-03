@@ -706,7 +706,7 @@ collection.prototype = {
     isEmpty: function() { return this._data.isEmpty(); },
     count: function() { return this._data.count(); },
     store: function(store) { this._store = store; return this; },
-    save: function() { this._store.write(this); return this; },
+    save: function(callback) { this._store.write(this, callback); return this; },
     init: function(list) {
         return this.__delete().insertList(list);
     },
@@ -787,16 +787,16 @@ collection.prototype = {
             throw $.ku4exception("$.collection", $.str.format("Invalid function={0}. exec method requires a function.", name));
         return new execCollection(this, func);
     },
-    __delete: function() {
+    __delete: function(callback) {
         this.remove()._store.remove(this);
         return this;
     },
+    toObject: function() { return this._data.toObject(); },
     serialize: function() {
         var name = this._name,
-            data = this._data.toObject(),
-            value = $.json.serialize({ "name": name, "data": data });
+            data = this.toObject();
 
-        return value;
+        return $.json.serialize({ "name": name, "data": data });
     }
 };
 $.ku4collection = function(name, obj) { return new collection(name, obj); };
@@ -851,7 +851,7 @@ execCollection.prototype = {
     isEmpty: function() { return this._collection.isEmpty(); },
     count: function() { return this._collection.count(); },
     store: function(store) { this._collection.store(store); return this; },
-    save: function() { this._collection.save(); return this; },
+    save: function(callback) { this._collection.save(callback); return this; },
     init: function(list) {
         this._collection.init(list);
         return this;
@@ -891,8 +891,100 @@ execCollection.prototype = {
     }
 };
 
-function store() { }
-store.prototype = {
+function indexedDbStore(name) {
+    this._name = name || "ku4indexedDbStore";
+}
+indexedDbStore.prototype = {
+    read: function(collectionName, callback) {
+        var name = this._name,
+            me = this;
+
+        ku4indexedDbStore_openDb(name, function (err, db) {
+            db.transaction(collectionName)
+                .objectStore(collectionName)
+                .get(1)
+                .onsuccess = function (event) {
+                    var data = event.target.result,
+                        collection = $.ku4collection(collectionName, data).store(me);
+                    callback(null, collection);
+                    db.close();
+                };
+        });
+        return this;
+    },
+    write: function(collection, callback) {
+        var storeName = collection.name(),
+            name = this._name,
+            me = this;
+
+        ku4indexedDbStore_openDb(name, function (err, db) {
+            if($.exists(err)) callback(err, null);
+            else {
+                var request = db.transaction([storeName], "readwrite").objectStore(storeName).put(collection.toObject(), 1);
+                request.onerror = function () {
+                    callback(new Error("Error writing data to indexedDbStore"), me);
+                    db.close();
+                };
+                request.onsuccess = function () {
+                    callback(null, me);
+                    db.close();
+                };
+            }
+        }, this, storeName);
+        return this;
+    },
+    remove: function(collection, callback) {
+        var storeName = collection.name(),
+            name = this._name,
+            me = this;
+
+        ku4indexedDbStore_openDb(name, function (err, db) {
+            if($.exists(err)) callback(err, null);
+            else {
+                var request = db.transaction([storeName], "readwrite").objectStore(storeName)["delete"](1);
+                request.onerror = function () {
+                    callback(new Error("Error removing data to indexedDbStore"), me);
+                    db.close();
+                };
+                request.onsuccess = function () {
+                    callback(null, me);
+                    db.close();
+                };
+            }
+        }, this, storeName);
+        return this;
+    },
+    __delete: function() {
+        var idxdb = window.indexedDB || window.webkitIndexedDB || window.mozIndexedDB;
+        idxdb.deleteDatabase(this._name);
+        return this;
+    }
+};
+
+$.ku4indexedDbStore = function(name) { return new indexedDbStore(name); };
+
+function ku4indexedDbStore_openDb(name, callback, scope, storeName) {
+    var idxdb = window.indexedDB || window.webkitIndexedDB || window.mozIndexedDB,
+        request = idxdb.open(name, 101),
+        scp = scope || window;
+
+    request.error = function(){
+        callback.call(scp, new Error("Error opening Indexed Database."), null);
+    };
+
+    request.onupgradeneeded = function (event) {
+        var db = event.target.result;
+        db.createObjectStore(storeName, { autoIncrement: false });
+    };
+
+    request.onsuccess = function () {
+        var db = request.result;
+        callback.call(scp, null, db);
+    };
+}
+
+function localStorageStore() { }
+localStorageStore.prototype = {
     read: function(collectionName) {
         var collection = localStorage.getItem(collectionName);
         return ($.exists(collection))
@@ -912,33 +1004,39 @@ store.prototype = {
         return this;
     }
 };
+$.ku4localStorageStore = function() { return new localStorageStore(); };
 
-function tempStore() { }
-tempStore.prototype = {
+
+var __ku4MemoryStore = $.dto();
+
+function memoryStore() { }
+memoryStore.prototype = {
     read: function(collectionName) {
-        var collection = __ku4tempStore.find(collectionName);
+        var collection = __ku4MemoryStore.find(collectionName);
         return ($.exists(collection))
             ? $.ku4collection.deserialize(collection)
             : $.ku4collection(collectionName);
     },
     write: function(collection) {
-        __ku4tempStore.update(collection.name(), collection.serialize());
+        __ku4MemoryStore.update(collection.name(), collection.serialize());
         return this;
     },
     remove: function(collection) {
-        __ku4tempStore.remove(collection.name());
+        __ku4MemoryStore.remove(collection.name());
         return this;
     },
     __delete: function() {
-        __ku4tempStore.clear();
+        __ku4MemoryStore.clear();
         return this;
     }
 };
-var __ku4tempStore = $.dto();
+
+$.ku4memoryStore = function() { return new memoryStore(); };
+
 
 $.ku4store = function() {
-    if(!$.exists(localStorage)) return new tempStore();
-    else return new store();
+    if($.exists(localStorage)) return $.ku4localStorageStore();
+    else return new $.ku4memoryStore();
 };
 
 })();
