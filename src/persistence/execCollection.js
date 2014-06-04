@@ -38,8 +38,8 @@ execCollection.prototype = {
     exec: function(func) {
         return this._collection.exec(func);
     },
-    __delete: function() {
-        this._collection.__delete();
+    __delete: function(callback) {
+        this._collection.__delete(callback);
         return this;
     },
     serialize: function() {

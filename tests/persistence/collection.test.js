@@ -468,7 +468,7 @@ $(function(){
                 }),
             regex = /\{"name":"test"\,"data":\{"[A-z0-9]{32}":\{"name":"Serial"\,"email":"Seri@lize.com"\}\,"[A-z0-9]{32}":\{"name":"Serial"\,"email":"Seri@lize.com"\}\}\}/;
 
-        expect(1)
+        expect(1);
         ok(regex.test(collection.serialize()));
     });
 

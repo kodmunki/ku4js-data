@@ -78,7 +78,7 @@ $.ku4indexedDbStore = function(name) { return new indexedDbStore(name); };
 
 function ku4indexedDbStore_openDb(name, callback, scope, storeName) {
     var idxdb = indexedDB || webkitIndexedDB || mozIndexedDB,
-        request = idxdb.open(name, 101),
+        request = idxdb.open(name, 1),
         scp = scope || window;
 
     request.error = function(){
@@ -86,8 +86,8 @@ function ku4indexedDbStore_openDb(name, callback, scope, storeName) {
     };
 
     request.onupgradeneeded = function (event) {
-        var db = event.target.result;
-        db.createObjectStore(storeName, { autoIncrement: false });
+        var db = event.target.result,
+            objectStore = db.createObjectStore(storeName, { autoIncrement: false });
     };
 
     request.onsuccess = function () {
