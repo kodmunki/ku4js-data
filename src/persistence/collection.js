@@ -92,7 +92,7 @@ collection.prototype = {
         return new execCollection(this, func);
     },
     __delete: function(callback) {
-        this.remove()._store.remove(this);
+        this.remove()._store.remove(this, callback);
         return this;
     },
     toObject: function() { return this._data.toObject(); },
