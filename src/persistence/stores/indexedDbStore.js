@@ -89,8 +89,6 @@ function ku4indexedDbStore_openDb(name, callback, collectionName) {
                     ? idxdb.open(name)
                     : idxdb.open(name, __ku4indexedDbStoreVersion);
 
-    console.log("version == ", __ku4indexedDbStoreVersion);
-
     request.error = function(){
         callback(new Error("Error opening Indexed Database."), null);
     };
@@ -109,10 +107,8 @@ function ku4indexedDbStore_openDb(name, callback, collectionName) {
         }
         catch(e)
         {
-            console.log(e);
             __ku4indexedDbStoreVersion++;
             ku4indexedDbStore_openDb(name, callback, collectionName);
         }
-
     };
 }

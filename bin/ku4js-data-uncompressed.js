@@ -980,8 +980,6 @@ function ku4indexedDbStore_openDb(name, callback, collectionName) {
                     ? idxdb.open(name)
                     : idxdb.open(name, __ku4indexedDbStoreVersion);
 
-    console.log("version == ", __ku4indexedDbStoreVersion);
-
     request.error = function(){
         callback(new Error("Error opening Indexed Database."), null);
     };
@@ -1000,11 +998,9 @@ function ku4indexedDbStore_openDb(name, callback, collectionName) {
         }
         catch(e)
         {
-            console.log(e);
             __ku4indexedDbStoreVersion++;
             ku4indexedDbStore_openDb(name, callback, collectionName);
         }
-
     };
 }
 
@@ -1071,8 +1067,6 @@ $.ku4memoryStore = function() { return new memoryStore(); };
 
 
 $.ku4store = function() {
-    var idxdb = indexedDB || webkitIndexedDB || mozIndexedDB;
-    if($.exists(idxdb)) return $.ku4indexedDbStore();
     if($.exists(localStorage)) return $.ku4localStorageStore();
     else return new $.ku4memoryStore();
 };
