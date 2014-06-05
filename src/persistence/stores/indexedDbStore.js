@@ -16,11 +16,11 @@ indexedDbStore.prototype = {
                     if($.exists(callback)) callback(null, collection);
                     db.close();
                 };
-        }, this, collectionName);
+        }, collectionName);
         return this;
     },
     write: function(collection, callback) {
-        var storeName = collection.name(),
+        var collectionName = collection.name(),
             name = this._name,
             me = this;
 
@@ -29,7 +29,7 @@ indexedDbStore.prototype = {
                 if($.exists(callback)) callback(err, null);
             }
             else {
-                var request = db.transaction([storeName], "readwrite").objectStore(storeName).put(collection.toObject(), 1);
+                var request = db.transaction([collectionName], "readwrite").objectStore(collectionName).put(collection.toObject(), 1);
                 request.onerror = function () {
                     if($.exists(callback)) callback(new Error("Error writing data to indexedDbStore"), me);
                     db.close();
@@ -39,18 +39,18 @@ indexedDbStore.prototype = {
                     db.close();
                 };
             }
-        }, this, storeName);
+        }, collectionName);
         return this;
     },
     remove: function(collection, callback) {
-        var storeName = collection.name(),
+        var collectionName = collection.name(),
             name = this._name,
             me = this;
 
         ku4indexedDbStore_openDb(name, function (err, db) {
             if($.exists(err)) callback(err, null);
             else {
-                var request = db.transaction([storeName], "readwrite").objectStore(storeName)["delete"](1);
+                var request = db.transaction([collectionName], "readwrite").objectStore(collectionName)["delete"](1);
                 request.onerror = function () {
                     if($.exists(callback)) callback(new Error("Error removing data to indexedDbStore"), me);
                     db.close();
@@ -60,7 +60,7 @@ indexedDbStore.prototype = {
                     db.close();
                 };
             }
-        }, this, storeName);
+        }, collectionName);
         return this;
     },
     __delete: function(callback) {
@@ -76,22 +76,37 @@ indexedDbStore.prototype = {
 
 $.ku4indexedDbStore = function(name) { return new indexedDbStore(name); };
 
-function ku4indexedDbStore_openDb(name, callback, scope, storeName) {
-    var idxdb = indexedDB || webkitIndexedDB || mozIndexedDB,
-        request = idxdb.open(name, 1),
-        scp = scope || window;
+var __ku4indexedDbStoreVersion;
+function ku4indexedDbStore_openDb(name, callback, collectionName) {
+    var idxdb = indexedDB || webkitIndexedDB || mozIndexedDB;
+        request = (!__ku4indexedDbStoreVersion)
+                    ? idxdb.open(name)
+                    : idxdb.open(name, __ku4indexedDbStoreVersion);
+
+    console.log("version == ", __ku4indexedDbStoreVersion);
 
     request.error = function(){
-        callback.call(scp, new Error("Error opening Indexed Database."), null);
+        callback(new Error("Error opening Indexed Database."), null);
     };
 
     request.onupgradeneeded = function (event) {
         var db = event.target.result,
-            objectStore = db.createObjectStore(storeName, { autoIncrement: false });
+            objectStore = db.createObjectStore(collectionName, { autoIncrement: false });
     };
 
     request.onsuccess = function () {
         var db = request.result;
-        callback.call(scp, null, db);
+        __ku4indexedDbStoreVersion = db.version;
+        try {
+            db.transaction(collectionName);
+            callback(null, db);
+        }
+        catch(e)
+        {
+            console.log(e);
+            __ku4indexedDbStoreVersion++;
+            ku4indexedDbStore_openDb(name, callback, collectionName);
+        }
+
     };
 }
