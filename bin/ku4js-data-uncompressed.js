@@ -960,20 +960,23 @@ indexedDbStore.prototype = {
             me = this;
 
         request.onerror = function() { if($.exists(callback)) callback(new Error("Error deleting indexedDbStore.", me))};
-        request.onsuccess = function() {
-            __ku4indexedDbStoreVersion = null;
-            if($.exists(callback)) callback(null, me);
-        };
+        request.onsuccess = function() { if($.exists(callback)) callback(null, me); };
         return this;
+    },
+    __reset: function(callback) {
+        this.__delete(function(err, store) {
+            __ku4indexedDbStoreVersion = 0;
+            if($.exists(callback)) callback(err, store);
+        });
     }
 };
 
 $.ku4indexedDbStore = function(name) { return new indexedDbStore(name); };
 
-var __ku4indexedDbStoreVersion;
+var __ku4indexedDbStoreVersion = 0;
 function ku4indexedDbStore_openDb(name, callback, collectionName) {
-    var idxdb = indexedDB || webkitIndexedDB || mozIndexedDB;
-        request = (!__ku4indexedDbStoreVersion)
+    var idxdb = indexedDB || webkitIndexedDB || mozIndexedDB,
+        request = (__ku4indexedDbStoreVersion < 1)
                     ? idxdb.open(name)
                     : idxdb.open(name, __ku4indexedDbStoreVersion);
 
@@ -984,8 +987,8 @@ function ku4indexedDbStore_openDb(name, callback, collectionName) {
     };
 
     request.onupgradeneeded = function (event) {
-        var db = event.target.result,
-            objectStore = db.createObjectStore(collectionName, { autoIncrement: false });
+        var db = event.target.result;
+        db.createObjectStore(collectionName, { autoIncrement: false });
     };
 
     request.onsuccess = function () {
