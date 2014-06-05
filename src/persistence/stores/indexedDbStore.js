@@ -7,6 +7,7 @@ indexedDbStore.prototype = {
             me = this;
 
         ku4indexedDbStore_openDb(name, function (err, db) {
+            console.log("read ", collectionName);
             db.transaction(collectionName)
                 .objectStore(collectionName)
                 .get(1)
@@ -86,11 +87,14 @@ function ku4indexedDbStore_openDb(name, callback, scope, storeName) {
     };
 
     request.onupgradeneeded = function (event) {
+        console.log("onupgradeneeded", storeName);
         var db = event.target.result,
             objectStore = db.createObjectStore(storeName, { autoIncrement: false });
+        objectStore.transaction.oncomplete = function() { console.log("transaction complete"); }
     };
 
     request.onsuccess = function () {
+        console.log("onsuccess")
         var db = request.result;
         callback.call(scp, null, db);
     };

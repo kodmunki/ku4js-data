@@ -5,11 +5,11 @@ $(function(){
 
     test("new", function() {
         expect(1);
-        ok($.ku4collection("test").exec(function(item) { return item; }));
+        ok($.ku4collection("test").store($.ku4localStorageStore()).exec(function(item) { return item; }));
     });
 
     test("find", function() {
-        var collection = $.ku4collection("test").exec(function(item) { return item; }),
+        var collection = $.ku4collection("test").store($.ku4localStorageStore()).exec(function(item) { return item; }),
             data1 = {
                 "name": "John",
                 "email": "email@email.com"
@@ -41,7 +41,7 @@ $(function(){
     });
 
     test("find with $criteria", function() {
-        var collection = $.ku4collection("test").exec(function(item) { return item; }),
+        var collection = $.ku4collection("test").store($.ku4localStorageStore()).exec(function(item) { return item; }),
             data1 = {
                 "name": "John",
                 "email": "email@email.com"
@@ -68,7 +68,7 @@ $(function(){
     });
 
     test("orderby ascending empty query", function() {
-        var collection = $.ku4collection("test").exec(function(item) { return item; }),
+        var collection = $.ku4collection("test").store($.ku4localStorageStore()).exec(function(item) { return item; }),
             data1 = {
                 "name": "John",
                 "email": "john.a@email.com"
@@ -96,7 +96,7 @@ $(function(){
     });
 
     test("orderby ascending", function() {
-        var collection = $.ku4collection("test").exec(function(item) { return item; }),
+        var collection = $.ku4collection("test").store($.ku4localStorageStore()).exec(function(item) { return item; }),
             data1 = {
                 "name": "John",
                 "email": "john.a@email.com"
@@ -124,7 +124,7 @@ $(function(){
     });
 
     test("orderby descending", function() {
-        var collection = $.ku4collection("test").exec(function(item) { return item; }),
+        var collection = $.ku4collection("test").store($.ku4localStorageStore()).exec(function(item) { return item; }),
             data1 = {
                 "name": "John",
                 "email": "john.a@email.com"
@@ -152,7 +152,7 @@ $(function(){
     });
 
     test("find in", function() {
-        var collection = $.ku4collection("test").exec(function(item) { return item; }),
+        var collection = $.ku4collection("test").store($.ku4localStorageStore()).exec(function(item) { return item; }),
             data1 = {
                 "name": "John",
                 "email": "john.a@email.com",
@@ -194,7 +194,7 @@ $(function(){
     });
 
     test("insert", function() {
-        var collection = $.ku4collection("test").exec(function(item) { return item; });
+        var collection = $.ku4collection("test").store($.ku4localStorageStore()).exec(function(item) { return item; });
         expect(3);
 
         ok(collection.isEmpty());
@@ -208,7 +208,7 @@ $(function(){
     });
 
     test("remove", function() {
-        var collection = $.ku4collection("test").exec(function(item) { return item; }),
+        var collection = $.ku4collection("test").store($.ku4localStorageStore()).exec(function(item) { return item; }),
             data1 = {
                 "name": "John",
                 "email": "email@email.com"
@@ -232,7 +232,7 @@ $(function(){
     });
 
     test("update", function() {
-        var collection = $.ku4collection("test").exec(function(item) { return item; }).init([
+        var collection = $.ku4collection("test").store($.ku4localStorageStore()).exec(function(item) { return item; }).init([
             {
                 "name": "John",
                 "email": "john@email.com"
@@ -265,7 +265,7 @@ $(function(){
     });
 
     test("join", function() {
-        var collection1 = $.ku4collection("collection1").init([
+        var collection1 = $.ku4collection("collection1").store($.ku4localStorageStore()).init([
                 {
                     "id": 100,
                     "name": "myName1"
@@ -279,7 +279,7 @@ $(function(){
                     "name": "myName3"
                 }
             ]),
-            collection2 = $.ku4collection("collection2").init([
+            collection2 = $.ku4collection("collection2").store($.ku4localStorageStore()).init([
                 {
                     "id": 110,
                     "cid": 100,
@@ -322,7 +322,7 @@ $(function(){
     });
 
      test("join with function", function() {
-        var collection1 = $.ku4collection("collection1").init([
+        var collection1 = $.ku4collection("collection1").store($.ku4localStorageStore()).init([
                 {
                     "id": 100,
                     "name": "myName1"
@@ -336,7 +336,7 @@ $(function(){
                     "name": "myName3"
                 }
             ]),
-            collection2 = $.ku4collection("collection2").init([
+            collection2 = $.ku4collection("collection2").store($.ku4localStorageStore()).init([
                 {
                     "id": 110,
                     "cid": 100,
@@ -377,7 +377,7 @@ $(function(){
     });
 
     test("exec", function(){
-        var collection = $.ku4collection("test").exec(function(item) { return item; }).exec(function(item){ return { "id": 1, "address": item.email } }),
+        var collection = $.ku4collection("test").store($.ku4localStorageStore()).exec(function(item) { return item; }).exec(function(item){ return { "id": 1, "address": item.email } }),
             data1 = {
                 "name": "John",
                 "email": "email@email.com"
@@ -411,7 +411,7 @@ $(function(){
     });
 
    test("spec", function() {
-        var collection = $.ku4collection("test").exec(function(item) { return item; }),
+        var collection = $.ku4collection("test").store($.ku4localStorageStore()).exec(function(item) { return item; }),
             data1 = {
                 "name": "John",
                 "email": "john.a@email.com",
@@ -457,7 +457,7 @@ $(function(){
     });
 
     test("serialize", function() {
-        var collection = $.ku4collection("test").exec(function(item) { return item; })
+        var collection = $.ku4collection("test").store($.ku4localStorageStore()).exec(function(item) { return item; })
                 .insert({
                     "name": "Serial",
                     "email": "Seri@lize.com"
@@ -481,7 +481,7 @@ $(function(){
                 "name": "Serial",
                 "email": "Seri@lize.com"
             },
-            collection = $.ku4collection("test").exec(function(item) { return item; }).init([data1, data2]),
+            collection = $.ku4collection("test").store($.ku4localStorageStore()).exec(function(item) { return item; }).init([data1, data2]),
             regex = /\{"name":"test"\,"data":\{"[A-z0-9]{32}":\{"name":"Serial"\,"email":"Seri@lize.com"\}\,"[A-z0-9]{32}":\{"name":"Serial"\,"email":"Seri@lize.com"\}\}\}/,
             serialized = collection.serialize(),
             deserialized = $.ku4collection.deserialize(serialized),
@@ -498,7 +498,7 @@ $(function(){
 
     test("__delete", function() {
         expect(2);
-        $.ku4collection("test").insertList([
+        $.ku4collection("test").store($.ku4localStorageStore()).insertList([
             {
                 "name": "John",
                 "email": "email@email.com"
@@ -517,12 +517,12 @@ $(function(){
             }
         ]).save();
 
-        var results1 = $.ku4store().read("test").find();
+        var results1 = $.ku4localStorageStore().read("test").find();
         equal(results1.length, 4);
 
-        $.ku4store().read("test").__delete();
+        $.ku4localStorageStore().read("test").__delete();
 
-        $.ku4collection("test").insertList([
+        $.ku4collection("test").store($.ku4localStorageStore()).insertList([
             {
                 "name": "John",
                 "email": "email@email.com"
@@ -541,8 +541,8 @@ $(function(){
             }
         ]).save();
 
-        var results2 = $.ku4store().read("test").find();
+        var results2 = $.ku4localStorageStore().read("test").find();
         equal(results2.length, 4);
-        $.ku4store().read("test").__delete();
+        $.ku4localStorageStore().read("test").__delete();
     });
 });
