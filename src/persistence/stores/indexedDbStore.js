@@ -69,7 +69,10 @@ indexedDbStore.prototype = {
             me = this;
 
         request.onerror = function() { if($.exists(callback)) callback(new Error("Error deleting indexedDbStore.", me))};
-        request.onsuccess = function() { if($.exists(callback)) callback(null, me); };
+        request.onsuccess = function() {
+            __ku4indexedDbStoreVersion = null;
+            if($.exists(callback)) callback(null, me);
+        };
         return this;
     }
 };

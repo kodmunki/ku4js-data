@@ -960,7 +960,10 @@ indexedDbStore.prototype = {
             me = this;
 
         request.onerror = function() { if($.exists(callback)) callback(new Error("Error deleting indexedDbStore.", me))};
-        request.onsuccess = function() { if($.exists(callback)) callback(null, me); };
+        request.onsuccess = function() {
+            __ku4indexedDbStoreVersion = null;
+            if($.exists(callback)) callback(null, me);
+        };
         return this;
     }
 };
@@ -974,7 +977,7 @@ function ku4indexedDbStore_openDb(name, callback, collectionName) {
                     ? idxdb.open(name)
                     : idxdb.open(name, __ku4indexedDbStoreVersion);
 
-    console.log("version == ", __ku4indexedDbStoreVersion)
+    console.log("version == ", __ku4indexedDbStoreVersion);
 
     request.error = function(){
         callback(new Error("Error opening Indexed Database."), null);
