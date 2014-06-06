@@ -26,5 +26,5 @@ memoryStore.prototype = {
         return this;
     }
 };
-
+$.Class.extend(memoryStore, abstractStore);
 $.ku4memoryStore = function() { return new memoryStore(); };

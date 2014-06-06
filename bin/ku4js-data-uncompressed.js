@@ -889,6 +889,31 @@ execCollection.prototype = {
     }
 };
 
+function abstractStore(name) {
+    this._name = name || "ku4indexedDbStore";
+}
+abstractStore.prototype = {
+    read: function(collectionName, callback) {
+        callback(new Error("Not Implemented"), null);
+        return this;
+    },
+    write: function(collection, callback) {
+        callback(new Error("Not Implemented"), null);
+        return this;
+    },
+    remove: function(collection, callback) {
+        callback(new Error("Not Implemented"), null);
+        return this;
+    },
+    __delete: function(callback) {
+        callback(new Error("Not Implemented"), null);
+        return this;
+    },
+    __reset: function(callback) {
+        return this.__delete(callback);
+    }
+};
+
 function indexedDbStore(name) {
     this._name = name || "ku4indexedDbStore";
 }
@@ -970,7 +995,7 @@ indexedDbStore.prototype = {
         });
     }
 };
-
+$.Class.extend(indexedDbStore, abstractStore);
 $.ku4indexedDbStore = function(name) { return new indexedDbStore(name); };
 
 var __ku4indexedDbStoreVersion = 0;
@@ -1031,6 +1056,7 @@ localStorageStore.prototype = {
         return this;
     }
 };
+$.Class.extend(localStorageStore, abstractStore);
 $.ku4localStorageStore = function() { return new localStorageStore(); };
 
 
@@ -1062,7 +1088,7 @@ memoryStore.prototype = {
         return this;
     }
 };
-
+$.Class.extend(memoryStore, abstractStore);
 $.ku4memoryStore = function() { return new memoryStore(); };
 
 

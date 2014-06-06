@@ -25,4 +25,5 @@ localStorageStore.prototype = {
         return this;
     }
 };
+$.Class.extend(localStorageStore, abstractStore);
 $.ku4localStorageStore = function() { return new localStorageStore(); };

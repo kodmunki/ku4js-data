@@ -79,7 +79,7 @@ indexedDbStore.prototype = {
         });
     }
 };
-
+$.Class.extend(indexedDbStore, abstractStore);
 $.ku4indexedDbStore = function(name) { return new indexedDbStore(name); };
 
 var __ku4indexedDbStoreVersion = 0;

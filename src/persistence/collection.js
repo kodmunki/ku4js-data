@@ -14,7 +14,6 @@ collection.prototype = {
     init: function(list) { return this.remove().insertList(list); },
     find: function(query) {
         if(!$.exists(query)) return this._data.values();
-
         var $in = query.$in,
             $spec = query.$spec,
             $orderby = query.$orderby,
