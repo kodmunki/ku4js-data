@@ -401,6 +401,7 @@ $(function(){
         collection.insert(data4);
 
         expect(6);
+        console.log("exec = ", collection.find)
         equal(collection.find().length, 4);
 
         var test = collection.find({"name": "John"});

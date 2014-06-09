@@ -859,9 +859,9 @@ function collection_orderby(arry, criteria) {
     return arry.sort(func);
 }
 
-function execCollection(collection, func) {
+function execCollection(collection, exec) {
     this._collection = collection;
-    this._exec = func || function(value) { return value; };
+    this._exec = exec;
 }
 execCollection.prototype = {
     name: function() { return this._collection.name(); },
@@ -1065,12 +1065,12 @@ function ku4indexedDbStore_getIdbx()
                     __ku4indexedDbStorage = mozIndexedDB;
                 }
                 catch (e) {
-                    throw $.ku4exception("Unsupported Exception", "Browser does not support IndexedDB");
+                    throw $.ku4exception("Unsupported Exception", "Browser or Process does not support IndexedDB -- 500");
                 }
             }
         }
-        if(!$.exists(__ku4indexedDbStorage)) throw $.ku4exception("Unsupported Exception", "Browser does not support IndexedDB");
-        else return __ku4indexedDbStorage;
+        if($.exists(__ku4indexedDbStorage)) return __ku4indexedDbStorage;
+        throw $.ku4exception("Unsupported Exception", "Browser or Process does not support IndexedDB -- 404");
     }
 }
 
