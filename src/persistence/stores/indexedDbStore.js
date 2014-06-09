@@ -83,8 +83,9 @@ $.Class.extend(indexedDbStore, abstractStore);
 $.ku4indexedDbStore = function(name) { return new indexedDbStore(name); };
 
 var __ku4indexedDbStoreVersion = 0;
+var __ku4indexedDbStorage;
 function ku4indexedDbStore_openDb(name, callback, collectionName) {
-    var idxdb = indexedDB || webkitIndexedDB || mozIndexedDB,
+    var idxdb = ku4indexedDbStore_getIdbx(),
         request = (__ku4indexedDbStoreVersion < 1)
                     ? idxdb.open(name)
                     : idxdb.open(name, __ku4indexedDbStoreVersion);
@@ -111,4 +112,29 @@ function ku4indexedDbStore_openDb(name, callback, collectionName) {
             ku4indexedDbStore_openDb(name, callback, collectionName);
         }
     };
+}
+
+function ku4indexedDbStore_getIdbx()
+{
+    if($.exists(__ku4indexedDbStorage)) return __ku4indexedDbStorage;
+    else {
+        try {
+            __ku4indexedDbStorage = indexedDB || webkitIndexedDB || mozIndexedDB;
+        }
+        catch (e) {
+            try {
+            __ku4indexedDbStorage = webkitIndexedDB || mozIndexedDB;
+            }
+            catch (e) {
+                try {
+                    __ku4indexedDbStorage = mozIndexedDB;
+                }
+                catch (e) {
+                    throw $.ku4exception("Unsupported Exception", "Browser does not support IndexedDB");
+                }
+            }
+        }
+        if(!$.exists(__ku4indexedDbStorage)) throw $.ku4exception("Unsupported Exception", "Browser does not support IndexedDB");
+        else return __ku4indexedDbStorage;
+    }
 }

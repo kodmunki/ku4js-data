@@ -3,13 +3,19 @@ function collection(name, obj) {
         throw $.ku4exception("$.collection", $.str.format("Invalid name={0}. Must be unique", name));
     this._name = name;
     this._data = $.dto(obj);
-    this._store = $.ku4store();
+
+    try {
+        this._store = $.ku4store();
+    }
+    catch(e) {
+        this._store = $.ku4memoryStore();
+    }
 }
 collection.prototype = {
     name: function() { return this._name; },
     isEmpty: function() { return this._data.isEmpty(); },
     count: function() { return this._data.count(); },
-    store: function(store) { this._store = store; return this; },
+    store: function(store) { this._store = collection_getStore(store); return this; },
     save: function(callback) { this._store.write(this, callback); return this; },
     init: function(list) { return this.remove().insertList(list); },
     find: function(query) {
@@ -105,6 +111,20 @@ $.ku4collection.deserialize = function(serialized) {
     var obj = $.json.deserialize(serialized);
     return new collection(obj.name, obj.data);
 };
+
+function collection_getStore(store) {
+    if($.isString(store)) {
+        switch (store) {
+            case "$.ku4indexedDbStore":
+                return $.ku4indexedDbStore();
+            case "$.ku4localStorageStore":
+                return $.ku4localStorageStore();
+            default:
+                return $.ku4memoryStore();
+        }
+    }
+    return store;
+}
 
 function collection_find(data, criteria) {
     var entities = $.list();

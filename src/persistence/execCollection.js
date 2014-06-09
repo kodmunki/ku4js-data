@@ -1,6 +1,5 @@
-function execCollection(collection, func) {
+function execCollection(collection) {
     this._collection = collection;
-    this._exec = func || function(value) { return value; };
 }
 execCollection.prototype = {
     name: function() { return this._collection.name(); },

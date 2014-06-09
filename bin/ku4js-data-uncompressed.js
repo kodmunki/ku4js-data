@@ -699,18 +699,23 @@ function collection(name, obj) {
         throw $.ku4exception("$.collection", $.str.format("Invalid name={0}. Must be unique", name));
     this._name = name;
     this._data = $.dto(obj);
-    this._store = $.ku4store();
+
+    try {
+        this._store = $.ku4store();
+    }
+    catch(e) {
+        this._store = $.ku4memoryStore();
+    }
 }
 collection.prototype = {
     name: function() { return this._name; },
     isEmpty: function() { return this._data.isEmpty(); },
     count: function() { return this._data.count(); },
-    store: function(store) { this._store = store; return this; },
+    store: function(store) { this._store = collection_getStore(store); return this; },
     save: function(callback) { this._store.write(this, callback); return this; },
     init: function(list) { return this.remove().insertList(list); },
     find: function(query) {
         if(!$.exists(query)) return this._data.values();
-
         var $in = query.$in,
             $spec = query.$spec,
             $orderby = query.$orderby,
@@ -802,6 +807,20 @@ $.ku4collection.deserialize = function(serialized) {
     var obj = $.json.deserialize(serialized);
     return new collection(obj.name, obj.data);
 };
+
+function collection_getStore(store) {
+    if($.isString(store)) {
+        switch (store) {
+            case "$.ku4indexedDbStore":
+                return $.ku4indexedDbStore();
+            case "$.ku4localStorageStore":
+                return $.ku4localStorageStore();
+            default:
+                return $.ku4memoryStore();
+        }
+    }
+    return store;
+}
 
 function collection_find(data, criteria) {
     var entities = $.list();
@@ -999,8 +1018,9 @@ $.Class.extend(indexedDbStore, abstractStore);
 $.ku4indexedDbStore = function(name) { return new indexedDbStore(name); };
 
 var __ku4indexedDbStoreVersion = 0;
+var __ku4indexedDbStorage;
 function ku4indexedDbStore_openDb(name, callback, collectionName) {
-    var idxdb = indexedDB || webkitIndexedDB || mozIndexedDB,
+    var idxdb = ku4indexedDbStore_getIdbx(),
         request = (__ku4indexedDbStoreVersion < 1)
                     ? idxdb.open(name)
                     : idxdb.open(name, __ku4indexedDbStoreVersion);
@@ -1027,6 +1047,31 @@ function ku4indexedDbStore_openDb(name, callback, collectionName) {
             ku4indexedDbStore_openDb(name, callback, collectionName);
         }
     };
+}
+
+function ku4indexedDbStore_getIdbx()
+{
+    if($.exists(__ku4indexedDbStorage)) return __ku4indexedDbStorage;
+    else {
+        try {
+            __ku4indexedDbStorage = indexedDB || webkitIndexedDB || mozIndexedDB;
+        }
+        catch (e) {
+            try {
+            __ku4indexedDbStorage = webkitIndexedDB || mozIndexedDB;
+            }
+            catch (e) {
+                try {
+                    __ku4indexedDbStorage = mozIndexedDB;
+                }
+                catch (e) {
+                    throw $.ku4exception("Unsupported Exception", "Browser does not support IndexedDB");
+                }
+            }
+        }
+        if(!$.exists(__ku4indexedDbStorage)) throw $.ku4exception("Unsupported Exception", "Browser does not support IndexedDB");
+        else return __ku4indexedDbStorage;
+    }
 }
 
 function localStorageStore() { }
