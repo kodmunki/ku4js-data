@@ -27,6 +27,14 @@ dto.prototype = {
     toObject: function() { return (this._isArray) ? this.values() : this.$h; },
     filter: function() {
         return $.dto(dto.base.prototype.filter.apply(this, arguments));
+    },
+    filterNullOrEmpty: function()
+    {
+        var keys = $.list.parseArguments(arguments);
+        this.each(function(obj) {
+            if(!$.isNullOrEmpty(obj.value)) keys.add(obj.key);
+        });
+        return this.filter.apply(this, keys.toArray());
     }
 };
 $.Class.extend(dto, $.hash.Class);

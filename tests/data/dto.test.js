@@ -34,10 +34,26 @@ $(function(){
             "zero": 0,
             "empty": "",
             "date": new Date(2013, 1, 1)
-        }).filter("zero", "date");
+        }).filter("zero", "empty");
     
-        expect(6);
+        expect(5);
         ok(dto.containsKey("zero"), "containsKey(\"zero\")");
+        ok(dto.containsKey("empty"), "containsKey(\"empty\")");
+        equal(dto.count(), 2, "count");
+        equal(dto.find("zero"), 0);
+        equal(dto.toJson(), "{\"zero\":0,\"empty\":\"\"}");
+    });
+
+    test("filterNullOrEmpty", function() {
+        var dto = $.dto({
+            "zero": 0,
+            "empty": "",
+            "date": new Date(2013, 1, 1)
+        }).filterNullOrEmpty();
+
+        expect(7);
+        ok(dto.containsKey("zero"), "containsKey(\"zero\")");
+        ok(!dto.containsKey("empty"), "!containsKey(\"empty\")");
         ok(dto.containsKey("date"), "containsKey(\"date\")");
         equal(dto.count(), 2, "count");
         equal(dto.find("zero"), 0);

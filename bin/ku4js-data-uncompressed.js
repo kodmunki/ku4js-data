@@ -322,6 +322,14 @@ dto.prototype = {
     toObject: function() { return (this._isArray) ? this.values() : this.$h; },
     filter: function() {
         return $.dto(dto.base.prototype.filter.apply(this, arguments));
+    },
+    filterNullOrEmpty: function()
+    {
+        var keys = $.list.parseArguments(arguments);
+        this.each(function(obj) {
+            if(!$.isNullOrEmpty(obj.value)) keys.add(obj.key);
+        });
+        return this.filter.apply(this, keys.toArray());
     }
 };
 $.Class.extend(dto, $.hash.Class);
@@ -467,7 +475,7 @@ $.Class.extend(abstractField, $.Class);
 function field(selector){
     field.base.call(this);
 
-    var query = $(selector);
+    var query = document.querySelectorAll(selector);
     if(query.length > 1)
         throw $.ku4exception("$.field", $.str.format("Invalid DOM selector= {0}. Requires unique node", selector));
     if(!$.exists(query[0]))
@@ -481,9 +489,9 @@ field.prototype = {
     $write: function(value){ this.dom().value = value; },
     $clear: function(){ this.dom().value = ""; return this; },
     dom: function(dom){ return this.property("dom", dom); }
- }
+ };
 $.Class.extend(field, abstractField);
-$.field = function(selector){ return new field(selector); }
+$.field = function(selector){ return new field(selector); };
 $.field.Class = field;
 
 function checkbox(selector){
@@ -536,7 +544,7 @@ $.radioset.Class = radioset;
 
 function select(selector){
     select.base.call(this, selector);
-    this._opts = function(){ return $.list(this.dom().options); }
+    this._opts = function(){ return $.list(this.dom().options); };
     if(this.dom().multiple) this.multiple();
     else this.single();
 }
@@ -565,7 +573,7 @@ select.prototype = {
         option.value = v;
 		
 		if(isOptGroup) 
-			dom.getElementsByTagName("optgroup")[index].appendChild(option)
+			dom.getElementsByTagName("optgroup")[index].appendChild(option);
 		else {
 			try { dom.add(option, opt); }
 			catch(ex) { dom.add(option, idx); }
@@ -576,9 +584,9 @@ select.prototype = {
       this.dom().remove(index);
       return this;
     }
-}
+};
 $.Class.extend(select, field);
-$.select = function(dom){ return new select(dom); }
+$.select = function(dom){ return new select(dom); };
 $.select.Class = select;
 
 function select_writeSingle(select, value){

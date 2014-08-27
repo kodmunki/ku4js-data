@@ -1,6 +1,6 @@
 function select(selector){
     select.base.call(this, selector);
-    this._opts = function(){ return $.list(this.dom().options); }
+    this._opts = function(){ return $.list(this.dom().options); };
     if(this.dom().multiple) this.multiple();
     else this.single();
 }
@@ -29,7 +29,7 @@ select.prototype = {
         option.value = v;
 		
 		if(isOptGroup) 
-			dom.getElementsByTagName("optgroup")[index].appendChild(option)
+			dom.getElementsByTagName("optgroup")[index].appendChild(option);
 		else {
 			try { dom.add(option, opt); }
 			catch(ex) { dom.add(option, idx); }
@@ -40,9 +40,9 @@ select.prototype = {
       this.dom().remove(index);
       return this;
     }
-}
+};
 $.Class.extend(select, field);
-$.select = function(dom){ return new select(dom); }
+$.select = function(dom){ return new select(dom); };
 $.select.Class = select;
 
 function select_writeSingle(select, value){
