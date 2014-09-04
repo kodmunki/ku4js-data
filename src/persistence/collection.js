@@ -157,8 +157,9 @@ function collection_spec(arry, spec) {
 function collection_orderby(arry, criteria) {
     var key = $.obj.keys(criteria)[0],
         val = criteria[key],
-        func = function(a, b) {
-            return (a[key] < b[key]) ? -val : val;
-        };
+        func = ($.isFunction(val))
+                ? function(a, b) { return val(a[key], b[key]); }
+                : function(a, b) { return (a[key] < b[key]) ? -val : val; };
+
     return arry.sort(func);
 }

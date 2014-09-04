@@ -5,7 +5,7 @@ $(function(){
     
     test("create", function() {
         raises(function(){ $.field(); });
-        ok($.field("#Field"));;
+        ok($.field("#Field"));
     });
     
     var field = $.field("#Field");

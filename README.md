@@ -172,6 +172,11 @@ will pass the 1 or -1 as a value of the key on which you want to order by.
 ```javascript
 myCollection.find({"$orderby": {"price": -1}});
 ```
+For more powerful ordering, you may also pass a function that takes parameters a and b where a and b are the expected
+values of the keys for each object to be evaluates. The function should return 1, 0, -1, true or false.
+```javascript
+myCollection.find({"$orderby": {"price": function(a, b) { return a-b }}});
+```
 
 #####Complex Find
 You can use all of the various finds together as well! But they will run in a specified order. First a simple find or

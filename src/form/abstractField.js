@@ -27,5 +27,5 @@ abstractField.prototype = {
     isEmpty: function(){ return $.isEmpty(this.value()); },
     onIsValid: function(f, s, id){ this._onIsValid.add(f, s, id); return this; },
     onInvalid: function(f, s, id){ this._onInvalid.add(f, s, id); return this; }
- }
+ };
 $.Class.extend(abstractField, $.Class);

@@ -42,7 +42,7 @@ $.json.deserialize = function(str) {
                 ? $.dayPoint.parse(obj).toDate()
                 : obj;
     }
-    catch (e) { return str; }
+    catch (e) { console.log(e); return str; }
 };
 
 function json_serializeString(str) {

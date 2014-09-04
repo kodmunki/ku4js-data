@@ -388,7 +388,7 @@ $.json.deserialize = function(str) {
                 ? $.dayPoint.parse(obj).toDate()
                 : obj;
     }
-    catch (e) { return str; }
+    catch (e) { console.log(e); return str; }
 };
 
 function json_serializeString(str) {
@@ -469,18 +469,14 @@ abstractField.prototype = {
     isEmpty: function(){ return $.isEmpty(this.value()); },
     onIsValid: function(f, s, id){ this._onIsValid.add(f, s, id); return this; },
     onInvalid: function(f, s, id){ this._onInvalid.add(f, s, id); return this; }
- }
+ };
 $.Class.extend(abstractField, $.Class);
 
 function field(selector){
     field.base.call(this);
 
-    var query = document.querySelectorAll(selector);
-    if(query.length > 1)
-        throw $.ku4exception("$.field", $.str.format("Invalid DOM selector= {0}. Requires unique node", selector));
-    if(!$.exists(query[0]))
-        throw $.ku4exception("$.field", $.str.format("Invalid DOM selector= {0}", selector));
-    this.dom(query[0])
+    var node = queryDom(selector);
+    this.dom(node)
         .spec($.spec(function(){ return true; }))
         .optional();
 }
@@ -493,6 +489,26 @@ field.prototype = {
 $.Class.extend(field, abstractField);
 $.field = function(selector){ return new field(selector); };
 $.field.Class = field;
+
+
+//TODO: This method should be moved if/when ku4js supports further DOM features.
+function queryDom(selector)
+{
+    var query;
+    try {
+        query = document.querySelectorAll(selector);
+    }
+    catch(e) {
+        if($.exists(selector.ownerDocument)) { return selector; }
+        else  { throw $.ku4exception("$.field", $.str.format("Invalid DOM selector= {0}", selector)); }
+    }
+
+    if(query.length > 1)
+        throw $.ku4exception("$.field", $.str.format("Invalid DOM selector= {0}. Requires unique node", selector));
+    if(!$.exists(query[0]))
+        throw $.ku4exception("$.field", $.str.format("Invalid DOM selector= {0}", selector));
+    return query[0];
+}
 
 function checkbox(selector){
     checkbox.base.call(this, selector);
@@ -861,9 +877,10 @@ function collection_spec(arry, spec) {
 function collection_orderby(arry, criteria) {
     var key = $.obj.keys(criteria)[0],
         val = criteria[key],
-        func = function(a, b) {
-            return (a[key] < b[key]) ? -val : val;
-        };
+        func = ($.isFunction(val))
+                ? function(a, b) { return val(a[key], b[key]); }
+                : function(a, b) { return (a[key] < b[key]) ? -val : val; };
+    
     return arry.sort(func);
 }
 

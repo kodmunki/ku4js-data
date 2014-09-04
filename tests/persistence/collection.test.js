@@ -151,6 +151,34 @@ $(function(){
         equal(test[2].email, data1.email);
     });
 
+    test("orderby ascending with function", function() {
+        var collection = $.ku4collection("test").store($.ku4localStorageStore()),
+            data1 = {
+                "name": "John",
+                "email": "john.a@email.com"
+            },
+            data2 = {
+                "name": "John",
+                "email": "john.A@email.com"
+            },
+            data3 = {
+                "name": "John",
+                "email": "john.b@email.com"
+            };
+        collection.insert(data1);
+        collection.insert(data2);
+        collection.insert(data3);
+
+        expect(5);
+        equal(collection.find().length, 3);
+
+        var test = collection.find({"name": "John", "$orderby": {"email": function(a, b) { return a.toLowerCase() > b.toLowerCase(); }}});
+        equal(test.length, 3);
+        equal(test[0].email, data1.email);
+        equal(test[1].email, data2.email);
+        equal(test[2].email, data3.email);
+    });
+
     test("find in", function() {
         var collection = $.ku4collection("test").store($.ku4localStorageStore()),
             data1 = {
@@ -401,7 +429,6 @@ $(function(){
         collection.insert(data4);
 
         expect(6);
-        console.log("exec = ", collection.find)
         equal(collection.find().length, 4);
 
         var test = collection.find({"name": "John"});
