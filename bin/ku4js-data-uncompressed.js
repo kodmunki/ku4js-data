@@ -99,8 +99,8 @@ $.service.noCache = function(dto) {
 
 function xhr(){
     xhr.base.call(this);
-    this._isOk = function(status){ return /[23]\d{2}/.test(status) || this.context().isLocal(); }
-    this._isAborted = function(status){ return !/\d{3}/.test(status); }
+    this._isOk = function(status){ return /[23]\d{2}/.test(status) || this.context().isLocal(); };
+    this._isAborted = function(status){ return !/\d{3}/.test(status); };
     this._attempts = 0;
 }
 xhr.prototype = {
@@ -114,11 +114,11 @@ xhr.prototype = {
         var paramsExist = $.exists(params),
             context = this.context(),
             isPost = context.isPost(),
+            isMultipart = /multipart\/form\-data/.test(settings.contentType),
             hasQuery = !isPost && paramsExist,
             noCache = context._noCache,
             cacheParam = $.str.format("__ku4nocache={0}", $.uid()),
-            postParams = (isPost) ? params : null,
-            paramLength = (paramsExist) ? params.length : 0,
+            postParams = (isMultipart) ? params.read() : (isPost) ? params : null,
             format = (hasQuery && noCache) ? "{0}?{1}&{2}" : hasQuery ? "{0}?{1}" : noCache ? "{0}?{2}" : "{0}",
             xhr = this._xhr,
             me = this;
@@ -127,10 +127,12 @@ xhr.prototype = {
         xhr.open(context.verb(), $.str.format(format, context.uri(), params, cacheParam), context.isAsync());
         
         if(isPost){
-            var contentType = (!settings.contentType) ? "application/x-www-form-urlencoded" : settings.contentType;
-            xhr.setRequestHeader("Content-type", contentType);
-            xhr.setRequestHeader("Content-length", paramLength);
-            xhr.setRequestHeader("Connection", "close");
+            var contentType = (isMultipart)
+                ? $.str.format("{0}; boundary={1}", settings.contentType, params.boundary())
+                : (!$.exists(settings.contentType))
+                    ? "application/x-www-form-urlencoded"
+                    : settings.contentType;
+            xhr.setRequestHeader("Content-Type", contentType);
         }
 
         xhr.onreadystatechange = function(){
@@ -148,11 +150,11 @@ xhr.prototype = {
                 }
                 context.error(response).complete(response);
             }
-        }
+        };
         if($.exists(postParams)) xhr.send(postParams);
         else xhr.send();
     }
-}
+};
 $.Class.extend(xhr, $.Class);
 
 function xhr_createXhr(){
@@ -409,6 +411,39 @@ function json_deserializeString(str) {
         .replace(/\\\\r/g,"\\r")
         .replace(/\\\\t/g,"\\t");
 }
+
+var multipartBoundary = "----------V2ymHFg03ehbqgZCaKO6jy",
+    multipartBoundaryFormat =  "\r\n--{0}\r\n",
+    multipartClosingBoundaryFormat = "\r\n--{0}--\r\n",
+    formDataTemplate = "Content-Disposition: form-data; name=\"{0}\"\r\n\r\n{1}",
+    fileDataTemplate = "Content-Disposition: form-data; name=\"{0}\"; filename=\"{1}\"\r\nContent-Type: {2}\r\n\r\n{3}",
+    ecodedDataTemplate = "Content-Disposition: form-data; name=\"{0}\"; filename=\"{1}\"\r\nContent-Type: {2}\r\nContent-Transfer-Encoding: {3}\r\n\r\n{4}";
+
+function multipartForm() {
+    this._data = "";
+}
+
+multipartForm.prototype = {
+    boundary: function() { return multipartBoundary; },
+    addData: function(name, data) {
+        return this._addData($.str.format(formDataTemplate, name, data));
+    },
+    addTextFile: function(name, fileName, contentType, data) {
+        return this._addData($.str.format(fileDataTemplate, name, fileName, contentType, data));
+    },
+    addImageFile: function(name, fileName, contentType, data) {
+        return this._addData($.str.format(ecodedDataTemplate, name, fileName, contentType, data, "binary"));
+    },
+    _addData: function(data) {
+        this._data += $.str.build($.str.format(multipartBoundaryFormat, this.boundary()), data);
+        return this;
+    },
+    read: function() {
+        return $.str.build(this._data, $.str.format(multipartClosingBoundaryFormat, this.boundary()));
+    }
+};
+
+$.multipartForm = function() { return new multipartForm(); };
 
 if(!$.exists($.queryString)) $.queryString = {};
 $.queryString.serialize = function(obj) {
@@ -880,7 +915,7 @@ function collection_orderby(arry, criteria) {
         func = ($.isFunction(val))
                 ? function(a, b) { return val(a[key], b[key]); }
                 : function(a, b) { return (a[key] < b[key]) ? -val : val; };
-    
+
     return arry.sort(func);
 }
 

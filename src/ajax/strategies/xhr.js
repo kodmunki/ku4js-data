@@ -1,7 +1,7 @@
 function xhr(){
     xhr.base.call(this);
-    this._isOk = function(status){ return /[23]\d{2}/.test(status) || this.context().isLocal(); }
-    this._isAborted = function(status){ return !/\d{3}/.test(status); }
+    this._isOk = function(status){ return /[23]\d{2}/.test(status) || this.context().isLocal(); };
+    this._isAborted = function(status){ return !/\d{3}/.test(status); };
     this._attempts = 0;
 }
 xhr.prototype = {
@@ -15,11 +15,11 @@ xhr.prototype = {
         var paramsExist = $.exists(params),
             context = this.context(),
             isPost = context.isPost(),
+            isMultipart = /multipart\/form\-data/.test(settings.contentType),
             hasQuery = !isPost && paramsExist,
             noCache = context._noCache,
             cacheParam = $.str.format("__ku4nocache={0}", $.uid()),
-            postParams = (isPost) ? params : null,
-            paramLength = (paramsExist) ? params.length : 0,
+            postParams = (isMultipart) ? params.read() : (isPost) ? params : null,
             format = (hasQuery && noCache) ? "{0}?{1}&{2}" : hasQuery ? "{0}?{1}" : noCache ? "{0}?{2}" : "{0}",
             xhr = this._xhr,
             me = this;
@@ -28,10 +28,12 @@ xhr.prototype = {
         xhr.open(context.verb(), $.str.format(format, context.uri(), params, cacheParam), context.isAsync());
         
         if(isPost){
-            var contentType = (!settings.contentType) ? "application/x-www-form-urlencoded" : settings.contentType;
-            xhr.setRequestHeader("Content-type", contentType);
-            xhr.setRequestHeader("Content-length", paramLength);
-            xhr.setRequestHeader("Connection", "close");
+            var contentType = (isMultipart)
+                ? $.str.format("{0}; boundary={1}", settings.contentType, params.boundary())
+                : (!$.exists(settings.contentType))
+                    ? "application/x-www-form-urlencoded"
+                    : settings.contentType;
+            xhr.setRequestHeader("Content-Type", contentType);
         }
 
         xhr.onreadystatechange = function(){
@@ -49,11 +51,11 @@ xhr.prototype = {
                 }
                 context.error(response).complete(response);
             }
-        }
+        };
         if($.exists(postParams)) xhr.send(postParams);
         else xhr.send();
     }
-}
+};
 $.Class.extend(xhr, $.Class);
 
 function xhr_createXhr(){
