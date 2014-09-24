@@ -21,7 +21,7 @@ radioset.prototype = {
         return this;
     },
     listNodes: function(){ return this._radios; } 
-}
+};
 $.Class.extend(radioset, abstractField);
-$.radioset = function(){ return new radioset(); }
+$.radioset = function(){ return new radioset(); };
 $.radioset.Class = radioset;

@@ -114,11 +114,11 @@ xhr.prototype = {
         var paramsExist = $.exists(params),
             context = this.context(),
             isPost = context.isPost(),
-            isMultipart = /multipart\/form\-data/.test(settings.contentType),
+            isMultipart = params instanceof FormData,
             hasQuery = !isPost && paramsExist,
             noCache = context._noCache,
             cacheParam = $.str.format("__ku4nocache={0}", $.uid()),
-            postParams = (isMultipart) ? params.read() : (isPost) ? params : null,
+            postParams = (isPost) ? params : null,
             format = (hasQuery && noCache) ? "{0}?{1}&{2}" : hasQuery ? "{0}?{1}" : noCache ? "{0}?{2}" : "{0}",
             xhr = this._xhr,
             me = this;
@@ -126,12 +126,8 @@ xhr.prototype = {
         if(!$.exists(xhr)) context.error(new Error("Ajax not supported")); 
         xhr.open(context.verb(), $.str.format(format, context.uri(), params, cacheParam), context.isAsync());
         
-        if(isPost){
-            var contentType = (isMultipart)
-                ? $.str.format("{0}; boundary={1}", settings.contentType, params.boundary())
-                : (!$.exists(settings.contentType))
-                    ? "application/x-www-form-urlencoded"
-                    : settings.contentType;
+        if(isPost && !isMultipart){
+            var contentType = (!$.exists(settings.contentType)) ? "application/x-www-form-urlencoded" : settings.contentType;
             xhr.setRequestHeader("Content-Type", contentType);
         }
 
@@ -303,7 +299,11 @@ dto.prototype = {
     name: function(name){ return this.set("name", name); },
     toJson: function() { return $.json.serialize(this.toObject()); },
     toQueryString: function() { return $.queryString.serialize(this.$h); },
-
+    toFormData: function() {
+        var data = new FormData();
+        this.each(function(obj) {  data.append(obj.key, obj.value); });
+        return data;
+    },
     saveAs: function(name) {
         if(!name) throw $.exception("arg", "$.dto.saveAs requires a name");
         $.cookie(name).save(this.$h);
@@ -412,39 +412,6 @@ function json_deserializeString(str) {
         .replace(/\\\\t/g,"\\t");
 }
 
-var multipartBoundary = "----------V2ymHFg03ehbqgZCaKO6jy",
-    multipartBoundaryFormat =  "\r\n--{0}\r\n",
-    multipartClosingBoundaryFormat = "\r\n--{0}--\r\n",
-    formDataTemplate = "Content-Disposition: form-data; name=\"{0}\"\r\n\r\n{1}",
-    fileDataTemplate = "Content-Disposition: form-data; name=\"{0}\"; filename=\"{1}\"\r\nContent-Type: {2}\r\n\r\n{3}",
-    ecodedDataTemplate = "Content-Disposition: form-data; name=\"{0}\"; filename=\"{1}\"\r\nContent-Type: {2}\r\nContent-Transfer-Encoding: {3}\r\n\r\n{4}";
-
-function multipartForm() {
-    this._data = "";
-}
-
-multipartForm.prototype = {
-    boundary: function() { return multipartBoundary; },
-    addData: function(name, data) {
-        return this._addData($.str.format(formDataTemplate, name, data));
-    },
-    addTextFile: function(name, fileName, contentType, data) {
-        return this._addData($.str.format(fileDataTemplate, name, fileName, contentType, data));
-    },
-    addImageFile: function(name, fileName, contentType, data) {
-        return this._addData($.str.format(ecodedDataTemplate, name, fileName, contentType, data, "binary"));
-    },
-    _addData: function(data) {
-        this._data += $.str.build($.str.format(multipartBoundaryFormat, this.boundary()), data);
-        return this;
-    },
-    read: function() {
-        return $.str.build(this._data, $.str.format(multipartClosingBoundaryFormat, this.boundary()));
-    }
-};
-
-$.multipartForm = function() { return new multipartForm(); };
-
 if(!$.exists($.queryString)) $.queryString = {};
 $.queryString.serialize = function(obj) {
     var result = "";
@@ -519,12 +486,12 @@ field.prototype = {
     $read: function(){ return this.dom().value },
     $write: function(value){ this.dom().value = value; },
     $clear: function(){ this.dom().value = ""; return this; },
-    dom: function(dom){ return this.property("dom", dom); }
+    dom: function(dom){ return this.property("dom", dom); },
+    files: function() { return this.dom().files; }
  };
 $.Class.extend(field, abstractField);
 $.field = function(selector){ return new field(selector); };
 $.field.Class = field;
-
 
 //TODO: This method should be moved if/when ku4js supports further DOM features.
 function queryDom(selector)
@@ -560,9 +527,9 @@ checkbox.prototype = {
     $clear: function(){ this.uncheck(); return this; },
     check: function(){ this.dom().checked = true; return this; },
     uncheck: function(){ this.dom().checked = false; return this; }
-}
+};
 $.Class.extend(checkbox, field);
-$.checkbox = function(dom){ return new checkbox(dom); }
+$.checkbox = function(dom){ return new checkbox(dom); };
 $.checkbox.Class = checkbox;
 
 function radioset(){
@@ -588,9 +555,9 @@ radioset.prototype = {
         return this;
     },
     listNodes: function(){ return this._radios; } 
-}
+};
 $.Class.extend(radioset, abstractField);
-$.radioset = function(){ return new radioset(); }
+$.radioset = function(){ return new radioset(); };
 $.radioset.Class = radioset;
 
 function select(selector){
@@ -696,6 +663,18 @@ form.prototype = {
             if($.exists(v.value)) dto.add(k, v.value());
         });
         return dto;
+    },
+    readMultipartData: function()
+    {
+        var data = new FormData();
+        this._fields.each(function(o){
+            var k = o.key, v = o.value;
+            if($.exists(v.files())) $.list(v.files()).each(function(file) {
+                data.append(file.name, file);
+            });
+            else if($.exists(v.value)) data.append(k, v.value());
+        });
+        return data;
     },
     write: function(obj){
         if(!$.exists(obj)) return this;

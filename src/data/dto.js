@@ -6,7 +6,11 @@ dto.prototype = {
     name: function(name){ return this.set("name", name); },
     toJson: function() { return $.json.serialize(this.toObject()); },
     toQueryString: function() { return $.queryString.serialize(this.$h); },
-
+    toFormData: function() {
+        var data = new FormData();
+        this.each(function(obj) {  data.append(obj.key, obj.value); });
+        return data;
+    },
     saveAs: function(name) {
         if(!name) throw $.exception("arg", "$.dto.saveAs requires a name");
         $.cookie(name).save(this.$h);

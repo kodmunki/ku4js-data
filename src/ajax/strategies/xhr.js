@@ -15,11 +15,11 @@ xhr.prototype = {
         var paramsExist = $.exists(params),
             context = this.context(),
             isPost = context.isPost(),
-            isMultipart = /multipart\/form\-data/.test(settings.contentType),
+            isMultipart = params instanceof FormData,
             hasQuery = !isPost && paramsExist,
             noCache = context._noCache,
             cacheParam = $.str.format("__ku4nocache={0}", $.uid()),
-            postParams = (isMultipart) ? params.read() : (isPost) ? params : null,
+            postParams = (isPost) ? params : null,
             format = (hasQuery && noCache) ? "{0}?{1}&{2}" : hasQuery ? "{0}?{1}" : noCache ? "{0}?{2}" : "{0}",
             xhr = this._xhr,
             me = this;
@@ -27,12 +27,8 @@ xhr.prototype = {
         if(!$.exists(xhr)) context.error(new Error("Ajax not supported")); 
         xhr.open(context.verb(), $.str.format(format, context.uri(), params, cacheParam), context.isAsync());
         
-        if(isPost){
-            var contentType = (isMultipart)
-                ? $.str.format("{0}; boundary={1}", settings.contentType, params.boundary())
-                : (!$.exists(settings.contentType))
-                    ? "application/x-www-form-urlencoded"
-                    : settings.contentType;
+        if(isPost && !isMultipart){
+            var contentType = (!$.exists(settings.contentType)) ? "application/x-www-form-urlencoded" : settings.contentType;
             xhr.setRequestHeader("Content-Type", contentType);
         }
 

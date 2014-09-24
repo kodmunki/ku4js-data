@@ -40,6 +40,18 @@ form.prototype = {
         });
         return dto;
     },
+    readMultipartData: function()
+    {
+        var data = new FormData();
+        this._fields.each(function(o){
+            var k = o.key, v = o.value;
+            if($.exists(v.files())) $.list(v.files()).each(function(file) {
+                data.append(file.name, file );
+            });
+            else if($.exists(v.value)) data.append(k, v.value());
+        });
+        return data;
+    },
     write: function(obj){
         if(!$.exists(obj)) return this;
         var dto = ($.exists(obj.toObject)) ? obj : $.dto(obj)
