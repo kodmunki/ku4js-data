@@ -16,4 +16,12 @@ $(function(){
         deepEqual($.json.deserialize(testSerialized), testDeserialized);
     });
 
+    test("deserialize malice", function() {
+        expect(2);
+        var malice1 = "{goober:(function(){alert('malice!');})}",
+            malice2 = (function(){ return $.str.encodeBase64("(function(alert('malice!'))()"); })();
+
+        deepEqual($.json.deserialize(malice1), malice1);
+        deepEqual($.json.deserialize(malice2), $.str.encodeBase64("(function(alert('malice!'))()"));
+    });
 });

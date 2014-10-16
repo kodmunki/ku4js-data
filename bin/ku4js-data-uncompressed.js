@@ -372,6 +372,7 @@ $.json.serialize = function(obj) {
     return $.str.format(f, r);
 };
 $.json.deserialize = function(str) {
+    if(/function|(=$)/i.test(str)) return str;
     try {
         var obj = ($.isString(str)) ? eval("(" + json_deserializeString(str) + ")") : str;
         if(!$.exists(obj)) return obj;
@@ -670,7 +671,7 @@ form.prototype = {
         this._fields.each(function(o){
             var k = o.key, v = o.value;
             if($.exists(v.files())) $.list(v.files()).each(function(file) {
-                data.append(file.name, file);
+                data.append(file.name, file );
             });
             else if($.exists(v.value)) data.append(k, v.value());
         });
