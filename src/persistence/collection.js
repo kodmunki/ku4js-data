@@ -65,28 +65,36 @@ collection.prototype = {
         }, this);
         return this;
     },
-    join: function(other, onKey, equalKey) {
+    join: function(other, onKey, equalKey, direction) {
         var thisResults = $.list(this.find()),
             otherResults = $.list(other.find()),
             thisName = this.name(),
             otherName = other.name(),
             func = ($.isFunction(onKey)) ? onKey : function(t, o) { return t[onKey] === o[equalKey]},
+            outerDirection = ($.isFunction(onKey)) ? equalKey : direction,
             join = $.hash();
 
         function addRecord(thisResult, otherResult) {
             var record = $.hash();
-            $.hash(thisResult).each(function(obj) { record.add(thisName + "." + obj.key, obj.value); });
-            $.hash(otherResult).each(function(obj) { record.add(otherName + "." + obj.key, obj.value); });
+            if($.exists(thisResult)) $.hash(thisResult).each(function(obj) { record.add(thisName + "." + obj.key, obj.value); });
+            if($.exists(otherResult)) $.hash(otherResult).each(function(obj) { record.add(otherName + "." + obj.key, obj.value); });
             join.add($.uid(), record.toObject());
         }
 
+        var isFirstPass = true;
         thisResults.each(function(thisResult) {
+            var didAddThisResult = false;
             otherResults.each(function(otherResult) {
                 if(func(thisResult, otherResult)) {
-                    addRecord(thisResult, otherResult)
+                    addRecord(thisResult, otherResult);
+                    didAddThisResult = true;
                 }
+                else if(isFirstPass && outerDirection === ">") addRecord(null, otherResult);
             });
+            if(!didAddThisResult && outerDirection === "<") addRecord(thisResult, null);
+            isFirstPass = false
         });
+
         return $.ku4collection(thisName + "." + otherName, join.toObject());
     },
     exec: function(func) {
