@@ -95,6 +95,10 @@ collection.prototype = {
             isFirstPass = false
         });
 
+        //NOTE: This ensures that a right outer join on an empty set returns the join data.
+        if(thisResults.isEmpty() && outerDirection === ">")
+            otherResults.each(function(otherResult) { addRecord(null, otherResult) });
+
         return $.ku4collection(thisName + "." + otherName, join.toObject());
     },
     exec: function(func) {
