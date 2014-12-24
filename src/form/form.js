@@ -54,7 +54,7 @@ form.prototype = {
     },
     write: function(obj){
         if(!$.exists(obj)) return this;
-        var dto = ($.exists(obj.toObject)) ? obj : $.dto(obj)
+        var dto = ($.exists(obj.toObject)) ? obj : $.dto(obj);
         this._fields.each(function(o) {
             var field = o.value;
             if($.exists(field.write)) field.write(dto);
@@ -82,7 +82,7 @@ form.prototype = {
         var n = this._name;
         return ($.exists(n)) ? this.write($.dto.serialize(n)) : this;
     }
-}
+};
 $.Class.extend(form, $.Class);
-$.form = function() { return new form(); }
+$.form = function() { return new form(); };
 $.form.Class = form;

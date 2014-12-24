@@ -86,12 +86,12 @@ service.prototype = {
     _readSettings: function() {
         return { "contentType": this._contentType }
     }
-}
+};
 $.Class.extend(service, $.Class);
-$.service = function(){ return new service(); }
+$.service = function(){ return new service(); };
 
 $.service.noCache = function(dto) {
     var noCache = $.dto({"noCache": $.uid()});
     if(!$.exists(dto)) return noCache;
     return dto.merge(noCache);
-}
+};

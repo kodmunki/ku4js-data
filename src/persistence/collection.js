@@ -88,34 +88,43 @@ collection.prototype = {
             });
         }
         else {
-            //NOTE: This performs the join.
-            var isRight = outerDirection === ">",
-                leftCollection = (isRight) ? otherResults : thisResults,
-                rightCollection = (isRight) ? thisResults : otherResults;
+            var isOuterJoin = $.exists(outerDirection);
+            if(isOuterJoin) {
+                //NOTE: This performs the outer join.
+                var isRight = outerDirection === ">",
+                    leftCollection = (isRight) ? otherResults : thisResults,
+                    rightCollection = (isRight) ? thisResults : otherResults;
 
-            leftCollection.each(function (thisResult) {
-                var didAddThisResult = false;
-                rightCollection.each(function (otherResult) {
-                    if(isRight) {
-                        if (func(otherResult, thisResult)) {
-                            addRecord(otherResult, thisResult);
-                            didAddThisResult = true;
+                leftCollection.each(function (thisResult) {
+                    var didAddThisResult = false;
+                    rightCollection.each(function (otherResult) {
+                        if (isRight) {
+                            if (func(otherResult, thisResult)) {
+                                addRecord(otherResult, thisResult);
+                                didAddThisResult = true;
+                            }
                         }
-                    }
-                    else {
-                        if (func(thisResult, otherResult)) {
-                            addRecord(thisResult, otherResult);
-                            didAddThisResult = true;
+                        else {
+                            if (func(thisResult, otherResult)) {
+                                addRecord(thisResult, otherResult);
+                                didAddThisResult = true;
+                            }
                         }
+                    });
+                    if (!didAddThisResult) {
+                        if (isRight) addRecord(null, thisResult);
+                        else addRecord(thisResult, null);
                     }
                 });
-                if (!didAddThisResult) {
-                    if(isRight) addRecord(null, thisResult);
-                    else addRecord(thisResult, null);
-                }
+            }
+            else thisResults.each(function(thisResult) {
+                otherResults.each(function(otherResult) {
+                    if(func(thisResult, otherResult)) {
+                        addRecord(thisResult, otherResult)
+                    }
+                });
             });
         }
-
         return $.ku4collection(thisName + "." + otherName, join.toObject());
     },
     exec: function(func) {

@@ -87,15 +87,15 @@ service.prototype = {
     _readSettings: function() {
         return { "contentType": this._contentType }
     }
-}
+};
 $.Class.extend(service, $.Class);
-$.service = function(){ return new service(); }
+$.service = function(){ return new service(); };
 
 $.service.noCache = function(dto) {
     var noCache = $.dto({"noCache": $.uid()});
     if(!$.exists(dto)) return noCache;
     return dto.merge(noCache);
-}
+};
 
 function xhr(){
     xhr.base.call(this);
@@ -679,7 +679,7 @@ form.prototype = {
     },
     write: function(obj){
         if(!$.exists(obj)) return this;
-        var dto = ($.exists(obj.toObject)) ? obj : $.dto(obj)
+        var dto = ($.exists(obj.toObject)) ? obj : $.dto(obj);
         this._fields.each(function(o) {
             var field = o.value;
             if($.exists(field.write)) field.write(dto);
@@ -707,9 +707,9 @@ form.prototype = {
         var n = this._name;
         return ($.exists(n)) ? this.write($.dto.serialize(n)) : this;
     }
-}
+};
 $.Class.extend(form, $.Class);
-$.form = function() { return new form(); }
+$.form = function() { return new form(); };
 $.form.Class = form;
 
 $.fields = {
@@ -823,34 +823,43 @@ collection.prototype = {
             });
         }
         else {
-            //NOTE: This performs the join.
-            var isRight = outerDirection === ">",
-                leftCollection = (isRight) ? otherResults : thisResults,
-                rightCollection = (isRight) ? thisResults : otherResults;
+            var isOuterJoin = $.exists(outerDirection);
+            if(isOuterJoin) {
+                //NOTE: This performs the outer join.
+                var isRight = outerDirection === ">",
+                    leftCollection = (isRight) ? otherResults : thisResults,
+                    rightCollection = (isRight) ? thisResults : otherResults;
 
-            leftCollection.each(function (thisResult) {
-                var didAddThisResult = false;
-                rightCollection.each(function (otherResult) {
-                    if(isRight) {
-                        if (func(otherResult, thisResult)) {
-                            addRecord(otherResult, thisResult);
-                            didAddThisResult = true;
+                leftCollection.each(function (thisResult) {
+                    var didAddThisResult = false;
+                    rightCollection.each(function (otherResult) {
+                        if (isRight) {
+                            if (func(otherResult, thisResult)) {
+                                addRecord(otherResult, thisResult);
+                                didAddThisResult = true;
+                            }
                         }
-                    }
-                    else {
-                        if (func(thisResult, otherResult)) {
-                            addRecord(thisResult, otherResult);
-                            didAddThisResult = true;
+                        else {
+                            if (func(thisResult, otherResult)) {
+                                addRecord(thisResult, otherResult);
+                                didAddThisResult = true;
+                            }
                         }
+                    });
+                    if (!didAddThisResult) {
+                        if (isRight) addRecord(null, thisResult);
+                        else addRecord(thisResult, null);
                     }
                 });
-                if (!didAddThisResult) {
-                    if(isRight) addRecord(null, thisResult);
-                    else addRecord(thisResult, null);
-                }
+            }
+            else thisResults.each(function(thisResult) {
+                otherResults.each(function(otherResult) {
+                    if(func(thisResult, otherResult)) {
+                        addRecord(thisResult, otherResult)
+                    }
+                });
             });
         }
-
         return $.ku4collection(thisName + "." + otherName, join.toObject());
     },
     exec: function(func) {

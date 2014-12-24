@@ -349,6 +349,59 @@ $(function(){
         equal(result[1]["collection2.name"], "otherName3");
     });
 
+    test("right outer join", function() {
+        var collection1 = $.ku4collection("collection1").store($.ku4localStorageStore()).init([
+                {
+                    "id": 100,
+                    "name": "myName1"
+                },
+                {
+                    "id": 200,
+                    "name": "myName2"
+                },
+                {
+                    "id": 300,
+                    "name": "myName3"
+                }
+            ]),
+            collection2 = $.ku4collection("collection2").store($.ku4localStorageStore()).init([
+                {
+                    "id": 110,
+                    "cid": 100,
+                    "name": "otherName1"
+                },
+                {
+                    "id": 120,
+                    "cid": 200,
+                    "name": "otherName1"
+                },
+                {
+                    "id": 130,
+                    "cid": 300,
+                    "name": "otherName3"
+                },
+                {
+                    "id": 230,
+                    "cid": 400,
+                    "name": "otherName3"
+                }
+            ]);
+
+        var join = collection1.join(collection2, "id", "cid", ">"),
+            result = join.find({
+                "collection1.name": "myName3",
+                "collection2.name": "otherName3"
+            });
+
+        expect(6);
+        equal(join.count(), 4);
+        equal(result.length, 1);
+        equal(result[0]["collection1.id"], 300);
+        equal(result[0]["collection2.id"], 130);
+        equal(result[0]["collection1.name"], "myName3");
+        equal(result[0]["collection2.name"], "otherName3");
+    });
+
      test("join with function", function() {
         var collection1 = $.ku4collection("collection1").store($.ku4localStorageStore()).init([
                 {
