@@ -36,38 +36,38 @@ directory structure found in /src. All constructors are empty unless otherwise n
 ###serivce
 | API | Return | Description |
 | --- | --- | --- |
-| processId | uid |  |
-| GET | this |  |
-| POST | this |  |
-| PUT | this |  |
-| HEAD | this |  |
-| OPTIONS | this |  |
-| DELETE | this |  |
-| TRACE | this |  |
-| CONNECT | this |  |
-| xhr | this |  |
-| xss | this |  |
-| sync | this |  |
-| async | this |  |
-| text | this |  |
-| xml | this |  |
-| verb | this |  |
-| uri | this |  |
-| contentType | this |  |
-| responseType | this |  |
-| strategy | this |  |
-| maxAttempts | this |  |
-| isLocal | Boolean |  |
-| isAsync | Boolean |  |
-| isLocked | Boolean |  |
-| isBusy | Boolean |  |
-| lock | this |  |
-| unlock | this |  |
-| onSuccess | this |  |
-| onError | this |  |
-| onComplete | this |  |
-| removeListener | this |  |
-| clearListeners | this |  |
+| processId() | uid |  |
+| GET() | this |  |
+| POST() | this |  |
+| PUT() | this |  |
+| HEAD() | this |  |
+| OPTIONS() | this |  |
+| DELETE() | this |  |
+| TRACE() | this |  |
+| CONNECT() | this |  |
+| xhr() | this |  |
+| xss() | this |  |
+| sync() | this |  |
+| async() | this |  |
+| text() | this |  |
+| xml() | this |  |
+| verb(value:_String_) | this |  |
+| uri(value:_String_) | this |  |
+| contentType(value:_String_) | this |  |
+| responseType(value:_String_) | this |  |
+| strategy(value:_Strategy_) | this |  |
+| maxAttempts(value:_Number_) | this |  |
+| isLocal() | Boolean |  |
+| isAsync() | Boolean |  |
+| isLocked() | Boolean |  |
+| isBusy() | Boolean |  |
+| lock() | this |  |
+| unlock() | this |  |
+| onSuccess(func:_Function_, scope:_Object_, id:_String_) | this |  |
+| onError(func:_Function_, scope:_Object_, id:_String_)  | this |  |
+| onComplete(func:_Function_, scope:_Object_, id:_String_)  | this |  |
+| removeListener(id:_String_) | this |  |
+| clearListeners() | this |  |
 
 ##Data
 
