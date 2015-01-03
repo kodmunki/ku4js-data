@@ -117,14 +117,14 @@ _Documentation Coming Soon_
 ###collection
 | API | Return | Description |
 | --- | --- | --- |
-| find(query) | Array | Returns an array containing the results of the query. More on find below. |
-| insert(entity) | object | String | Inserts the entity into the collection |
-| update(criteria, updates) | this | Updates all entities that satisfy the criteria with the data in updates. |
-| remove(criteria) | this | Removes all entities that satisfy the criteria. |
-| join(otherCollection, on, equals) | collection | Joins this collection with otherCollection on collection[on] == otherCollection[equals] |
-| join(otherCollection, function) | collection | Joins this collection with otherCollection based upon the boolean return value of the passed function. The passed function will receive two parameters for each possibility combination of joins that can be used to evaluate the intention ot join. |
-| exec(function) | collection | Runs the function for each item in the results passing the result as the argument to the function. Then function should return a value as that value will be the value in the find results. |
-| init(array) | this | Clears this collection and initializes it with the entities in the array. |
+| find(query:_{}_) | Array | Returns an array containing the results of the query. More on find below. |
+| insert(entity:_Object_) | object | String | Inserts the entity into the collection |
+| update(criteria:_{}_, updates:_{}_) | this | Updates all entities that satisfy the criteria with the data in updates. |
+| remove(criteria:_{}_) | this | Removes all entities that satisfy the criteria. |
+| join(otherCollection:_collection_, on:_String_, equals:_Object_) | collection | Joins this collection with otherCollection on collection[on] == otherCollection[equals] |
+| join(otherCollection:_collection_, func:_Function_) | collection | Joins this collection with otherCollection based upon the boolean return value of the passed function. The passed function will receive two parameters for each possibility combination of joins that can be used to evaluate the intention ot join. |
+| exec(func:_Function_) | collection | Runs the function for each item in the results passing the result as the argument to the function. Then function should return a value as that value will be the value in the find results. |
+| init(array:_Array<Object>_) | this | Clears this collection and initializes it with the entities in the array. |
 | save() | this | Saves this collection to localStorage (as available). |
 
 ####Find
