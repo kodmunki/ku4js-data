@@ -9,4 +9,6 @@ cp -f ../bin/ku4js-data.js ../../ku4js-webApp/example/scripts/example/lib/
 cp -f ../bin/ku4js-data.js ../../ku4js-webApp/_TEMPLATE/lib/
 cp -f ../bin/ku4js-data.js ../../ku4js-widget/tests/_dependencies/
 
+cp -f ../bin/ku4js-data.js ../../../../products/gifthorse/gifthorse/public/javascript/lib/
+
 echo "Update complete :{)}"
