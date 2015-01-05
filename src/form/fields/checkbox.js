@@ -15,5 +15,5 @@ checkbox.prototype = {
     uncheck: function(){ this.dom().checked = false; return this; }
 };
 $.Class.extend(checkbox, field);
-$.checkbox = function(dom){ return new checkbox(dom); };
+$.checkbox = function(selector){ return new checkbox(selector); };
 $.checkbox.Class = checkbox;

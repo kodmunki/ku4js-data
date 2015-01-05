@@ -7,17 +7,21 @@ $(function(){
         ok($.form());
     });
     
-    var firstName = $.field($("#FirstName")[0]).spec($.fields.specs.alpha),
+    var file = $.imageFileField($("#File")[0]).maxDims({width:50, height:50}),
+        firstName = $.field($("#FirstName")[0]).spec($.fields.specs.alpha),
         lastName = $.field($("#LastName")[0]).spec($.fields.specs.alpha),
         date = $.field($("#Birthday")[0]).spec($.fields.specs.date),
         currency = $.field($("#Salary")[0]).spec($.fields.specs.currency),
         title = $.select($("#Title")[0]).multiple().spec($.spec(function(v){ return /[0-2]/.test(v)})),
         form = $.form()
+            .add("file", file)
             .add("firstName", firstName)
             .add("lastName", lastName)
             .add("date", date)
             .add("currency", currency)
             .add("title", title);
+
+    myForm = form;
     
     test("list fields", function() {
         var fieldList = form.listFields();

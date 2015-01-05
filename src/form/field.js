@@ -10,8 +10,15 @@ field.prototype = {
     $read: function(){ return this.dom().value },
     $write: function(value){ this.dom().value = value; },
     $clear: function(){ this.dom().value = ""; return this; },
+    $readFiles: function(func, scp) {
+        var scope = scp || this;
+        return func.call(scope, this.files());
+    },
     dom: function(dom){ return this.property("dom", dom); },
-    files: function() { return this.dom().files; }
+    hasFiles: function() { return $.exists(this.dom().files); },
+    fileCount: function() { return (!this.hasFiles) ? 0 : this.files().length; },
+    files: function() { return this.dom().files; },
+    readFiles: function(func, scp) { return this.$readFiles(func, scp); }
  };
 $.Class.extend(field, abstractField);
 $.field = function(selector){ return new field(selector); };

@@ -42,7 +42,7 @@ select.prototype = {
     }
 };
 $.Class.extend(select, field);
-$.select = function(dom){ return new select(dom); };
+$.select = function(selector){ return new select(selector); };
 $.select.Class = select;
 
 function select_writeSingle(select, value){

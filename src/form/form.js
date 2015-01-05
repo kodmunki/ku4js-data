@@ -52,6 +52,32 @@ form.prototype = {
         });
         return data;
     },
+    readAsyncMultipartData: function(func, scp)
+    {
+        var data = new FormData(),
+            fileCount = 0,
+            fieldsRead = false,
+            scope = scp || this;
+
+        function callback() { func.call(scope, data); }
+
+        this._fields.each(function(o){
+            var name = o.key, field = o.value;
+            if($.exists(field.hasFiles) && field.hasFiles()) {
+                fileCount += field.fileCount();
+                field.readFiles(function (files) {
+                    $.list(files).each(function(file) {
+                        data.append(file.name, file);
+                        fileCount --;
+                    });
+                    if(fieldsRead && fileCount < 1) callback();
+                }, this);
+            }
+            else if($.exists(field.value)) data.append(name, field.value());
+        });
+        fieldsRead = true;
+        if(fileCount < 1) callback();
+    },
     write: function(obj){
         if(!$.exists(obj)) return this;
         var dto = ($.exists(obj.toObject)) ? obj : $.dto(obj);
