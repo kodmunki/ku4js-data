@@ -573,30 +573,29 @@ imageFileField.prototype = {
 
                         sourceContext.drawImage(image, 0, 0);
 
-                        var maxRect = $.rectangle($.point.zero(), maxDims),
+                        var exif = get_exif_data(e.target.result),
+                            orientation = exif.Orientation,
+                            maxRect = $.rectangle($.point.zero(), maxDims),
                             imageWidth = ($.exists(image.naturalWidth)) ? image.naturalWidth : image.width,
                             imageHeight = ($.exists(image.naturalHeight)) ? image.naturalHeight : image.height,
                             imageRect = $.rectangle($.point.zero(), $.point(imageWidth, imageHeight)),
                             aspectDims = imageRect.aspectToFit(maxRect).dims(),
                             aspectWidth = aspectDims.x(),
                             aspectHeight = aspectDims.y(),
+                            aspectCanvasWidth = (orientation == 6 || orientation == 8) ? aspectHeight : aspectWidth,
+                            aspectCanvasHeight = (orientation == 6 || orientation == 8) ? aspectWidth : aspectHeight,
                             aspectCanvas = document.createElement("canvas");
 
-                        aspectCanvas.width = aspectWidth;
-                        aspectCanvas.height = aspectHeight;
+                        aspectCanvas.width = aspectCanvasWidth;
+                        aspectCanvas.height = aspectCanvasHeight;
 
-                        var aspectContext = aspectCanvas.getContext("2d"),
-                            exif = get_exif_data(e.target.result),
-                            orientation = exif.Orientation;
+                        var aspectContext = aspectCanvas.getContext("2d");
 
                         if(!$.isNumber(orientation) || orientation == 1) {
                             aspectContext.drawImage(image, 0, 0, aspectWidth, aspectHeight);
                         }
                         else {
-                            var rotation,
-                                hAspectWidth = aspectWidth/2,
-                                hAspectHeight = aspectHeight/2,
-                                radians = Math.PI/180;
+                            var radians = Math.PI/180, rotation;
 
                             switch (orientation) {
                                 case 3: rotation = 180 * radians; break;
@@ -604,11 +603,9 @@ imageFileField.prototype = {
                                 case 8: rotation = -90 * radians; break;
                                 default: rotation = 0;
                             }
-                            aspectContext.translate(hAspectWidth, hAspectHeight);
+                            aspectContext.translate(aspectCanvasWidth/2, aspectCanvasHeight/2);
                             aspectContext.rotate(rotation);
-                            aspectContext.drawImage(image, -hAspectWidth, -hAspectHeight, aspectWidth, aspectHeight);
-                            aspectContext.rotate(-rotation);
-                            aspectContext.translate(-hAspectWidth, -hAspectHeight);
+                            aspectContext.drawImage(image, -aspectCanvasHeight/2, -aspectCanvasWidth/2, aspectWidth, aspectHeight);
                         }
 
                         var dataUrl = aspectCanvas.toDataURL("image/png"),
