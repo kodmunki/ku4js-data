@@ -1,13 +1,17 @@
 (function(l){
-function service(){
+function service(name){
     service.base.call(this);
-    this._processId = $.uid("svc");
-    this._onSuccess = $.observer();
-    this._onError = $.observer();
-    this._onComplete = $.observer();
+
+    var processId = name || $.uid(),
+        format = "ku4service_{0}_{1}";
+
+    this._onSuccess = $.observer($.str.format(format, processId, "onSuccess"));
+    this._onError = $.observer($.str.format(format, processId, "onError"));
+    this._onComplete = $.observer($.str.format(format, processId, "onComplete"));
     this._lock = $.lock();
     this._noCache = false;
     this._isLocal = false;
+    this._processId = processId;
     
     this.GET().text().xhr().async().unlock();
 }
@@ -89,7 +93,7 @@ service.prototype = {
     }
 };
 $.Class.extend(service, $.Class);
-$.service = function(){ return new service(); };
+$.service = function(name){ return new service(name); };
 
 $.service.noCache = function(dto) {
     var noCache = $.dto({"noCache": $.uid()});
