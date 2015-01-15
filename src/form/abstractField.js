@@ -2,8 +2,7 @@ function abstractField(){
     abstractField.base.call(this);
     this._onIsValid = $.observer();
     this._onInvalid = $.observer();
-    this.spec($.spec(function(){ return true; }))
-        .optional();
+    this.spec($.spec(function(){ return true; })).optional()
 }
 abstractField.prototype = {
     $read: function(){ return; },

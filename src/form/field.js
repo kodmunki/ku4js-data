@@ -1,19 +1,17 @@
 function field(selector){
     field.base.call(this);
-
     var node = queryDom(selector);
-    this.dom(node)
-        .spec($.spec(function(){ return true; }))
-        .optional();
+    this.dom(node).format(function(value) { return value; });
 }
 field.prototype = {
-    $read: function(){ return this.dom().value },
+    $read: function(){ return this._format(this.dom().value); },
     $write: function(value){ this.dom().value = value; },
     $clear: function(){ this.dom().value = ""; return this; },
     $readFiles: function(func, scp) {
         var scope = scp || this;
         return func.call(scope, this.files());
     },
+    format: function(func) { this._format = func; return this; },
     dom: function(dom){ return this.property("dom", dom); },
     hasFiles: function() { return $.exists(this.dom().files); },
     fileCount: function() { return (!this.hasFiles) ? 0 : this.files().length; },
