@@ -60,6 +60,10 @@ service.prototype = {
     
     xhr: function(){ return this.strategy(new xhr()); },
     xss: function(){ return this.strategy(new xss()); },
+    cors: function(){ return this.strategy(new cors()); },
+    withCredentials: function(){ return this.property("withCredentials", true); },
+    withoutCredentials: function(){ return this.property("withCredentials", false); },
+
     sync: function(){ return this.callType("sync"); },
     async: function(){ return this.callType("async"); },
     text: function(){ return this.responseType("responseText"); },
@@ -88,7 +92,10 @@ service.prototype = {
         return this;
     },
     _readSettings: function() {
-        return { "contentType": this._contentType }
+        return {
+            "contentType": this._contentType,
+            "withCredentials": this._withCredentials
+        }
     }
 };
 $.Class.extend(service, $.Class);

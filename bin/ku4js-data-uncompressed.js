@@ -61,6 +61,10 @@ service.prototype = {
     
     xhr: function(){ return this.strategy(new xhr()); },
     xss: function(){ return this.strategy(new xss()); },
+    cors: function(){ return this.strategy(new cors()); },
+    withCredentials: function(){ return this.property("withCredentials", true); },
+    withoutCredentials: function(){ return this.property("withCredentials", false); },
+
     sync: function(){ return this.callType("sync"); },
     async: function(){ return this.callType("async"); },
     text: function(){ return this.responseType("responseText"); },
@@ -89,7 +93,10 @@ service.prototype = {
         return this;
     },
     _readSettings: function() {
-        return { "contentType": this._contentType }
+        return {
+            "contentType": this._contentType,
+            "withCredentials": this._withCredentials
+        }
     }
 };
 $.Class.extend(service, $.Class);
@@ -100,6 +107,79 @@ $.service.noCache = function(dto) {
     if(!$.exists(dto)) return noCache;
     return dto.merge(noCache);
 };
+
+function cors(){
+    cors.base.call(this);
+    this._isOk = function(status){ return /[23]\d{2}/.test(status) || this.context().isLocal(); };
+    this._isAborted = function(status){ return !/\d{3}/.test(status); };
+    this._attempts = 0;
+}
+cors.prototype = {
+    context: function(context){ return this.property("context", context); },
+    abort: function(){
+        try { this._cors.abort(); }
+        catch(e){ /*Fail*/ }
+    },
+    call: function(params, settings){
+        this._cors = cors_createCors();
+        var paramsExist = $.exists(params),
+            context = this.context(),
+            isPost = context.isPost(),
+            isMultipart = params instanceof FormData,
+            hasQuery = !isPost && paramsExist,
+            noCache = context._noCache,
+            cacheParam = $.str.format("__ku4nocache={0}", $.uid()),
+            postParams = (isPost) ? params : null,
+            format = (hasQuery && noCache) ? "{0}?{1}&{2}" : hasQuery ? "{0}?{1}" : noCache ? "{0}?{2}" : "{0}",
+            cors = this._cors,
+            me = this;
+
+        if(!$.exists(cors)) context.error(new Error("CORS not supported"));
+        if($.exists(settings.withCredentials)) this._cors.withCredentials = settings.withCredentials;
+        cors.open(context.verb(), $.str.format(format, context.uri(), params, cacheParam), context.isAsync());
+
+        if(isPost && !isMultipart){
+            var contentType = (!$.exists(settings.contentType)) ? "application/x-www-form-urlencoded" : settings.contentType;
+            cors.setRequestHeader("Content-Type", contentType);
+        }
+
+        cors.onreadystatechange = function(){
+            if(cors.readyState > 3) {
+                var response = cors[context.responseType()],
+                    status = cors.status;
+                if(me._isAborted(status)) return;
+                if(me._isOk(status)){
+                    context.success(response).complete(response);
+                    return;
+                }
+                if(me._attempts < context.maxAttempts()) {
+                    me.call(params);
+                    return;
+                }
+                context.error(response).complete(response);
+            }
+        };
+
+//        cors.onload = function() { };
+//        cors.onerror = function() { };
+
+
+        if($.exists(postParams)) cors.send(postParams);
+        else cors.send();
+    }
+};
+$.Class.extend(cors, $.Class);
+
+function cors_createCors(){
+
+    var xhr = $.exists(XMLHttpRequest) ? new XMLHttpRequest() : null;
+
+    return ("withCredentials" in xhr)
+        ? xhr
+        : ($.exists(XDomainRequest))
+            ? new XDomainRequest()
+            : null;
+}
 
 function xhr(){
     xhr.base.call(this);
@@ -508,8 +588,8 @@ $.blob = {
                 : null;
         }
     },
-    parseDataUri: function(dataUri) {
-        var dataArray = dataUri.split(','),
+    parseDataUrl: function(dataUrl) {
+        var dataArray = dataUrl.split(','),
             byteString = (dataArray[0].indexOf('base64') >= 0)
                 ? $.str.decodeBase64(dataArray[1])
                 : decodeURIComponent(dataArray[1]),
@@ -562,7 +642,7 @@ var exif = {
             offset += intShortPlus2;
         }
 
-        return invalidExifReturnValue();;
+        return invalidExifReturnValue();
     },
 
     readExifData: function (file, start) {
@@ -754,15 +834,6 @@ function invalidExifReturnValue () {
 
 $.exif = function() {
     return exif;
-};
-
-function image(imageResult) {
-    this._imageResult = imageResult;
-}
-image.prototype = {
-    toBinaryFile: function() {
-        return binaryFile.parseImageResult(this._imageResult);
-    }
 };
 
 var EXIF_TAGS = {
@@ -1154,6 +1225,8 @@ imageFileField.prototype = {
                 reader.onload = function (e) {
                     fileCount --;
 
+
+                    //NEED to pull this so that you can use it for ajax functions in the browser plugin
                     image.src = e.target.result;
                     image.onload = function() {
 
@@ -1195,7 +1268,7 @@ imageFileField.prototype = {
                         }
 
                         var dataUrl = aspectCanvas.toDataURL("image/jpeg", 1.0),
-                            blob = $.blob.parseDataUri(dataUrl);
+                            blob = $.blob.parseDataUrl(dataUrl);
 
                         blob.lastModified = file.lastModified;
                         blob.lastModifiedDate = file.lastModifiedDate;

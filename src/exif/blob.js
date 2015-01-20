@@ -19,8 +19,8 @@ $.blob = {
                 : null;
         }
     },
-    parseDataUri: function(dataUri) {
-        var dataArray = dataUri.split(','),
+    parseDataUrl: function(dataUrl) {
+        var dataArray = dataUrl.split(','),
             byteString = (dataArray[0].indexOf('base64') >= 0)
                 ? $.str.decodeBase64(dataArray[1])
                 : decodeURIComponent(dataArray[1]),

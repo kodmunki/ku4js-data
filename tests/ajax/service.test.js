@@ -21,8 +21,8 @@ $(function(){
             
         runTest = function(type){
             service[type]().uri($.str.format("tests/ajax/{0}Test.js", type)).call();
-        }
+        };
 
-    //asyncTest("xhr", function() { runTest("xhr"); });
-    //asyncTest("xss", function() { runTest("xss"); });
+    asyncTest("xhr", function() { runTest("xhr"); });
+    asyncTest("xss", function() { runTest("xss"); });
 });

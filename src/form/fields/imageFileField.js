@@ -26,6 +26,8 @@ imageFileField.prototype = {
                 reader.onload = function (e) {
                     fileCount --;
 
+
+                    //NEED to pull this so that you can use it for ajax functions in the browser plugin
                     image.src = e.target.result;
                     image.onload = function() {
 
@@ -67,7 +69,7 @@ imageFileField.prototype = {
                         }
 
                         var dataUrl = aspectCanvas.toDataURL("image/jpeg", 1.0),
-                            blob = $.blob.parseDataUri(dataUrl);
+                            blob = $.blob.parseDataUrl(dataUrl);
 
                         blob.lastModified = file.lastModified;
                         blob.lastModifiedDate = file.lastModifiedDate;

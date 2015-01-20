@@ -35,7 +35,7 @@ var exif = {
             offset += intShortPlus2;
         }
 
-        return invalidExifReturnValue();;
+        return invalidExifReturnValue();
     },
 
     readExifData: function (file, start) {
