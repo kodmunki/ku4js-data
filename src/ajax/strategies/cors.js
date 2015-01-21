@@ -33,10 +33,9 @@ cors.prototype = {
             cors.setRequestHeader("Content-Type", contentType);
         }
 
-        cors.onreadystatechange = function(){
-            if(cors.readyState > 3) {
-                var response = cors[context.responseType()],
-                    status = cors.status;
+        cors.onload = function(e) {
+            var response = this[context.responseType()],
+                    status = this.status;
                 if(me._isAborted(status)) return;
                 if(me._isOk(status)){
                     context.success(response).complete(response);
@@ -47,12 +46,18 @@ cors.prototype = {
                     return;
                 }
                 context.error(response).complete(response);
-            }
         };
 
-//        cors.onload = function() { };
-//        cors.onerror = function() { };
-
+        cors.onerror = function(e) {
+            var response = this[context.responseType()],
+                    status = this.status;
+                if(me._isAborted(status)) return;
+                if(me._attempts < context.maxAttempts()) {
+                    me.call(params);
+                    return;
+                }
+                context.error(response).complete(response);
+        };
 
         if($.exists(postParams)) cors.send(postParams);
         else cors.send();
