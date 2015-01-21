@@ -8,7 +8,7 @@ dto.prototype = {
     toQueryString: function() { return $.queryString.serialize(this.$h); },
     toFormData: function() {
         var data = new FormData();
-        this.each(function(obj) {  data.append(obj.key, obj.value); });
+        this.each(function(obj) { data.append(obj.key, obj.value); });
         return data;
     },
     saveAs: function(name) {
