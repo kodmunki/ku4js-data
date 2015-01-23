@@ -390,7 +390,7 @@ dto.prototype = {
     toQueryString: function() { return $.queryString.serialize(this.$h); },
     toFormData: function() {
         var data = new FormData();
-        this.each(function(obj) {  data.append(obj.key, obj.value); });
+        this.each(function(obj) { data.append(obj.key, obj.value); });
         return data;
     },
     saveAs: function(name) {
@@ -565,8 +565,8 @@ binaryFile.prototype = {
     }
 };
 
-binaryFile.parseImageResult = function(result) {
-    var base64Data = result.replace(/data:image\/.*;base64,/, ""),
+binaryFile.parseDataUrl = function(dataUrl) {
+    var base64Data = dataUrl.replace(/data:image\/.*;base64,/, ""),
         data = $.str.decodeBase64(base64Data);
 
     return new binaryFile(data);
@@ -615,9 +615,9 @@ var exif = {
         return $.exists(file) && (file.getByteAt(0) == 0xFF || file.getByteAt(1) == 0xD8);
     },
 
-    readExifDataInImageResult: function(result) {
-        if(!$.exists(result)) throw $.ku4exception("EXIF", "Cannot get exif data for an invalid image result.");
-        var file = binaryFile.parseImageResult(result);
+    readExifDataInDataUrl: function(dataUrl) {
+        if(!$.exists(dataUrl)) throw $.ku4exception("EXIF", "Cannot get exif data for an invalid dataUrl.");
+        var file = binaryFile.parseDataUrl(dataUrl);
         return exif.readExifDataInJpeg(file);
     },
 
@@ -839,6 +839,69 @@ function invalidExifReturnValue () {
 
 $.exif = function() {
     return exif;
+};
+
+$.image = {
+    binaryFileFromSrc: function() {
+
+    },
+    blobFromSrc: function (src, onLoad, scp, options) {
+
+        var scope = (!$.exists(scp) || $.isObjectLiteral(scp)) ? this : scp,
+            opts = ($.isObjectLiteral(scp)) ? scp : ($.exists(options)) ? options : { },
+            mimeType = opts.mimeType || "image/jpeg",
+            image = document.createElement("img"),
+            sourceCanvas = document.createElement("canvas"),
+            sourceContext = sourceCanvas.getContext("2d");
+
+        image.onload = function () {
+
+            sourceContext.drawImage(image, 0, 0);
+
+            var sourceDataUrl = sourceCanvas.toDataURL(mimeType, 1.0),
+                exif = $.exif().readExifDataInDataUrl(sourceDataUrl),
+                orientation = exif.Orientation,
+                imageWidth = ($.exists(image.naturalWidth)) ? image.naturalWidth : image.width,
+                imageHeight = ($.exists(image.naturalHeight)) ? image.naturalHeight : image.height,
+                imageRect = $.rectangle($.point.zero(), $.point(imageWidth, imageHeight)),
+                maxDims = opts.maxDims || {x:imageWidth, y:imageHeight},
+                maxRect = $.rectangle($.point.zero(), maxDims),
+                aspectDims = imageRect.aspectToFit(maxRect).dims(),
+                aspectWidth = aspectDims.x(),
+                aspectHeight = aspectDims.y(),
+                aspectCanvasWidth = (orientation == 6 || orientation == 8) ? aspectHeight : aspectWidth,
+                aspectCanvasHeight = (orientation == 6 || orientation == 8) ? aspectWidth : aspectHeight,
+                aspectCanvas = document.createElement("canvas");
+
+            aspectCanvas.width = aspectCanvasWidth;
+            aspectCanvas.height = aspectCanvasHeight;
+
+            var aspectContext = aspectCanvas.getContext("2d");
+
+            if (!$.isNumber(orientation) || orientation == 1) {
+                aspectContext.drawImage(image, 0, 0, aspectWidth, aspectHeight);
+            }
+            else {
+                var radians = Math.PI / 180, rotation;
+                switch (orientation) {
+                    case 3: rotation = 180 * radians; break;
+                    case 6: rotation = 90 * radians; break;
+                    case 8: rotation = -90 * radians; break;
+                    default: rotation = 0;
+                }
+                aspectContext.translate(aspectCanvasWidth / 2, aspectCanvasHeight / 2);
+                aspectContext.rotate(rotation);
+                aspectContext.drawImage(image, -aspectCanvasHeight / 2, -aspectCanvasWidth / 2, aspectWidth, aspectHeight);
+            }
+
+            var dataUrl = aspectCanvas.toDataURL(mimeType, 1.0),
+                blob = $.blob.parseDataUrl(dataUrl);
+
+            onLoad.call(scope, blob);
+        };
+        image.crossorigin="anonymous";
+        image.src = src;
+    }
 };
 
 var EXIF_TAGS = {
@@ -1221,67 +1284,21 @@ imageFileField.prototype = {
             function callback() { func.call(scope, resizedFiles.toArray()); }
 
             files.each(function (file) {
+                fileCount --;
 
-                var image = document.createElement("img"),
-                    sourceCanvas = document.createElement("canvas"),
-                    sourceContext = sourceCanvas.getContext("2d"),
-                    reader = new FileReader();
+                var reader = new FileReader();
 
-                reader.onload = function (e) {
-                    fileCount --;
-
-
-                    //NEED to pull this so that you can use it for ajax functions in the browser plugin
-                    image.src = e.target.result;
-                    image.onload = function() {
-
-                        sourceContext.drawImage(image, 0, 0);
-
-                        var exif = $.exif().readExifDataInImageResult(e.target.result),
-                            orientation = exif.Orientation,
-                            maxRect = $.rectangle($.point.zero(), maxDims),
-                            imageWidth = ($.exists(image.naturalWidth)) ? image.naturalWidth : image.width,
-                            imageHeight = ($.exists(image.naturalHeight)) ? image.naturalHeight : image.height,
-                            imageRect = $.rectangle($.point.zero(), $.point(imageWidth, imageHeight)),
-                            aspectDims = imageRect.aspectToFit(maxRect).dims(),
-                            aspectWidth = aspectDims.x(),
-                            aspectHeight = aspectDims.y(),
-                            aspectCanvasWidth = (orientation == 6 || orientation == 8) ? aspectHeight : aspectWidth,
-                            aspectCanvasHeight = (orientation == 6 || orientation == 8) ? aspectWidth : aspectHeight,
-                            aspectCanvas = document.createElement("canvas");
-
-                        aspectCanvas.width = aspectCanvasWidth;
-                        aspectCanvas.height = aspectCanvasHeight;
-
-                        var aspectContext = aspectCanvas.getContext("2d");
-
-                        if(!$.isNumber(orientation) || orientation == 1) {
-                            aspectContext.drawImage(image, 0, 0, aspectWidth, aspectHeight);
-                        }
-                        else {
-                            var radians = Math.PI/180, rotation;
-
-                            switch (orientation) {
-                                case 3: rotation = 180 * radians; break;
-                                case 6: rotation = 90 * radians; break;
-                                case 8: rotation = -90 * radians; break;
-                                default: rotation = 0;
-                            }
-                            aspectContext.translate(aspectCanvasWidth/2, aspectCanvasHeight/2);
-                            aspectContext.rotate(rotation);
-                            aspectContext.drawImage(image, -aspectCanvasHeight/2, -aspectCanvasWidth/2, aspectWidth, aspectHeight);
-                        }
-
-                        var dataUrl = aspectCanvas.toDataURL("image/jpeg", 1.0),
-                            blob = $.blob.parseDataUrl(dataUrl);
-
+                reader.onload = function(e) {
+                    $.image.blobFromSrc(e.target.result, function(blob) {
                         blob.lastModified = file.lastModified;
                         blob.lastModifiedDate = file.lastModifiedDate;
                         blob.name = file.name;
 
                         resizedFiles.add(blob);
                         if (fileCount < 1) callback();
-                    }
+                    }, {
+                        maxDims: maxDims
+                    });
                 };
                 reader.readAsDataURL(file);
             });

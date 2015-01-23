@@ -31,8 +31,8 @@ binaryFile.prototype = {
     }
 };
 
-binaryFile.parseImageResult = function(result) {
-    var base64Data = result.replace(/data:image\/.*;base64,/, ""),
+binaryFile.parseDataUrl = function(dataUrl) {
+    var base64Data = dataUrl.replace(/data:image\/.*;base64,/, ""),
         data = $.str.decodeBase64(base64Data);
 
     return new binaryFile(data);

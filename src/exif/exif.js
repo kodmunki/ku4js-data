@@ -3,9 +3,9 @@ var exif = {
         return $.exists(file) && (file.getByteAt(0) == 0xFF || file.getByteAt(1) == 0xD8);
     },
 
-    readExifDataInImageResult: function(result) {
-        if(!$.exists(result)) throw $.ku4exception("EXIF", "Cannot get exif data for an invalid image result.");
-        var file = binaryFile.parseImageResult(result);
+    readExifDataInDataUrl: function(dataUrl) {
+        if(!$.exists(dataUrl)) throw $.ku4exception("EXIF", "Cannot get exif data for an invalid dataUrl.");
+        var file = binaryFile.parseDataUrl(dataUrl);
         return exif.readExifDataInJpeg(file);
     },
 
