@@ -1,5 +1,12 @@
 $.image = {
-    binaryFileFromSrc: function() {
+    dataUrlFromSrc: function(src, onLoad, scp, options) {
+
+        var scope = (!$.exists(scp) || $.isObjectLiteral(scp)) ? this : scp;
+        $.image.blobFromSrc(src, function(blob) {
+            var fileReader = new FileReader();
+            fileReader.onload = function() { onLoad.call(scope, fileReader.result); };
+            fileReader.readAsDataURL(blob);
+        },  scp, options);
 
     },
     blobFromSrc: function (src, onLoad, scp, options) {

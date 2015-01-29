@@ -842,7 +842,14 @@ $.exif = function() {
 };
 
 $.image = {
-    binaryFileFromSrc: function() {
+    dataUrlFromSrc: function(src, onLoad, scp, options) {
+
+        var scope = (!$.exists(scp) || $.isObjectLiteral(scp)) ? this : scp;
+        $.image.blobFromSrc(src, function(blob) {
+            var fileReader = new FileReader();
+            fileReader.onload = function() { onLoad.call(scope, fileReader.result); };
+            fileReader.readAsDataURL(blob);
+        },  scp, options);
 
     },
     blobFromSrc: function (src, onLoad, scp, options) {
@@ -1434,11 +1441,18 @@ form.prototype = {
     },
     read: function(){
         var dto = $.dto();
+
         this._fields.each(function(o){
             var k = o.key, v = o.value;
-            if($.exists(v.read)) dto.merge(v.read());
-            if($.exists(v.value)) dto.add(k, v.value());
+            if($.exists(v.files())) $.list(v.files()).each(function(file) {
+                dto.add(k, file);
+            });
+            else {
+                if($.exists(v.read)) dto.merge(v.read());
+                if($.exists(v.value)) dto.add(k, v.value());
+            }
         });
+
         return dto;
     },
     readMultipartData: function()
