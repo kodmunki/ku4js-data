@@ -25,7 +25,7 @@ $(function(){
     
     test("list fields", function() {
         var fieldList = form.listFields();
-        equal(fieldList.count(), 5);
+        equal(fieldList.count(), 6);
         form.listFields().each(function(field){
             ok(field);
         });

@@ -1,0 +1,1 @@
+ku4jsXss.test_success({message: "testMessage"});

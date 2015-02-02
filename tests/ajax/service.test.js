@@ -4,23 +4,15 @@ $(function(){
     module("service");
     
     test("create", function() { ok($.service()); });
-    
-    var assertSuccess = function(response){
-            ok(response.success);
-            notOk(response.error);
-            start();
-        },
-        assertError = function(response){
-            ok(response.error);
-            notOk(response.success);
-            start();
-        },
-        service = $.service()
-            .onSuccess(assertSuccess)
-            .onError(assertError),
-            
+
+    var service = $.service("test")
+            .onSuccess(function(response){
+                var data = $.dto.parseJson(response).toObject();
+                equal(data.message, "testMessage");
+                start();
+            }),
         runTest = function(type){
-            service[type]().uri($.str.format("tests/ajax/{0}Test.js", type)).call();
+            service[type]().uri($.str.format("stubs/ajax/{0}Test.js", type)).call();
         };
 
     asyncTest("xhr", function() { runTest("xhr"); });
