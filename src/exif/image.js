@@ -1,20 +1,20 @@
 $.image = {
-    dataUrlFromSrc: function(src, onLoad, scp, options) {
-
+    dataUrlFromSrc: function(src, func, scp, options) {
         var scope = (!$.exists(scp) || $.isObjectLiteral(scp)) ? this : scp;
         $.image.blobFromSrc(src, function(blob) {
             var fileReader = new FileReader();
-            fileReader.onload = function() { onLoad.call(scope, fileReader.result); };
+            fileReader.onload = function() { func.call(scope, fileReader.result); };
             fileReader.readAsDataURL(blob);
         },  scp, options);
 
     },
-    blobFromSrc: function (src, onLoad, scp, options) {
-
+    blobFromSrc: function (src, func, scp, options) {
         var scope = (!$.exists(scp) || $.isObjectLiteral(scp)) ? this : scp,
             opts = ($.isObjectLiteral(scp)) ? scp : ($.exists(options)) ? options : { },
             mimeType = opts.mimeType || "image/jpeg",
             image = document.createElement("img"),
+
+
             sourceCanvas = document.createElement("canvas"),
             sourceContext = sourceCanvas.getContext("2d");
 
@@ -35,6 +35,8 @@ $.image = {
                 aspectHeight = aspectDims.y(),
                 aspectCanvasWidth = (orientation == 6 || orientation == 8) ? aspectHeight : aspectWidth,
                 aspectCanvasHeight = (orientation == 6 || orientation == 8) ? aspectWidth : aspectHeight,
+
+
                 aspectCanvas = document.createElement("canvas");
 
             aspectCanvas.width = aspectCanvasWidth;
@@ -61,7 +63,7 @@ $.image = {
             var dataUrl = aspectCanvas.toDataURL(mimeType, 1.0),
                 blob = $.blob.parseDataUrl(dataUrl);
 
-            onLoad.call(scope, blob);
+            func.call(scope, blob);
         };
         image.crossorigin="anonymous";
         image.src = src;
