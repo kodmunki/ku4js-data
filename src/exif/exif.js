@@ -20,7 +20,7 @@ var exif = {
         function isFfe1Marker(marker) { return marker == 22400 || marker == 225; }
 
         while (offset < fileLength) {
-            if (!isValidMarkerOffset(file, offset)) return invalidExifReturnValue();;
+            if (!isValidMarkerOffset(file, offset)) return invalidExifReturnValue();
 
             marker = file.getByteAt(offset + 1);
 
