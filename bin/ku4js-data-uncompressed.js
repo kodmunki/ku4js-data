@@ -896,15 +896,12 @@ $.image = {
                 aspectHeight = aspectDims.y(),
                 aspectCanvasWidth = (orientation == 6 || orientation == 8) ? aspectHeight : aspectWidth,
                 aspectCanvasHeight = (orientation == 6 || orientation == 8) ? aspectWidth : aspectHeight,
-
                 aspectCanvas = document.createElement("canvas");
 
             aspectCanvas.width = aspectCanvasWidth;
             aspectCanvas.height = aspectCanvasHeight;
 
             var aspectContext = aspectCanvas.getContext("2d");
-
-            console.log(exif);
 
             if (!$.isNumber(orientation) || orientation == 1) {
                 aspectContext.drawImage(image, 0, 0, aspectWidth, aspectHeight);
