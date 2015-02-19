@@ -5,6 +5,10 @@ kodmunki™ utilities for JavaScript data.
 
 This library includes Query String and JSON parsers, Data Transfer Objects, ajax services, and persistent, validatable, and transferable forms
 
+<img src="http://www.kodmunki.com/media/logo-small.png" alt="kodmunki" />
+
+---
+
 #Dependencies
 * ku4js-kernel - https://github.com/kodmunki/ku4js-kernel
 
