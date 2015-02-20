@@ -27,6 +27,7 @@ $.json.deserialize = function(str) {
     if(/function|(=$)/i.test(str)) return str;
     try {
         var obj = ($.isString(str)) ? eval("(" + json_deserializeString(str) + ")") : str;
+        if($.isFunction(obj)) obj = str;
         if(!$.exists(obj)) return obj;
         if($.isNullOrEmpty(obj.tagName) &&
             ($.isObject(obj) || $.isArray(obj))) {
@@ -43,7 +44,7 @@ $.json.deserialize = function(str) {
                 ? $.dayPoint.parse(obj).toDate()
                 : obj;
     }
-    catch (e) { console.log(e); return str; }
+    catch (e) { return str; }
 };
 
 function json_serializeString(str) {

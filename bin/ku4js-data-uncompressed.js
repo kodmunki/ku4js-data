@@ -203,7 +203,7 @@ xhr.prototype = {
         var paramsExist = $.exists(params),
             context = this.context(),
             isPost = context.isPost(),
-            isMultipart = params instanceof FormData,
+            isMultipart = (function() { var FormData; return ($.exists(FormData) && (params instanceof FormData)) })(),
             hasQuery = !isPost && paramsExist,
             noCache = context._noCache,
             cacheParam = $.str.format("__ku4nocache={0}", $.uid()),
@@ -469,6 +469,7 @@ $.json.deserialize = function(str) {
     if(/function|(=$)/i.test(str)) return str;
     try {
         var obj = ($.isString(str)) ? eval("(" + json_deserializeString(str) + ")") : str;
+        if($.isFunction(obj)) obj = str;
         if(!$.exists(obj)) return obj;
         if($.isNullOrEmpty(obj.tagName) &&
             ($.isObject(obj) || $.isArray(obj))) {
@@ -485,7 +486,7 @@ $.json.deserialize = function(str) {
                 ? $.dayPoint.parse(obj).toDate()
                 : obj;
     }
-    catch (e) { console.log(e); return str; }
+    catch (e) { return str; }
 };
 
 function json_serializeString(str) {
