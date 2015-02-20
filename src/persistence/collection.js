@@ -1,15 +1,10 @@
-function collection(name, obj) {
+function collection(name, obj, isAsync) {
     if(!$.exists(name))
         throw $.ku4exception("$.collection", $.str.format("Invalid name={0}. Must be unique", name));
     this._name = name;
     this._data = $.dto(obj);
+    this._store = (isAsync) ? $.ku4AsyncStore() : $.ku4store();
 
-    try {
-        this._store = $.ku4store();
-    }
-    catch(e) {
-        this._store = $.ku4memoryStore();
-    }
 }
 collection.prototype = {
     name: function() { return this._name; },
@@ -144,7 +139,7 @@ collection.prototype = {
         return $.json.serialize({ "name": name, "data": data });
     }
 };
-$.ku4collection = function(name, obj) { return new collection(name, obj); };
+$.ku4collection = function(name, obj, isAsync) { return new collection(name, obj, isAsync); };
 $.ku4collection.deserialize = function(serialized) {
     var obj = $.json.deserialize(serialized);
     return new collection(obj.name, obj.data);
