@@ -686,13 +686,9 @@ var exif = {
 
         if (!isValidTiff(file, tiffOffset, isBigEndian)) return {};
 
-        //NOTE: tags should be a property and return the valid tags.
-
         var tiffTags = exif.readTiffTags(file, tiffOffset, isBigEndian),
-
             exifTags = ($.exists(tiffTags.ExifIFDPointer))
                 ? exif.readExifTags(file, tiffOffset, tiffTags.ExifIFDPointer, isBigEndian) : {},
-
             gpsTags = ($.exists(tiffTags.GPSInfoIFDPointer))
                 ? exif.readGpsTags(file, tiffOffset, tiffTags.GPSInfoIFDPointer, isBigEndian) : {};
 

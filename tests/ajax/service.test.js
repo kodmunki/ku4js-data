@@ -11,6 +11,7 @@ $(function(){
                 equal(data.message, "testMessage");
                 start();
             }),
+
         runTest = function(type){
             service[type]().uri($.str.format("stubs/ajax/{0}Test.js", type)).call();
         };

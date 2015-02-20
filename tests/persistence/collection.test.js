@@ -481,7 +481,7 @@ $(function(){
         collection.insert(data3);
         collection.insert(data4);
 
-        expect(6);
+        expect(7);
         equal(collection.find().length, 4);
 
         var test = collection.find({"name": "John"});
@@ -490,6 +490,8 @@ $(function(){
         equal(test[0].address, data1.email);
         equal(test[1].id, 1);
         equal(test[1].address, data2.email);
+
+        performanceOk(function() { collection.find() }, 1);
     });
 
     test("spec", function() {
@@ -550,8 +552,10 @@ $(function(){
                 }),
             regex = /\{"name":"test"\,"data":\{"[A-z0-9]{32}":\{"name":"Serial"\,"email":"Seri@lize.com"\}\,"[A-z0-9]{32}":\{"name":"Serial"\,"email":"Seri@lize.com"\}\}\}/;
 
-        expect(1);
+        expect(2);
         ok(regex.test(collection.serialize()));
+
+        performanceOk(function() { collection.serialize() }, 1);
     });
 
     test("deserialize", function() {
