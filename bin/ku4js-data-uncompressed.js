@@ -465,6 +465,7 @@ $.json.serialize = function(obj) {
     }
     return $.str.format(f, r);
 };
+
 $.json.deserialize = function(str) {
     if(/function|(=$)/i.test(str)) return str;
     try {

@@ -64,34 +64,45 @@ $(function(){
     test("toFormData", function() {
         var testDeserialized = {a:null, b:undefined, man:{sex:"m", age:25, married:true, children:["Tom","Dick","Jane"],contact:{"home":9998887777}},"date":new Date(1,1,2011),"multiline":"Here is\\ / a multiline\f\nparagraph\rfor\ttesting","html":"<html class=\"css-class\"></html>"};
 
-        expect(1);
+        expect(2);
         ok($.dto(testDeserialized).toFormData() instanceof FormData);
+
+        performanceOk(function() { $.dto(testDeserialized).toFormData(); }, 5);
     });
 
     test("parseJson", function() {
         var testSerialized = '{"a":null,"man":{"sex":"m","age":25,"married":true,"children":["Tom","Dick","Jane"],"contact":{"home":9998887777}},"date":"1906-08-04T05:00:00.000Z","multiline":"Here is\\\\ \/ a multiline\\f\\nparagraph\\rfor\\ttesting","html":"<html class=\\\"css-class\\\"></html>"}',
             testDeserialized = {a:null, b:undefined, man:{sex:"m", age:25, married:true, children:["Tom","Dick","Jane"],contact:{"home":9998887777}},"date":new Date(1,1,2011),"multiline":"Here is\\ / a multiline\f\nparagraph\rfor\ttesting","html":"<html class=\"css-class\"></html>"};
 
-        expect(2);
+        expect(4);
         equal($.dto(testDeserialized).toJson(), testSerialized, "Serialize");
         deepEqual($.dto.parseJson(testSerialized).toObject(), $.hash(testDeserialized).remove("b").toObject(), "Deserialize");
+
+        performanceOk(function() { $.dto(testDeserialized).toJson(); }, 5);
+        performanceOk(function() { $.dto.parseJson(testSerialized).toObject(), $.hash(testDeserialized).remove("b").toObject() }, 1);
     });
 
     test("parseQueryString", function() {
         var testSerialized = "sex=m&test=test&age=25&married=true&_uri=here%2Fto%2Fthere.go&date1=2014-3-25&date2=2014-02-01T06%3A00%3A00.000Z&number=23.45&_null=null",
             testDeserialized = {sex:"m", test: "test", age:25, married:true, "_uri":"here/to/there.go", "date1": "2014-3-25", "date2": new Date(2014, 1, 1), "number": 23.45, "_undefined": undefined, "_null": null};
 
-        expect(2);
+        expect(4);
         equal($.dto(testDeserialized).toQueryString(), testSerialized, "Serialize");
         deepEqual($.dto.parseQueryString(testSerialized).toObject(), $.hash(testDeserialized).remove("_undefined").toObject(), "Deserialize");
+
+        performanceOk(function() { $.dto(testDeserialized).toQueryString(); }, 5);
+        performanceOk(function() { $.dto.parseQueryString(testSerialized).toObject() }, 5);
     });
 
     test("parseJsonArray", function() {
         var testSerialized = '[{"a":null,"man":{"sex":"m","age":25,"married":true,"children":["Tom","Dick","Jane"],"contact":{"home":9998887777}},"date":"1906-08-04T05:00:00.000Z","multiline":"Here is\\\\ \/ a multiline\\f\\nparagraph\\rfor\\ttesting","html":"<html class=\\\"css-class\\\"></html>"}]',
             testDeserialized = [{a:null, man:{sex:"m", age:25, married:true, children:["Tom","Dick","Jane"],contact:{"home":9998887777}},"date":new Date(1,1,2011),"multiline":"Here is\\ / a multiline\f\nparagraph\rfor\ttesting","html":"<html class=\"css-class\"></html>"}];
 
-        expect(2);
+        expect(4    );
         equal($.dto(testDeserialized).toJson(), testSerialized, "Serialize");
         deepEqual($.dto.parseJson(testSerialized).toObject(), $.list(testDeserialized).toArray(), "Deserialize");
+
+        performanceOk(function() { $.dto(testDeserialized).toJson(); }, 5);
+        performanceOk(function() { $.dto.parseJson(testSerialized).toObject(); }, 5);
     });
 });
