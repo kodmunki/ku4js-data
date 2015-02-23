@@ -2,8 +2,10 @@ function indexedDbStore(name) {
     this._name = name || "ku4indexedDbStore";
 }
 indexedDbStore.prototype = {
-    read: function(collectionName, callback) {
+    read: function(collectionName, callback, scope) {
+        if(!$.isFunction(callback)) throw $.ku4exception("$.ku4indexedDbStore", "Invalid callback parameter at read");
         var name = this._name,
+            scp = scope || this,
             me = this;
 
         ku4indexedDbStore_openDb(name, function (err, db) {
@@ -13,69 +15,83 @@ indexedDbStore.prototype = {
                 .onsuccess = function (event) {
                     var data = event.target.result,
                         collection = $.ku4collection(collectionName, data).store(me);
-                    if($.exists(callback)) callback(null, collection);
+                    if($.exists(callback)) callback.call(scp, null, collection);
                     db.close();
                 };
         }, collectionName);
         return this;
     },
-    write: function(collection, callback) {
+    write: function(collection, callback, scope) {
+        if(!$.isFunction(callback)) throw $.ku4exception("$.ku4indexedDbStore", "Invalid callback parameter at write");
         var collectionName = collection.name(),
             name = this._name,
+            scp = scope || this,
             me = this;
 
         ku4indexedDbStore_openDb(name, function (err, db) {
             if($.exists(err)) {
-                if($.exists(callback)) callback(err, null);
+                if($.exists(callback)) callback.call(scp, err, me, collection);
             }
             else {
                 var request = db.transaction([collectionName], "readwrite").objectStore(collectionName).put(collection.toObject(), 1);
                 request.onerror = function () {
-                    if($.exists(callback)) callback(new Error("Error writing data to indexedDbStore"), me);
+                    if($.exists(callback)) callback.call(scp, new Error("Error writing data to indexedDbStore"), me, collection);
                     db.close();
                 };
                 request.onsuccess = function () {
-                    if($.exists(callback)) callback(null, me);
+                    if($.exists(callback)) callback.call(scp, null, me, collection);
                     db.close();
                 };
             }
         }, collectionName);
         return this;
     },
-    remove: function(collection, callback) {
+    remove: function(collection, callback, scope) {
+        if(!$.isFunction(callback)) throw $.ku4exception("$.ku4indexedDbStore", "Invalid callback parameter at remove");
         var collectionName = collection.name(),
             name = this._name,
+            scp = scope || this,
             me = this;
 
         ku4indexedDbStore_openDb(name, function (err, db) {
-            if($.exists(err)) callback(err, null);
+            if($.exists(err)) callback.call(scp, err, me, collection);
             else {
                 var request = db.transaction([collectionName], "readwrite").objectStore(collectionName)["delete"](1);
                 request.onerror = function () {
-                    if($.exists(callback)) callback(new Error("Error removing data to indexedDbStore"), me);
+                    if($.exists(callback)) callback.call(scp, new Error("Error removing data to indexedDbStore"), me, collection);
                     db.close();
                 };
                 request.onsuccess = function () {
-                    if($.exists(callback)) callback(null, me);
+                    if($.exists(callback)) callback.call(scp, null, me, collection);
                     db.close();
                 };
             }
         }, collectionName);
         return this;
     },
-    __delete: function(callback) {
+    __delete: function(callback, scope) {
+        if(!$.isFunction(callback)) throw $.ku4exception("$.ku4indexedDbStore", "Invalid callback parameter at __delete");
         var idxdb = indexedDB || webkitIndexedDB || mozIndexedDB,
             request = idxdb.deleteDatabase(this._name),
+            scp = scope || this,
             me = this;
 
-        request.onerror = function() { if($.exists(callback)) callback(new Error("Error deleting indexedDbStore.", me))};
-        request.onsuccess = function() { if($.exists(callback)) callback(null, me); };
+        request.onerror = function() {
+            if($.exists(callback))
+                callback.call(scp, new Error("Error deleting indexedDbStore.", me))}
+        ;
+        request.onsuccess = function() {
+            if($.exists(callback))
+                callback.call(scp, null, me);
+        };
         return this;
     },
-    __reset: function(callback) {
+    __reset: function(callback, scope) {
+        if(!$.isFunction(callback)) throw $.ku4exception("$.ku4indexedDbStore", "Invalid callback parameter at __reset");
+        var scp = scope || this;
         this.__delete(function(err, store) {
             __ku4indexedDbStoreVersion = 0;
-            if($.exists(callback)) callback(err, store);
+            if($.exists(callback)) callback.call(scp, err, store);
         });
     }
 };

@@ -11,7 +11,7 @@ collection.prototype = {
     isEmpty: function() { return this._data.isEmpty(); },
     count: function() { return this._data.count(); },
     store: function(store) { this._store = collection_getStore(store); return this; },
-    save: function(callback) { this._store.write(this, callback); return this; },
+    save: function(callback, scope) { this._store.write(this, callback, scope); return this; },
     init: function(list) { return this.remove().insertList(list); },
     find: function(query) {
         if(!$.exists(query)) return this._data.values();
