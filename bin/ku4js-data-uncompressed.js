@@ -1344,7 +1344,7 @@ imageFileField.prototype = {
 
                         resizedFiles.add(blob);
                         if (fileCount < 1) callback();
-                    }, {
+                    }, this, {
                         maxDims: maxDims
                     });
                 };
