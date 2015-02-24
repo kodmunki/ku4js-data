@@ -1798,7 +1798,7 @@ execCollection.prototype = {
     isEmpty: function() { return this._collection.isEmpty(); },
     count: function() { return this._collection.count(); },
     store: function(store) { this._collection.store(store); return this; },
-    save: function(callback) { this._collection.save(callback); return this; },
+    save: function(callback, scope) { this._collection.save(callback, scope); return this; },
     init: function(list) {
         this._collection.init(list);
         return this;
@@ -1868,7 +1868,7 @@ function indexedDbStore(name) {
 }
 indexedDbStore.prototype = {
     read: function(collectionName, callback, scope) {
-        if(!$.isFunction(callback)) throw new $.ku4exception("$.ku4indexedDbStore", "Invalid callback parameter at read");
+        if(!$.isFunction(callback)) throw $.ku4exception("$.ku4indexedDbStore", "Invalid callback parameter at read");
         var name = this._name,
             scp = scope || this,
             me = this;
@@ -1887,7 +1887,7 @@ indexedDbStore.prototype = {
         return this;
     },
     write: function(collection, callback, scope) {
-        if(!$.isFunction(callback)) throw new $.ku4exception("$.ku4indexedDbStore", "Invalid callback parameter at write");
+        if(!$.isFunction(callback)) throw $.ku4exception("$.ku4indexedDbStore", "Invalid callback parameter at write");
         var collectionName = collection.name(),
             name = this._name,
             scp = scope || this,
@@ -1912,7 +1912,7 @@ indexedDbStore.prototype = {
         return this;
     },
     remove: function(collection, callback, scope) {
-        if(!$.isFunction(callback)) throw new $.ku4exception("$.ku4indexedDbStore", "Invalid callback parameter at remove");
+        if(!$.isFunction(callback)) throw $.ku4exception("$.ku4indexedDbStore", "Invalid callback parameter at remove");
         var collectionName = collection.name(),
             name = this._name,
             scp = scope || this,
@@ -1935,7 +1935,7 @@ indexedDbStore.prototype = {
         return this;
     },
     __delete: function(callback, scope) {
-        if(!$.isFunction(callback)) throw new $.ku4exception("$.ku4indexedDbStore", "Invalid callback parameter at __delete");
+        if(!$.isFunction(callback)) throw $.ku4exception("$.ku4indexedDbStore", "Invalid callback parameter at __delete");
         var idxdb = indexedDB || webkitIndexedDB || mozIndexedDB,
             request = idxdb.deleteDatabase(this._name),
             scp = scope || this,
@@ -1952,7 +1952,7 @@ indexedDbStore.prototype = {
         return this;
     },
     __reset: function(callback, scope) {
-        if(!$.isFunction(callback)) throw new $.ku4exception("$.ku4indexedDbStore", "Invalid callback parameter at __reset");
+        if(!$.isFunction(callback)) throw $.ku4exception("$.ku4indexedDbStore", "Invalid callback parameter at __reset");
         var scp = scope || this;
         this.__delete(function(err, store) {
             __ku4indexedDbStoreVersion = 0;
