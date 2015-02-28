@@ -11,4 +11,7 @@ cp -f ../bin/ku4js-data.js ../../ku4js-widget/tests/_dependencies/
 
 cp -f ../bin/ku4js-data.js ../../../../products/gifthorse/gifthorse/public/javascript/lib/
 
+echo "Copying resources to _LATEST/"
+cp -f ../bin/ku4js-data.js ../../_LATEST/
+
 echo "Update complete :{)}"
