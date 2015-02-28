@@ -42,7 +42,7 @@
 <h1>
 <a id="documentation" class="anchor" href="#documentation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Documentation</h1>
 
-<p>The following documentation describes each class in the ku4js-data library. It is organized to follow the directory structure found in /src ordered by lowest level constructs first. All constructors are empty unless otherwise noted.</p>
+<p>The following documentation describes each class in the ku4js-data library. It is organized to follow the directory structure found in /src ordered by lowest level constructs first. All instantiable classes can be instantiated using the $.className() syntax. All constructors are empty unless otherwise noted.</p>
 
 <p>The API tables in each section of the documentation contain three columns.</p>
 
@@ -56,7 +56,8 @@
 </thead>
 <tbody>
 <tr>
-<td>This column contains the actual JavaScript API of the property or method in question. Proper syntax is depicted. Argument types are displyed in italics. An example: $.MethodName(argument:_Type)</td>
+<td>This column contains the actual JavaScript API of the property or method in question. Proper syntax is depicted. Argument types are displyed in italics. Class/static methods are denoted with the class name, whereas instance level methods will begin with a dot. Example class/static method: <strong>$.math.round(value:<em>Number</em>, nearest:<em>Number</em>)</strong>. Example of an instance method: <strong>.toString()</strong>
+</td>
 <td>The return values type, if any. A value of "this" in this column indicates the return of a reference to self</td>
 <td>This column contains descriptions and any <strong>Gotchas!</strong>
 </td>
@@ -80,162 +81,162 @@
 </thead>
 <tbody>
 <tr>
-<td>processId()</td>
+<td>.processId()</td>
 <td>uid</td>
 <td></td>
 </tr>
 <tr>
-<td>GET()</td>
+<td>.GET()</td>
 <td>this</td>
 <td></td>
 </tr>
 <tr>
-<td>POST()</td>
+<td>.POST()</td>
 <td>this</td>
 <td></td>
 </tr>
 <tr>
-<td>PUT()</td>
+<td>.PUT()</td>
 <td>this</td>
 <td></td>
 </tr>
 <tr>
-<td>HEAD()</td>
+<td>.HEAD()</td>
 <td>this</td>
 <td></td>
 </tr>
 <tr>
-<td>OPTIONS()</td>
+<td>.OPTIONS()</td>
 <td>this</td>
 <td></td>
 </tr>
 <tr>
-<td>DELETE()</td>
+<td>.DELETE()</td>
 <td>this</td>
 <td></td>
 </tr>
 <tr>
-<td>TRACE()</td>
+<td>.TRACE()</td>
 <td>this</td>
 <td></td>
 </tr>
 <tr>
-<td>CONNECT()</td>
+<td>.CONNECT()</td>
 <td>this</td>
 <td></td>
 </tr>
 <tr>
-<td>xhr()</td>
+<td>.xhr()</td>
 <td>this</td>
 <td></td>
 </tr>
 <tr>
-<td>xss()</td>
+<td>.xss()</td>
 <td>this</td>
 <td></td>
 </tr>
 <tr>
-<td>sync()</td>
+<td>.sync()</td>
 <td>this</td>
 <td></td>
 </tr>
 <tr>
-<td>async()</td>
+<td>.async()</td>
 <td>this</td>
 <td></td>
 </tr>
 <tr>
-<td>text()</td>
+<td>.text()</td>
 <td>this</td>
 <td></td>
 </tr>
 <tr>
-<td>xml()</td>
+<td>.xml()</td>
 <td>this</td>
 <td></td>
 </tr>
 <tr>
-<td>verb(value:<em>String</em>)</td>
+<td>.verb(value:<em>String</em>)</td>
 <td>this</td>
 <td></td>
 </tr>
 <tr>
-<td>uri(value:<em>String</em>)</td>
+<td>.uri(value:<em>String</em>)</td>
 <td>this</td>
 <td></td>
 </tr>
 <tr>
-<td>contentType(value:<em>String</em>)</td>
+<td>.contentType(value:<em>String</em>)</td>
 <td>this</td>
 <td></td>
 </tr>
 <tr>
-<td>responseType(value:<em>String</em>)</td>
+<td>.responseType(value:<em>String</em>)</td>
 <td>this</td>
 <td></td>
 </tr>
 <tr>
-<td>strategy(value:<em>Strategy</em>)</td>
+<td>.strategy(value:<em>Strategy</em>)</td>
 <td>this</td>
 <td></td>
 </tr>
 <tr>
-<td>maxAttempts(value:<em>Number</em>)</td>
+<td>.maxAttempts(value:<em>Number</em>)</td>
 <td>this</td>
 <td></td>
 </tr>
 <tr>
-<td>isLocal()</td>
+<td>.isLocal()</td>
 <td>Boolean</td>
 <td></td>
 </tr>
 <tr>
-<td>isAsync()</td>
+<td>.isAsync()</td>
 <td>Boolean</td>
 <td></td>
 </tr>
 <tr>
-<td>isLocked()</td>
+<td>.isLocked()</td>
 <td>Boolean</td>
 <td></td>
 </tr>
 <tr>
-<td>isBusy()</td>
+<td>.isBusy()</td>
 <td>Boolean</td>
 <td></td>
 </tr>
 <tr>
-<td>lock()</td>
+<td>.lock()</td>
 <td>this</td>
 <td></td>
 </tr>
 <tr>
-<td>unlock()</td>
+<td>.unlock()</td>
 <td>this</td>
 <td></td>
 </tr>
 <tr>
-<td>onSuccess(func:<em>Function</em>, scope:<em>Object</em>, id:<em>String</em>)</td>
+<td>.onSuccess(func:<em>Function</em>, scope:<em>Object</em>, id:<em>String</em>)</td>
 <td>this</td>
 <td></td>
 </tr>
 <tr>
-<td>onError(func:<em>Function</em>, scope:<em>Object</em>, id:<em>String</em>)</td>
+<td>.onError(func:<em>Function</em>, scope:<em>Object</em>, id:<em>String</em>)</td>
 <td>this</td>
 <td></td>
 </tr>
 <tr>
-<td>onComplete(func:<em>Function</em>, scope:<em>Object</em>, id:<em>String</em>)</td>
+<td>.onComplete(func:<em>Function</em>, scope:<em>Object</em>, id:<em>String</em>)</td>
 <td>this</td>
 <td></td>
 </tr>
 <tr>
-<td>removeListener(id:<em>String</em>)</td>
+<td>.removeListener(id:<em>String</em>)</td>
 <td>this</td>
 <td></td>
 </tr>
 <tr>
-<td>clearListeners()</td>
+<td>.clearListeners()</td>
 <td>this</td>
 <td></td>
 </tr>
@@ -253,6 +254,9 @@
 <h3>
 <a id="dto" class="anchor" href="#dto" aria-hidden="true"><span class="octicon octicon-link"></span></a>dto</h3>
 
+<p>A powerful DTO (Data Transfer Object). This class is excellent for passing
+data around an application as it can easily be transfered to an object, array, query string, JSON, or multipart form data.</p>
+
 <table>
 <thead>
 <tr>
@@ -263,27 +267,37 @@
 </thead>
 <tbody>
 <tr>
-<td>toJson()</td>
+<td>.toObject()</td>
+<td>{} or []</td>
+<td>Returns an object literal or array representation of the contained data, depending upon what is the contained data.</td>
+</tr>
+<tr>
+<td>.toJson()</td>
 <td>String</td>
 <td>Returns the dto key, value pairs as a JSON string.</td>
 </tr>
 <tr>
-<td>toQueryString()</td>
+<td>.toQueryString()</td>
 <td>String</td>
 <td>Returns the dto key, value pairs as a Query String</td>
 </tr>
 <tr>
-<td>saveAs(name:<em>String</em>)</td>
+<td>.toFormData()</td>
+<td>FormData</td>
+<td>Returns a FromData representation of  the dto data.</td>
+</tr>
+<tr>
+<td>.saveAs(name:<em>String</em>)</td>
 <td>this</td>
 <td>Saves the dto key, value pairs to a cookie with name.</td>
 </tr>
 <tr>
-<td>save()</td>
+<td>.save()</td>
 <td>String</td>
 <td>Saves the dto key, value pairs to a cookie with name.</td>
 </tr>
 <tr>
-<td>erase()</td>
+<td>.erase()</td>
 <td>this</td>
 <td>Erases the current dto from the cookie.</td>
 </tr>
@@ -352,47 +366,47 @@
 </thead>
 <tbody>
 <tr>
-<td>find(query:<em>{}</em>)</td>
+<td>.find(query:<em>{}</em>)</td>
 <td>Array</td>
 <td>Returns an array containing the results of the query. More on find below.</td>
 </tr>
 <tr>
-<td>insert(entity:<em>Object</em>)</td>
+<td>.insert(entity:<em>Object</em>)</td>
 <td>object</td>
 <td>String</td>
 </tr>
 <tr>
-<td>update(criteria:<em>{}</em>, updates:<em>{}</em>)</td>
+<td>.update(criteria:<em>{}</em>, updates:<em>{}</em>)</td>
 <td>this</td>
 <td>Updates all entities that satisfy the criteria with the data in updates.</td>
 </tr>
 <tr>
-<td>remove(criteria:<em>{}</em>)</td>
+<td>.remove(criteria:<em>{}</em>)</td>
 <td>this</td>
 <td>Removes all entities that satisfy the criteria.</td>
 </tr>
 <tr>
-<td>join(otherCollection:<em>collection</em>, on:<em>String</em>, equals:<em>Object</em>)</td>
+<td>.join(otherCollection:<em>collection</em>, on:<em>String</em>, equals:<em>Object</em>)</td>
 <td>collection</td>
 <td>Joins this collection with otherCollection on collection[on] == otherCollection[equals]</td>
 </tr>
 <tr>
-<td>join(otherCollection:<em>collection</em>, func:<em>Function</em>)</td>
+<td>.join(otherCollection:<em>collection</em>, func:<em>Function</em>)</td>
 <td>collection</td>
 <td>Joins this collection with otherCollection based upon the boolean return value of the passed function. The passed function will receive two parameters for each possibility combination of joins that can be used to evaluate the intention ot join.</td>
 </tr>
 <tr>
-<td>exec(func:<em>Function</em>)</td>
+<td>.exec(func:<em>Function</em>)</td>
 <td>collection</td>
 <td>Runs the function for each item in the results passing the result as the argument to the function. Then function should return a value as that value will be the value in the find results.</td>
 </tr>
 <tr>
-<td>init(array:<em>Array</em>)</td>
+<td>.init(array:<em>Array</em>)</td>
 <td>this</td>
 <td>Clears this collection and initializes it with the entities in the array.</td>
 </tr>
 <tr>
-<td>save()</td>
+<td>.save()</td>
 <td>this</td>
 <td>Saves this collection to localStorage (as available).</td>
 </tr>
