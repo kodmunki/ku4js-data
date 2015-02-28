@@ -10,52 +10,51 @@ This library includes Query String and JSON parsers, Data Transfer Objects, ajax
 ---
 
 #Documentation
-The following documentation describes each class in the ku4js-data library. It is organized to follow the directory structure found in /src ordered by lowest level constructs first. All constructors are empty unless otherwise noted.
+The following documentation describes each class in the ku4js-data library. It is organized to follow the directory structure found in /src ordered by lowest level constructs first. All instantiable classes can be instantiated using the $.className() syntax. All constructors are empty unless otherwise noted.
 
 The API tables in each section of the documentation contain three columns.
 
 | API | Return | Description |
 | --- | --- | --- |
-|This column contains the actual JavaScript API of the property or method in question. Proper syntax is depicted. Argument types are displyed in italics. An example: $.MethodName(argument:_Type)| The return values type, if any. A value of "this" in this column indicates the return of a reference to self | This column contains descriptions and any **Gotchas!**  |
-
+|This column contains the actual JavaScript API of the property or method in question. Proper syntax is depicted. Argument types are displyed in italics. Class/static methods are denoted with the class name, whereas instance level methods will begin with a dot. Example class/static method: **$.math.round(value:_Number_, nearest:_Number_)**. Example of an instance method: **.toString()** | The return values type, if any. A value of "this" in this column indicates the return of a reference to self | This column contains descriptions and any **Gotchas!** |
 
 ##Ajax
 
 ###serivce
 | API | Return | Description |
 | --- | --- | --- |
-| processId() | uid |  |
-| GET() | this |  |
-| POST() | this |  |
-| PUT() | this |  |
-| HEAD() | this |  |
-| OPTIONS() | this |  |
-| DELETE() | this |  |
-| TRACE() | this |  |
-| CONNECT() | this |  |
-| xhr() | this |  |
-| xss() | this |  |
-| sync() | this |  |
-| async() | this |  |
-| text() | this |  |
-| xml() | this |  |
-| verb(value:_String_) | this |  |
-| uri(value:_String_) | this |  |
-| contentType(value:_String_) | this |  |
-| responseType(value:_String_) | this |  |
-| strategy(value:_Strategy_) | this |  |
-| maxAttempts(value:_Number_) | this |  |
-| isLocal() | Boolean |  |
-| isAsync() | Boolean |  |
-| isLocked() | Boolean |  |
-| isBusy() | Boolean |  |
-| lock() | this |  |
-| unlock() | this |  |
-| onSuccess(func:_Function_, scope:_Object_, id:_String_) | this |  |
-| onError(func:_Function_, scope:_Object_, id:_String_)  | this |  |
-| onComplete(func:_Function_, scope:_Object_, id:_String_)  | this |  |
-| removeListener(id:_String_) | this |  |
-| clearListeners() | this |  |
+| .processId() | uid |  |
+| .GET() | this |  |
+| .POST() | this |  |
+| .PUT() | this |  |
+| .HEAD() | this |  |
+| .OPTIONS() | this |  |
+| .DELETE() | this |  |
+| .TRACE() | this |  |
+| .CONNECT() | this |  |
+| .xhr() | this |  |
+| .xss() | this |  |
+| .sync() | this |  |
+| .async() | this |  |
+| .text() | this |  |
+| .xml() | this |  |
+| .verb(value:_String_) | this |  |
+| .uri(value:_String_) | this |  |
+| .contentType(value:_String_) | this |  |
+| .responseType(value:_String_) | this |  |
+| .strategy(value:_Strategy_) | this |  |
+| .maxAttempts(value:_Number_) | this |  |
+| .isLocal() | Boolean |  |
+| .isAsync() | Boolean |  |
+| .isLocked() | Boolean |  |
+| .isBusy() | Boolean |  |
+| .lock() | this |  |
+| .unlock() | this |  |
+| .onSuccess(func:_Function_, scope:_Object_, id:_String_) | this |  |
+| .onError(func:_Function_, scope:_Object_, id:_String_)  | this |  |
+| .onComplete(func:_Function_, scope:_Object_, id:_String_)  | this |  |
+| .removeListener(id:_String_) | this |  |
+| .clearListeners() | this |  |
 
 ##Data
 
@@ -64,13 +63,18 @@ _Documentation Coming Soon_
 
 ###dto
 
+A powerful DTO (Data Transfer Object). This class is excellent for passing
+data around an application as it can easily be transfered to an object, array, query string, JSON, or multipart form data.
+
 | API | Return | Description |
 | --- | --- | --- |
-| toJson() | String | Returns the dto key, value pairs as a JSON string. |
-| toQueryString() | String | Returns the dto key, value pairs as a Query String |
-| saveAs(name:_String_) | this | Saves the dto key, value pairs to a cookie with name. |
-| save() | String | Saves the dto key, value pairs to a cookie with name. |
-| erase() | this | Erases the current dto from the cookie. |
+| .toObject() | {} or [] | Returns an object literal or array representation of the contained data, depending upon what is the contained data. |
+| .toJson() | String | Returns the dto key, value pairs as a JSON string. |
+| .toQueryString() | String | Returns the dto key, value pairs as a Query String |
+| .toFormData() | FormData | Returns a FromData representation of  the dto data. |
+| .saveAs(name:_String_) | this | Saves the dto key, value pairs to a cookie with name. |
+| .save() | String | Saves the dto key, value pairs to a cookie with name. |
+| .erase() | this | Erases the current dto from the cookie. |
 
 ###json
 _Documentation Coming Soon_
@@ -105,15 +109,15 @@ _Documentation Coming Soon_
 ###collection
 | API | Return | Description |
 | --- | --- | --- |
-| find(query:_{}_) | Array | Returns an array containing the results of the query. More on find below. |
-| insert(entity:_Object_) | object | String | Inserts the entity into the collection |
-| update(criteria:_{}_, updates:_{}_) | this | Updates all entities that satisfy the criteria with the data in updates. |
-| remove(criteria:_{}_) | this | Removes all entities that satisfy the criteria. |
-| join(otherCollection:_collection_, on:_String_, equals:_Object_) | collection | Joins this collection with otherCollection on collection[on] == otherCollection[equals] |
-| join(otherCollection:_collection_, func:_Function_) | collection | Joins this collection with otherCollection based upon the boolean return value of the passed function. The passed function will receive two parameters for each possibility combination of joins that can be used to evaluate the intention ot join. |
-| exec(func:_Function_) | collection | Runs the function for each item in the results passing the result as the argument to the function. Then function should return a value as that value will be the value in the find results. |
-| init(array:_Array<Object>_) | this | Clears this collection and initializes it with the entities in the array. |
-| save() | this | Saves this collection to localStorage (as available). |
+| .find(query:_{}_) | Array | Returns an array containing the results of the query. More on find below. |
+| .insert(entity:_Object_) | object | String | Inserts the entity into the collection |
+| .update(criteria:_{}_, updates:_{}_) | this | Updates all entities that satisfy the criteria with the data in updates. |
+| .remove(criteria:_{}_) | this | Removes all entities that satisfy the criteria. |
+| .join(otherCollection:_collection_, on:_String_, equals:_Object_) | collection | Joins this collection with otherCollection on collection[on] == otherCollection[equals] |
+| .join(otherCollection:_collection_, func:_Function_) | collection | Joins this collection with otherCollection based upon the boolean return value of the passed function. The passed function will receive two parameters for each possibility combination of joins that can be used to evaluate the intention ot join. |
+| .exec(func:_Function_) | collection | Runs the function for each item in the results passing the result as the argument to the function. Then function should return a value as that value will be the value in the find results. |
+| .init(array:_Array<Object>_) | this | Clears this collection and initializes it with the entities in the array. |
+| .save() | this | Saves this collection to localStorage (as available). |
 
 ####Find
 The find method is the means by which you can query your collections. There are many ways to query a collection from
