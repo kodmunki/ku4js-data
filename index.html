@@ -40,46 +40,29 @@
 <hr>
 
 <h1>
-<a id="dependencies" class="anchor" href="#dependencies" aria-hidden="true"><span class="octicon octicon-link"></span></a>Dependencies</h1>
-
-<ul>
-<li>ku4js-kernel - <a href="https://github.com/kodmunki/ku4js-kernel">https://github.com/kodmunki/ku4js-kernel</a>
-</li>
-</ul>
-
-<h1>
-<a id="kodmunki-build-process" class="anchor" href="#kodmunki-build-process" aria-hidden="true"><span class="octicon octicon-link"></span></a>kodmunki™ build process</h1>
-
-<p>This build process is dependent upon yuicompressor and a specific directory structure:</p>
-
-<ul>
-<li>root
-*:_build (This build script and the yuicompressor)
-
-<ul>
-<li>bin (The compiled scripts will appear here)</li>
-<li>src (All script files go here)</li>
-</ul>
-</li>
-</ul>
-
-<p>The following variables found in setup () are
-expected to be changed by the developer running
-this process:</p>
-
-<ul>
-<li>PROJNAME (The name of your project)</li>
-<li>STARTMSG (A message to echo at start of build)</li>
-<li>ENDMSG (A message to echo at end of build)</li>
-</ul>
-
-<hr>
-
-<h1>
 <a id="documentation" class="anchor" href="#documentation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Documentation</h1>
 
-<p>The following is documentation for each class in the ku4js-data library organized by common domain to follow the
-directory structure found in /src. All constructors are empty unless otherwise noted.</p>
+<p>The following documentation describes each class in the ku4js-data library. It is organized to follow the directory structure found in /src ordered by lowest level constructs first. All constructors are empty unless otherwise noted.</p>
+
+<p>The API tables in each section of the documentation contain three columns.</p>
+
+<table>
+<thead>
+<tr>
+<th>API</th>
+<th>Return</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>This column contains the actual JavaScript API of the property or method in question. Proper syntax is depicted. Argument types are displyed in italics. An example: $.MethodName(argument:_Type)</td>
+<td>The return values type, if any. A value of "this" in this column indicates the return of a reference to self</td>
+<td>This column contains descriptions and any <strong>Gotchas!</strong>
+</td>
+</tr>
+</tbody>
+</table>
 
 <h2>
 <a id="ajax" class="anchor" href="#ajax" aria-hidden="true"><span class="octicon octicon-link"></span></a>Ajax</h2>
