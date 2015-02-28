@@ -9,31 +9,15 @@ This library includes Query String and JSON parsers, Data Transfer Objects, ajax
 
 ---
 
-#Dependencies
-* ku4js-kernel - https://github.com/kodmunki/ku4js-kernel
-
-#kodmunki™ build process
-
-This build process is dependent upon yuicompressor and a specific directory structure:
-
-* root
- *:_build (This build script and the yuicompressor)
- * bin (The compiled scripts will appear here)
- * src (All script files go here)
-
-The following variables found in setup () are
-expected to be changed by the developer running
-this process:
-
-* PROJNAME (The name of your project)
-* STARTMSG (A message to echo at start of build)
-* ENDMSG (A message to echo at end of build)
-
----
-
 #Documentation
-The following is documentation for each class in the ku4js-data library organized by common domain to follow the
-directory structure found in /src. All constructors are empty unless otherwise noted.
+The following documentation describes each class in the ku4js-data library. It is organized to follow the directory structure found in /src ordered by lowest level constructs first. All constructors are empty unless otherwise noted.
+
+The API tables in each section of the documentation contain three columns.
+
+| API | Return | Description |
+| --- | --- | --- |
+|This column contains the actual JavaScript API of the property or method in question. Proper syntax is depicted. Argument types are displyed in italics. An example: $.MethodName(argument:_Type)| The return values type, if any. A value of "this" in this column indicates the return of a reference to self | This column contains descriptions and any **Gotchas!**  |
+
 
 ##Ajax
 
