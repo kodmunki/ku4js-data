@@ -15,7 +15,7 @@ xhr.prototype = {
         var paramsExist = $.exists(params),
             context = this.context(),
             isPost = context.isPost(),
-            isMultipart = (function() { var FormData; return ($.exists(FormData) && (params instanceof FormData)) })(),
+            isMultipart = (function() { try { return ($.exists(FormData) && (params instanceof FormData)) } catch(e) { return false; } })(),
             hasQuery = !isPost && paramsExist,
             noCache = context._noCache,
             cacheParam = $.str.format("__ku4nocache={0}", $.uid()),
