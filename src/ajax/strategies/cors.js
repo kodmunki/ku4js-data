@@ -35,28 +35,27 @@ cors.prototype = {
 
         cors.onload = function(e) {
             var response = this[context.responseType()],
-                    status = this.status;
-                if(me._isAborted(status)) return;
-                if(me._isOk(status)){
-                    context.success(response).complete(response);
-                    return;
-                }
-                if(me._attempts < context.maxAttempts()) {
-                    me.call(params);
-                    return;
-                }
-                context.error(response).complete(response);
+                status = this.status;
+
+            if(me._isAborted(status)) return;
+            if(me._isOk(status)){
+                context.success(response).complete(response);
+                return;
+            }
+            if(me._attempts < context.maxAttempts()) {
+                me.call(params);
+                return;
+            }
+            context.error(response).complete(response);
         };
 
         cors.onerror = function(e) {
-            var response = this[context.responseType()],
-                    status = this.status;
-                if(me._isAborted(status)) return;
-                if(me._attempts < context.maxAttempts()) {
-                    me.call(params);
-                    return;
-                }
-                context.error(response).complete(response);
+            var response = this[context.responseType()];
+            if(me._attempts < context.maxAttempts()) {
+                me.call(params);
+                return;
+            }
+            context.error(response).complete(response);
         };
 
         if($.exists(postParams)) cors.send(postParams);
