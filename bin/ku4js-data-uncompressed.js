@@ -878,6 +878,7 @@ $.image = {
         $.image.blobFromSrc(src, function(blob) {
             var fileReader = new FileReader();
             fileReader.onload = function() { func.call(scope, fileReader.result); };
+            fileReader.onerror = function() { func.call(scope, fileReader.error); };
             fileReader.readAsDataURL(blob);
         },  scp, options);
 
@@ -929,6 +930,9 @@ $.image = {
                 blob = $.blob.parseDataUrl(dataUrl);
 
             func.call(scope, blob);
+        };
+        image.onerror = function() {
+            func.call(scope, null);
         };
         image.crossorigin="anonymous";
         image.src = src;
