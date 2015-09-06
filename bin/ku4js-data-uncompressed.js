@@ -10,7 +10,6 @@ function service(name){
     this._onComplete = $.observer($.str.format(format, processId, "onComplete"));
     this._lock = $.lock();
     this._noCache = false;
-    this._isLocal = false;
     this._processId = processId;
     
     this.GET().text().xhr().async().unlock();
@@ -143,7 +142,7 @@ cors.prototype = {
             cors.setRequestHeader("Content-Type", contentType);
         }
 
-        cors.onload = function(e) {
+        cors.onload = function() {
             var response = this[context.responseType()],
                 status = this.status;
 
@@ -159,7 +158,7 @@ cors.prototype = {
             context.error(response).complete(response);
         };
 
-        cors.onerror = function(e) {
+        cors.onerror = function() {
             var response = this[context.responseType()];
             if(me._attempts < context.maxAttempts()) {
                 me.call(params);
@@ -235,7 +234,7 @@ xhr.prototype = {
                 context.error(response).complete(response);
             }
         };
-        xhr.onerror = function(e) {
+        xhr.onerror = function() {
             var response = this[context.responseType()];
             if(me._attempts < context.maxAttempts()) {
                 me.call(params);
@@ -345,8 +344,8 @@ $.cookie.erase = function(name){
 };
 
 $.cookie.load = function(name){
-    var o = ($.isObject(name)) ? name : { name: name };
-        p = cookie_defaultParams.replicate().merge(o).toObject()
+    var o = ($.isObject(name)) ? name : { name: name },
+        p = cookie_defaultParams.replicate().merge(o).toObject();
     return $.cookie(p);
 };
 
@@ -367,10 +366,10 @@ $.cookie.serialize = function(obj, params) {
         p = o.path,
         d = o.domain,
         s = o.isSecure,
-        I = cookie_buildInfoPair(n, escape($.json.serialize(obj))),
+        I = cookie_buildInfoPair(n, encodeURIComponent($.json.serialize(obj))),
         E = ($.isDate(e)) ? cookie_buildInfoPair("; expires", e.toGMTString()) : "",
-        P = (!p) ? "" : cookie_buildInfoPair("; path", escape(p)),
-        D = (!d) ? "" : cookie_buildInfoPair("; domain", escape(d)),
+        P = (!p) ? "" : cookie_buildInfoPair("; path", encodeURIComponent(p)),
+        D = (!d) ? "" : cookie_buildInfoPair("; domain", encodeURIComponent(d)),
         S = (!s) ? "" : "; secure";
     return I + E + P + D + S;
 };
@@ -381,7 +380,7 @@ $.cookie.deserialize = function(cookie) {
             ? cookie.substring(0, cookie.search(";")).split("=")
             : cookie.split("="),
             kv = { key: ck[0], value: ck[1] };
-        return $.json.deserialize(unescape(kv.value));
+        return $.json.deserialize(decodeURIComponent(kv.value));
     }
     catch(e){ throw $.exception("arg", $.str.format("Cannot deserialize {0}", cookie)); }
 };
@@ -457,7 +456,7 @@ $.json.serialize = function(obj) {
     var r = [],
         f = ($.isArray(obj)) ? "[{0}]" : "{{0}}";
     for (var n in obj) {
-        var o = obj[n];
+        var o = $.obj.ownProp(obj, n);
         if ($.isUndefined(o) && $.isFunction(o)) continue;
         var v = ($.isNumber(o))
                 ? o
@@ -483,7 +482,7 @@ $.json.deserialize = function(str) {
         if($.isNullOrEmpty(obj.tagName) &&
             ($.isObject(obj) || $.isArray(obj))) {
             for (var n in obj) {
-                var value = obj[n];
+                var value = $.obj.ownProp(obj, n);
                 if ($.isObject(value) || $.isArray(value)) obj[n] = $.json.deserialize(value);
                 if(/\d{4}\-\d{2}\-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z/.test(value) && $.dayPoint.canParse(value)) {
                     obj[n] = $.dayPoint.parse(value).toDate();
@@ -1237,9 +1236,9 @@ function abstractField(){
     this.spec($.spec(function(){ return true; })).optional()
 }
 abstractField.prototype = {
-    $read: function(){ return; },
-    $write: function(){ return; },
-    $clear: function(){ return; },
+    $read: function() { },
+    $write: function() { },
+    $clear: function() { },
     value: function(value){
         if(!$.exists(value)) return this.$read();
         this.$write(value);
@@ -1330,7 +1329,7 @@ function imageFileField(selector) {
 
 imageFileField.prototype = {
     maxDims: function(value) { return this.property("maxDims", $.point.parse(value)); },
-    $write: function(){ return; },
+    $write: function(){ },
     $readFiles: function(func, scp) {
         var files = $.list(this.files()),
             maxDims = this._maxDims,
@@ -1465,7 +1464,7 @@ function form(){
     this._fields = $.hash();
 }
 form.prototype = {
-    $submit: function(){ return; },
+    $submit: function(){ },
     name: function(name){ return this.property("name", name); },
     fields: function(){ return this._fields; },
     listFields: function(){ return $.list(this._fields.values()); },
@@ -1585,9 +1584,8 @@ $.fields = {
     specs: (function(){
         var value = {};
         try {
-            value.required = $.spec(function(v){ return (!$.isNullOrEmpty(v)) && /^.+$/.test(v); }),
-            value.optional = $.spec(function(v){ return $.isNullOrEmpty(v); }),
-            
+            value.required = $.spec(function(v){ return (!$.isNullOrEmpty(v)) && /^.+$/.test(v); });
+            value.optional = $.spec(function(v){ return $.isNullOrEmpty(v); });
             value.currency = $.spec(function(v){ return /^[\w\$]?(\d+|(\d{1,3}(,\d{3})*))(\.\d{2})?$/.test(v); });
             value.date = $.spec(function(v){ return /^\d{1,2}\/\d{1,2}\/(\d{2}|\d{4})$/.test(v); });
             value.alpha = $.spec(function(v){ return /^[A-Za-z]+$/.test(v); });
@@ -1596,9 +1594,9 @@ $.fields = {
             value.phone = $.spec(function(v){ return /^\d{10,11}|(((1\s)?\(\d{3}\)\s?)|((1\-)?\d{3}\-))\d{3}\-\d{4}$/.test(v); });
             value.ssn = $.spec(function(v){ return /^(\d{9}|(\d{3}\-\d{2}\-\d{4}))$/.test(v); });
             value.email = $.spec(function(v){ return /^\w+(\.\w+)?@\w+(\.\w+)?\.[A-Za-z0-9]{2,}$/.test(v); });
+            return value;
         }
-        catch(e) { }
-        finally { return value; }
+        catch(e) { return value; }
     })()
 };
 
@@ -1854,24 +1852,24 @@ function abstractStore(name) {
     this._name = name || "ku4indexedDbStore";
 }
 abstractStore.prototype = {
-    read: function(collectionName, callback, scope) {
+    read: function(collectionName, callback) {
         callback(new Error("Not Implemented"), null);
         return this;
     },
-    write: function(collection, callback, scope) {
+    write: function(collection, callback) {
         callback(new Error("Not Implemented"), null);
         return this;
     },
-    remove: function(collection, callback, scope) {
+    remove: function(collection, callback) {
         callback(new Error("Not Implemented"), null);
         return this;
     },
-    __delete: function(callback, scope) {
+    __delete: function(callback) {
         callback(new Error("Not Implemented"), null);
         return this;
     },
-    __reset: function(callback, scope) {
-        return this.__delete(callback, scope);
+    __reset: function(callback) {
+        return this.__delete(callback);
     }
 };
 

@@ -9,7 +9,6 @@ function service(name){
     this._onComplete = $.observer($.str.format(format, processId, "onComplete"));
     this._lock = $.lock();
     this._noCache = false;
-    this._isLocal = false;
     this._processId = processId;
     
     this.GET().text().xhr().async().unlock();

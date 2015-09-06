@@ -4,7 +4,7 @@ function imageFileField(selector) {
 
 imageFileField.prototype = {
     maxDims: function(value) { return this.property("maxDims", $.point.parse(value)); },
-    $write: function(){ return; },
+    $write: function(){ },
     $readFiles: function(func, scp) {
         var files = $.list(this.files()),
             maxDims = this._maxDims,

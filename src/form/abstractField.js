@@ -5,9 +5,9 @@ function abstractField(){
     this.spec($.spec(function(){ return true; })).optional()
 }
 abstractField.prototype = {
-    $read: function(){ return; },
-    $write: function(){ return; },
-    $clear: function(){ return; },
+    $read: function() { },
+    $write: function() { },
+    $clear: function() { },
     value: function(value){
         if(!$.exists(value)) return this.$read();
         this.$write(value);

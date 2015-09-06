@@ -41,8 +41,8 @@ $.cookie.erase = function(name){
 };
 
 $.cookie.load = function(name){
-    var o = ($.isObject(name)) ? name : { name: name };
-        p = cookie_defaultParams.replicate().merge(o).toObject()
+    var o = ($.isObject(name)) ? name : { name: name },
+        p = cookie_defaultParams.replicate().merge(o).toObject();
     return $.cookie(p);
 };
 
@@ -63,10 +63,10 @@ $.cookie.serialize = function(obj, params) {
         p = o.path,
         d = o.domain,
         s = o.isSecure,
-        I = cookie_buildInfoPair(n, escape($.json.serialize(obj))),
+        I = cookie_buildInfoPair(n, encodeURIComponent($.json.serialize(obj))),
         E = ($.isDate(e)) ? cookie_buildInfoPair("; expires", e.toGMTString()) : "",
-        P = (!p) ? "" : cookie_buildInfoPair("; path", escape(p)),
-        D = (!d) ? "" : cookie_buildInfoPair("; domain", escape(d)),
+        P = (!p) ? "" : cookie_buildInfoPair("; path", encodeURIComponent(p)),
+        D = (!d) ? "" : cookie_buildInfoPair("; domain", encodeURIComponent(d)),
         S = (!s) ? "" : "; secure";
     return I + E + P + D + S;
 };
@@ -77,7 +77,7 @@ $.cookie.deserialize = function(cookie) {
             ? cookie.substring(0, cookie.search(";")).split("=")
             : cookie.split("="),
             kv = { key: ck[0], value: ck[1] };
-        return $.json.deserialize(unescape(kv.value));
+        return $.json.deserialize(decodeURIComponent(kv.value));
     }
     catch(e){ throw $.exception("arg", $.str.format("Cannot deserialize {0}", cookie)); }
 };

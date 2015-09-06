@@ -48,7 +48,7 @@ xhr.prototype = {
                 context.error(response).complete(response);
             }
         };
-        xhr.onerror = function(e) {
+        xhr.onerror = function() {
             var response = this[context.responseType()];
             if(me._attempts < context.maxAttempts()) {
                 me.call(params);

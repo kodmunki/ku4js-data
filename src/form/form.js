@@ -4,7 +4,7 @@ function form(){
     this._fields = $.hash();
 }
 form.prototype = {
-    $submit: function(){ return; },
+    $submit: function(){ },
     name: function(name){ return this.property("name", name); },
     fields: function(){ return this._fields; },
     listFields: function(){ return $.list(this._fields.values()); },

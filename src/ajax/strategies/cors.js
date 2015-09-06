@@ -33,7 +33,7 @@ cors.prototype = {
             cors.setRequestHeader("Content-Type", contentType);
         }
 
-        cors.onload = function(e) {
+        cors.onload = function() {
             var response = this[context.responseType()],
                 status = this.status;
 
@@ -49,7 +49,7 @@ cors.prototype = {
             context.error(response).complete(response);
         };
 
-        cors.onerror = function(e) {
+        cors.onerror = function() {
             var response = this[context.responseType()];
             if(me._attempts < context.maxAttempts()) {
                 me.call(params);

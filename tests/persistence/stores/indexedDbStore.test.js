@@ -13,6 +13,7 @@ $(function(){
 
         expect(10);
         store.read("testCollection", function(err, collection) {
+        console.log(collection)
             ok(collection);
             collection
                 .insert({

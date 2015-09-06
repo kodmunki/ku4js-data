@@ -7,7 +7,7 @@ $.json.serialize = function(obj) {
     var r = [],
         f = ($.isArray(obj)) ? "[{0}]" : "{{0}}";
     for (var n in obj) {
-        var o = obj[n];
+        var o = $.obj.ownProp(obj, n);
         if ($.isUndefined(o) && $.isFunction(o)) continue;
         var v = ($.isNumber(o))
                 ? o
@@ -33,7 +33,7 @@ $.json.deserialize = function(str) {
         if($.isNullOrEmpty(obj.tagName) &&
             ($.isObject(obj) || $.isArray(obj))) {
             for (var n in obj) {
-                var value = obj[n];
+                var value = $.obj.ownProp(obj, n);
                 if ($.isObject(value) || $.isArray(value)) obj[n] = $.json.deserialize(value);
                 if(/\d{4}\-\d{2}\-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z/.test(value) && $.dayPoint.canParse(value)) {
                     obj[n] = $.dayPoint.parse(value).toDate();
