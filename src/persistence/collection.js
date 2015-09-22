@@ -140,6 +140,8 @@ collection.prototype = {
     }
 };
 $.ku4collection = function(name, obj, isAsync) { return new collection(name, obj, isAsync); };
+$.ku4collection.Class = collection;
+
 $.ku4collection.deserialize = function(serialized) {
     var obj = $.json.deserialize(serialized);
     return new collection(obj.name, obj.data);
