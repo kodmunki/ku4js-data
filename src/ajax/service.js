@@ -10,6 +10,7 @@ function service(name){
     this._lock = $.lock();
     this._noCache = false;
     this._processId = processId;
+    this._requestHeaders = $.hash();
     
     this.GET().text().xhr().async().unlock();
 }
@@ -20,6 +21,7 @@ service.prototype = {
     responseType: function(responseType){ return this.property("responseType", responseType); },
     uri: function(uri){ return this.property("uri", uri); },
     contentType: function(contentType){ return this.property("contentType", contentType); },
+    setRequestHeader: function(key, value) { this._requestHeaders.update(key, value); return this; },
     maxAttempts: function(maxAttempts){ return this.property("maxAttempts", maxAttempts); },
     cache: function(){ this._noCache = false; return this; },
     noCache: function(){ this._noCache = true; return this; },
@@ -93,7 +95,8 @@ service.prototype = {
     _readSettings: function() {
         return {
             "contentType": this._contentType,
-            "withCredentials": this._withCredentials
+            "withCredentials": this._withCredentials,
+            "requestHeaders": this._requestHeaders
         }
     }
 };

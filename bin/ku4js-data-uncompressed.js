@@ -11,6 +11,7 @@ function service(name){
     this._lock = $.lock();
     this._noCache = false;
     this._processId = processId;
+    this._requestHeaders = $.hash();
     
     this.GET().text().xhr().async().unlock();
 }
@@ -21,6 +22,7 @@ service.prototype = {
     responseType: function(responseType){ return this.property("responseType", responseType); },
     uri: function(uri){ return this.property("uri", uri); },
     contentType: function(contentType){ return this.property("contentType", contentType); },
+    setRequestHeader: function(key, value) { this._requestHeaders.update(key, value); return this; },
     maxAttempts: function(maxAttempts){ return this.property("maxAttempts", maxAttempts); },
     cache: function(){ this._noCache = false; return this; },
     noCache: function(){ this._noCache = true; return this; },
@@ -94,7 +96,8 @@ service.prototype = {
     _readSettings: function() {
         return {
             "contentType": this._contentType,
-            "withCredentials": this._withCredentials
+            "withCredentials": this._withCredentials,
+            "requestHeaders": this._requestHeaders
         }
     }
 };
@@ -122,6 +125,7 @@ cors.prototype = {
     call: function(params, settings){
         this._cors = cors_createCors();
         var paramsExist = $.exists(params),
+            requestHeaders = settings.requestHeaders,
             context = this.context(),
             isPost = context.isPost(),
             isMultipart = params instanceof FormData,
@@ -141,6 +145,10 @@ cors.prototype = {
             var contentType = (!$.exists(settings.contentType)) ? "application/x-www-form-urlencoded" : settings.contentType;
             cors.setRequestHeader("Content-Type", contentType);
         }
+
+        if(!requestHeaders.isEmpty()) requestHeaders.each(function(header) {
+            cors.setRequestHeader(header.key, header.value);
+        });
 
         cors.onload = function() {
             var response = this[context.responseType()],
@@ -199,6 +207,7 @@ xhr.prototype = {
     call: function(params, settings){
         this._xhr = xhr_createXhr();
         var paramsExist = $.exists(params),
+            requestHeaders = settings.requestHeaders,
             context = this.context(),
             isPost = context.isPost(),
             isMultipart = (function() { try { return ($.exists(FormData) && (params instanceof FormData)) } catch(e) { return false; } })(),
@@ -217,6 +226,10 @@ xhr.prototype = {
             var contentType = (!$.exists(settings.contentType)) ? "application/x-www-form-urlencoded" : settings.contentType;
             xhr.setRequestHeader("Content-Type", contentType);
         }
+
+        if(!requestHeaders.isEmpty()) requestHeaders.each(function(header) {
+            xhr.setRequestHeader(header.key, header.value);
+        });
 
         xhr.onreadystatechange = function(){
             if(xhr.readyState > 3) {
@@ -1742,6 +1755,8 @@ collection.prototype = {
     }
 };
 $.ku4collection = function(name, obj, isAsync) { return new collection(name, obj, isAsync); };
+$.ku4collection.Class = collection;
+
 $.ku4collection.deserialize = function(serialized) {
     var obj = $.json.deserialize(serialized);
     return new collection(obj.name, obj.data);

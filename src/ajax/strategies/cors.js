@@ -13,6 +13,7 @@ cors.prototype = {
     call: function(params, settings){
         this._cors = cors_createCors();
         var paramsExist = $.exists(params),
+            requestHeaders = settings.requestHeaders,
             context = this.context(),
             isPost = context.isPost(),
             isMultipart = params instanceof FormData,
@@ -32,6 +33,10 @@ cors.prototype = {
             var contentType = (!$.exists(settings.contentType)) ? "application/x-www-form-urlencoded" : settings.contentType;
             cors.setRequestHeader("Content-Type", contentType);
         }
+
+        if(!requestHeaders.isEmpty()) requestHeaders.each(function(header) {
+            cors.setRequestHeader(header.key, header.value);
+        });
 
         cors.onload = function() {
             var response = this[context.responseType()],

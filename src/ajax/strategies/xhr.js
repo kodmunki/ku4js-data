@@ -13,6 +13,7 @@ xhr.prototype = {
     call: function(params, settings){
         this._xhr = xhr_createXhr();
         var paramsExist = $.exists(params),
+            requestHeaders = settings.requestHeaders,
             context = this.context(),
             isPost = context.isPost(),
             isMultipart = (function() { try { return ($.exists(FormData) && (params instanceof FormData)) } catch(e) { return false; } })(),
@@ -31,6 +32,10 @@ xhr.prototype = {
             var contentType = (!$.exists(settings.contentType)) ? "application/x-www-form-urlencoded" : settings.contentType;
             xhr.setRequestHeader("Content-Type", contentType);
         }
+
+        if(!requestHeaders.isEmpty()) requestHeaders.each(function(header) {
+            xhr.setRequestHeader(header.key, header.value);
+        });
 
         xhr.onreadystatechange = function(){
             if(xhr.readyState > 3) {
