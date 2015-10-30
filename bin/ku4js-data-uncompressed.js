@@ -8,6 +8,7 @@ function service(name){
     this._onSuccess = $.observer($.str.format(format, processId, "onSuccess"));
     this._onError = $.observer($.str.format(format, processId, "onError"));
     this._onComplete = $.observer($.str.format(format, processId, "onComplete"));
+    this._onAbort = $.observer($.str.format(format, processId, "onAbort"));
     this._lock = $.lock();
     this._noCache = false;
     this._processId = processId;
@@ -38,17 +39,20 @@ service.prototype = {
     
     onSuccess: function(f, s, id){ this._onSuccess.add(f, s, id); return this; },
     onError: function(f, s, id){ this._onError.add(f, s, id); return this; },
-    onComplete: function(f, s, id){ this._onComplete.add(f, s, id); return this; },    
+    onComplete: function(f, s, id){ this._onComplete.add(f, s, id); return this; },
+    onAbort: function(f, s, id){ this._onAbort.add(f, s, id); return this; },
     removeListener: function(id){
         this._onSuccess.add(id);
         this._onError.add(id);
         this._onComplete.add(id);
+        this._onAbort.add(id);
         return this;
     },
     clearListeners: function(){
          this._onSuccess.clear();
         this._onError.clear();
         this._onComplete.clear();
+        this._onAbort.clear();
         return this;
     },
     OPTIONS: function(){ return this.verb("OPTIONS"); },
@@ -85,11 +89,13 @@ service.prototype = {
     abort: function(){
         if(!this._isBusy) return this;
         this.strategy().abort();
+        this._onAbort.notify(this._params, this._processId);
         return this;
     },
     call: function(params){
         if(this.isLocked()) return this;
         this._isBusy = true;
+        this._params = params;
         this.strategy().call(params, this._readSettings());
         return this;
     },
@@ -103,6 +109,7 @@ service.prototype = {
 };
 $.Class.extend(service, $.Class);
 $.service = function(name){ return new service(name); };
+$.service.Class = service;
 
 $.service.noCache = function(dto) {
     var noCache = $.dto({"noCache": $.uid()});
@@ -159,20 +166,14 @@ cors.prototype = {
                 context.success(response).complete(response);
                 return;
             }
-            if(me._attempts < context.maxAttempts()) {
-                me.call(params);
-                return;
-            }
-            context.error(response).complete(response);
+            if(me._attempts < context.maxAttempts()) me.call(params);
+            else context.error(response).complete(response);
         };
 
         cors.onerror = function() {
             var response = this[context.responseType()];
-            if(me._attempts < context.maxAttempts()) {
-                me.call(params);
-                return;
-            }
-            context.error(response).complete(response);
+            if(me._attempts < context.maxAttempts()) me.call(params);
+            else context.error(response).complete(response);
         };
 
         if($.exists(postParams)) cors.send(postParams);
@@ -240,20 +241,14 @@ xhr.prototype = {
                     context.success(response).complete(response);
                     return;
                 }
-                if(me._attempts < context.maxAttempts()) {
-                    me.call(params);
-                    return;
-                }
-                context.error(response).complete(response);
+                if(me._attempts < context.maxAttempts()) me.call(params);
+                else context.error(response).complete(response);
             }
         };
         xhr.onerror = function() {
             var response = this[context.responseType()];
-            if(me._attempts < context.maxAttempts()) {
-                me.call(params);
-                return;
-            }
-            context.error(response).complete(response);
+            if(me._attempts < context.maxAttempts()) me.call(params);
+            else context.error(response).complete(response);
         };
 
         if($.exists(postParams)) xhr.send(postParams);
@@ -907,7 +902,7 @@ $.image = {
                 orientation = exif.Orientation,
                 imageWidth = ($.exists(image.naturalWidth)) ? image.naturalWidth : image.width,
                 imageHeight = ($.exists(image.naturalHeight)) ? image.naturalHeight : image.height,
-                imageRect = $.rectangle($.point.zero(), $.point(imageWidth, imageHeight)),
+                imageRect = $.rectangle($.point.zero(), $.coord(imageWidth, imageHeight)),
                 maxDims = ($.exists(opts.maxDims)) ? $.coord.parse(opts.maxDims).value() : {x:imageWidth, y:imageHeight},
                 maxRect = $.rectangle($.point.zero(), maxDims),
                 aspectDims = imageRect.aspectToFit(maxRect).dims(),

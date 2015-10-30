@@ -46,20 +46,14 @@ xhr.prototype = {
                     context.success(response).complete(response);
                     return;
                 }
-                if(me._attempts < context.maxAttempts()) {
-                    me.call(params);
-                    return;
-                }
-                context.error(response).complete(response);
+                if(me._attempts < context.maxAttempts()) me.call(params);
+                else context.error(response).complete(response);
             }
         };
         xhr.onerror = function() {
             var response = this[context.responseType()];
-            if(me._attempts < context.maxAttempts()) {
-                me.call(params);
-                return;
-            }
-            context.error(response).complete(response);
+            if(me._attempts < context.maxAttempts()) me.call(params);
+            else context.error(response).complete(response);
         };
 
         if($.exists(postParams)) xhr.send(postParams);

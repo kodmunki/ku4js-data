@@ -9,8 +9,6 @@ cp -f ../bin/ku4js-data.js ../../ku4js-webApp/_example/javascript/lib/
 cp -f ../bin/ku4js-data.js ../../ku4js-webApp/_TEMPLATE/lib/
 cp -f ../bin/ku4js-data.js ../../ku4js-widget/tests/_dependencies/
 
-cp -f ../bin/ku4js-data.js ../../../../products/gifthorse/gifthorse/public/javascript/lib/
-
 echo "Copying resources to _LATEST/"
 cp -f ../bin/ku4js-data.js ../../_LATEST/
 
