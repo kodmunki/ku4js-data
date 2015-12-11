@@ -1,4 +1,4 @@
-(function(l){
+(function($){
 function service(name){
     service.base.call(this);
 
@@ -2123,4 +2123,4 @@ $.ku4AsyncStore = function() {
     else return $.ku4memoryStore();
 };
 
-})();
+})(ku4js);

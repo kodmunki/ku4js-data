@@ -35,7 +35,7 @@ setup () {
 
 openlink () {
     touch $LNKGFILE
-    echo "(function(l){" >> $LNKGFILE
+    echo "(function($){" >> $LNKGFILE
 }
 
 linkfiles () {
@@ -48,7 +48,7 @@ linkfiles () {
 }
 
 closelink () {
-    echo "})();" >> $LNKGFILE
+    echo "})(ku4js);" >> $LNKGFILE
 }
 
 compile () {
