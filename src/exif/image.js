@@ -66,11 +66,8 @@ $.image = {
     dataUrlFromFile: function(file, func, scp, options) {
         var reader = new FileReader();
         reader.onload = function(e) {
-            $.image.dataUrlFromSrc(e.target.result, function(blob) {
-                blob.lastModified = file.lastModified;
-                blob.lastModifiedDate = file.lastModifiedDate;
-                blob.name = file.name;
-                func.call(scp, blob);
+            $.image.dataUrlFromSrc(e.target.result, function(dataUrl) {
+                func.call(scp, dataUrl);
             }, this, options);
         };
         reader.readAsDataURL(file);
