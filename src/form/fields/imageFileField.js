@@ -13,30 +13,14 @@ imageFileField.prototype = {
             scope = scp || this;
 
         if(!$.exists(maxDims) || files.isEmpty()) func.call(scope, this.files());
-        else
-        {
-            function callback() { func.call(scope, resizedFiles.toArray()); }
+        else files.each(function (file) {
+            fileCount--;
+            $.image.blobFromFile(file, function(blob) {
+                resizedFiles.add(blob);
+                if (fileCount < 1) func.call(scope, resizedFiles.toArray());
+            }, this, { maxDims: maxDims });
+        });
 
-            files.each(function (file) {
-                fileCount --;
-
-                var reader = new FileReader();
-
-                reader.onload = function(e) {
-                    $.image.blobFromSrc(e.target.result, function(blob) {
-                        blob.lastModified = file.lastModified;
-                        blob.lastModifiedDate = file.lastModifiedDate;
-                        blob.name = file.name;
-
-                        resizedFiles.add(blob);
-                        if (fileCount < 1) callback();
-                    }, this, {
-                        maxDims: maxDims
-                    });
-                };
-                reader.readAsDataURL(file);
-            });
-        }
     }
 };
 $.Class.extend(imageFileField, field);
