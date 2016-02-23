@@ -894,11 +894,12 @@ $.image = {
         var scope = (!$.exists(scp) || $.isObjectLiteral(scp)) ? this : scp,
             opts = ($.isObjectLiteral(scp)) ? scp : ($.exists(options)) ? options : { },
             mimeType = opts.mimeType || "image/jpeg",
-            image = document.createElement("img");
+            image = document.createElement("img"),
+            isDataUrl = /data:image\/.*;base64,/.test(src);
 
         image.onload = function () {
 
-            var exif = (/data:image\/.*;base64,/.test(src)) ? $.exif().readExifDataInDataUrl(src) : {},
+            var exif = isDataUrl ? $.exif().readExifDataInDataUrl(src) : {},
                 orientation = exif.Orientation,
                 imageWidth = ($.exists(image.naturalWidth)) ? image.naturalWidth : image.width,
                 imageHeight = ($.exists(image.naturalHeight)) ? image.naturalHeight : image.height,
@@ -941,7 +942,10 @@ $.image = {
         image.onerror = function() {
             func.call(scope, null);
         };
-        image.crossorigin="anonymous";
+        if(options.crossOrigin && !isDataUrl) {
+            image.setAttribute("crossOrigin", "anonymous");
+            image.crossorigin = "anonymous";
+        }
         image.src = src;
     },
     dataUrlFromFile: function(file, func, scp, options) {
