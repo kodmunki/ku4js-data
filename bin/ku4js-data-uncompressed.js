@@ -482,7 +482,10 @@ $.json.serialize = function(obj) {
 };
 
 $.json.deserialize = function(str) {
-    if(/function|(=$)/i.test(str)) return str;
+    return (/function|(=$)/i.test(str)) ? str : $.json.deserialize.unsafe(str);
+};
+
+$.json.deserialize.unsafe = function(str) {
     try {
         var obj = ($.isString(str)) ? eval("(" + json_deserializeString(str) + ")") : str;
         if($.isFunction(obj)) obj = str;
@@ -523,6 +526,7 @@ function json_deserializeString(str) {
         .replace(/\\\\r/g,"\\r")
         .replace(/\\\\t/g,"\\t");
 }
+
 
 if(!$.exists($.queryString)) $.queryString = {};
 $.queryString.serialize = function(obj) {
