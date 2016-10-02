@@ -1742,7 +1742,7 @@ $.ku4collection = function(name, obj, isAsync) { return new collection(name, obj
 $.ku4collection.Class = collection;
 
 $.ku4collection.deserialize = function(serialized) {
-    var obj = $.json.deserialize(serialized);
+    var obj = $.json.deserialize.unsafe(serialized);
     return new collection(obj.name, obj.data);
 };
 
@@ -1797,6 +1797,7 @@ function collection_orderby(arry, criteria) {
 
     return arry.sort(func);
 }
+
 
 function execCollection(collection, exec) {
     this._collection = collection;
