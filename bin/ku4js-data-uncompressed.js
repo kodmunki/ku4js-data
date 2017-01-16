@@ -229,7 +229,7 @@ xhr.prototype = {
     call: function(params, settings){
         this._xhr = xhr_createXhr();
         var paramsExist = $.exists(params),
-            requestHeaders = settings.requestHeaders,
+            requestHeaders = ($.exists(settings)) ? settings.requestHeaders : null,
             context = this.context(),
             isPost = context.isPost(),
             isMultipart = (function() { try { return ($.exists(FormData) && (params instanceof FormData)) } catch(e) { return false; } })(),
@@ -249,9 +249,12 @@ xhr.prototype = {
             xhr.setRequestHeader("Content-Type", contentType);
         }
 
-        if(!requestHeaders.isEmpty()) requestHeaders.each(function(header) {
-            xhr.setRequestHeader(header.key, header.value);
-        });
+        if($.exists(requestHeaders) &&  $.isFunction(requestHeaders.isEmpty) && !requestHeaders.isEmpty()) {
+            requestHeaders.each(function (header) {
+                if($.exists(header) && !$.isNullOrEmpty(header.key) && !$.isNullOrEmpty(header.value))
+                    xhr.setRequestHeader(header.key, header.value);
+            });
+        }
 
         xhr.onreadystatechange = function(){
             if(xhr.readyState > 3) {
@@ -262,13 +265,13 @@ xhr.prototype = {
                     context.success(response).complete(response);
                     return;
                 }
-                if(me._attempts < context.maxAttempts()) me.call(params);
+                if(++me._attempts < context.maxAttempts()) me.call(params);
                 else context.error(response).complete(response);
             }
         };
         xhr.onerror = function() {
             var response = this[context.responseType()];
-            if(me._attempts < context.maxAttempts()) me.call(params);
+            if(++me._attempts < context.maxAttempts()) me.call(params);
             else context.error(response).complete(response);
         };
 
@@ -292,6 +295,7 @@ function xhr_createXhr(){
                 })()
             : null;
 }
+
 
 function xss(){
     xss.base.call(this);
@@ -490,7 +494,7 @@ $.json.serialize = function(obj) {
         var v = ($.isNumber(o))
                 ? o
                 : ($.isDate(o))
-                ? '"' + $.dayPoint.parse(o).toJson() + '"'
+                ? '"' + o.toJSON() + '"'
                 : ($.isString(o))
                 ? '"' + json_serializeString(o) + '"'
                 : $.json.serialize(o);
@@ -516,14 +520,14 @@ $.json.deserialize.unsafe = function(str) {
             for (var n in obj) {
                 var value = $.obj.ownProp(obj, n);
                 if ($.isObject(value) || $.isArray(value)) obj[n] = $.json.deserialize(value);
-                if(/\d{4}\-\d{2}\-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z/.test(value) && $.dayPoint.canParse(value)) {
-                    obj[n] = $.dayPoint.parse(value).toDate();
+                if(/\d{4}\-\d{2}\-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z/.test(value)) {
+                    obj[n] = new Date(value);
                 }
             }
             return obj;
         }
         return (/\d{4}\-\d{2}\-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z/.test(obj))
-                ? $.dayPoint.parse(obj).toDate()
+                ? new Date(obj)
                 : obj;
     }
     catch (e) { return str; }
@@ -918,9 +922,11 @@ $.image = {
     blobFromSrc: function (src, func, scp, options) {
         var scope = (!$.exists(scp) || $.isObjectLiteral(scp)) ? this : scp,
             opts = ($.isObjectLiteral(scp)) ? scp : ($.exists(options)) ? options : { },
-            mimeType = opts.mimeType || "image/jpeg",
+            mimeType = opts.mimeType || "image/*",
             image = document.createElement("img"),
-            isDataUrl = /data:image\/.*;base64,/.test(src);
+            isDataUrl = /data:image\/.*;base64,/.test(src),
+            maxAttempts = opts.maxAttempts || 1,
+            attempts = 0;
 
         image.onload = function () {
 
@@ -965,9 +971,10 @@ $.image = {
             func.call(scope, blob);
         };
         image.onerror = function() {
-            func.call(scope, null);
+            if(++attempts < maxAttempts) image.src = src;
+            else func.call(scope, null);
         };
-        if(options.crossOrigin && !isDataUrl) {
+        if(opts.crossOrigin && !isDataUrl) {
             image.setAttribute("crossOrigin", "anonymous");
             image.crossorigin = "anonymous";
         }
@@ -995,6 +1002,7 @@ $.image = {
         reader.readAsDataURL(file);
     }
 };
+
 
 var EXIF_TAGS = {
     0x9000: "ExifVersion",

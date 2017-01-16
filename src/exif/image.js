@@ -12,9 +12,11 @@ $.image = {
     blobFromSrc: function (src, func, scp, options) {
         var scope = (!$.exists(scp) || $.isObjectLiteral(scp)) ? this : scp,
             opts = ($.isObjectLiteral(scp)) ? scp : ($.exists(options)) ? options : { },
-            mimeType = opts.mimeType || "image/jpeg",
+            mimeType = opts.mimeType || "image/*",
             image = document.createElement("img"),
-            isDataUrl = /data:image\/.*;base64,/.test(src);
+            isDataUrl = /data:image\/.*;base64,/.test(src),
+            maxAttempts = opts.maxAttempts || 1,
+            attempts = 0;
 
         image.onload = function () {
 
@@ -59,9 +61,10 @@ $.image = {
             func.call(scope, blob);
         };
         image.onerror = function() {
-            func.call(scope, null);
+            if(++attempts < maxAttempts) image.src = src;
+            else func.call(scope, null);
         };
-        if(options.crossOrigin && !isDataUrl) {
+        if(opts.crossOrigin && !isDataUrl) {
             image.setAttribute("crossOrigin", "anonymous");
             image.crossorigin = "anonymous";
         }

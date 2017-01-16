@@ -12,7 +12,7 @@ $.json.serialize = function(obj) {
         var v = ($.isNumber(o))
                 ? o
                 : ($.isDate(o))
-                ? '"' + $.dayPoint.parse(o).toJson() + '"'
+                ? '"' + o.toJSON() + '"'
                 : ($.isString(o))
                 ? '"' + json_serializeString(o) + '"'
                 : $.json.serialize(o);
@@ -38,14 +38,14 @@ $.json.deserialize.unsafe = function(str) {
             for (var n in obj) {
                 var value = $.obj.ownProp(obj, n);
                 if ($.isObject(value) || $.isArray(value)) obj[n] = $.json.deserialize(value);
-                if(/\d{4}\-\d{2}\-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z/.test(value) && $.dayPoint.canParse(value)) {
-                    obj[n] = $.dayPoint.parse(value).toDate();
+                if(/\d{4}\-\d{2}\-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z/.test(value)) {
+                    obj[n] = new Date(value);
                 }
             }
             return obj;
         }
         return (/\d{4}\-\d{2}\-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z/.test(obj))
-                ? $.dayPoint.parse(obj).toDate()
+                ? new Date(obj)
                 : obj;
     }
     catch (e) { return str; }

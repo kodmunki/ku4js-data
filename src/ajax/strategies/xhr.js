@@ -13,7 +13,7 @@ xhr.prototype = {
     call: function(params, settings){
         this._xhr = xhr_createXhr();
         var paramsExist = $.exists(params),
-            requestHeaders = settings.requestHeaders,
+            requestHeaders = ($.exists(settings)) ? settings.requestHeaders : null,
             context = this.context(),
             isPost = context.isPost(),
             isMultipart = (function() { try { return ($.exists(FormData) && (params instanceof FormData)) } catch(e) { return false; } })(),
@@ -33,9 +33,12 @@ xhr.prototype = {
             xhr.setRequestHeader("Content-Type", contentType);
         }
 
-        if(!requestHeaders.isEmpty()) requestHeaders.each(function(header) {
-            xhr.setRequestHeader(header.key, header.value);
-        });
+        if($.exists(requestHeaders) &&  $.isFunction(requestHeaders.isEmpty) && !requestHeaders.isEmpty()) {
+            requestHeaders.each(function (header) {
+                if($.exists(header) && !$.isNullOrEmpty(header.key) && !$.isNullOrEmpty(header.value))
+                    xhr.setRequestHeader(header.key, header.value);
+            });
+        }
 
         xhr.onreadystatechange = function(){
             if(xhr.readyState > 3) {
@@ -46,13 +49,13 @@ xhr.prototype = {
                     context.success(response).complete(response);
                     return;
                 }
-                if(me._attempts < context.maxAttempts()) me.call(params);
+                if(++me._attempts < context.maxAttempts()) me.call(params);
                 else context.error(response).complete(response);
             }
         };
         xhr.onerror = function() {
             var response = this[context.responseType()];
-            if(me._attempts < context.maxAttempts()) me.call(params);
+            if(++me._attempts < context.maxAttempts()) me.call(params);
             else context.error(response).complete(response);
         };
 
