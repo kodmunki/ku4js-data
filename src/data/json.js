@@ -24,11 +24,12 @@ $.json.serialize = function(obj) {
     return $.str.format(f, r);
 };
 
-$.json.deserialize = function(str) {
-    return (/function|(=$)/i.test(str)) ? str : $.json.deserialize.unsafe(str);
+$.json.deserialize = function(str, isTimeZoneAgnostic) {
+    return (/function|(=$)/i.test(str)) ? str : $.json.deserialize.unsafe(str, isTimeZoneAgnostic);
 };
 
-$.json.deserialize.unsafe = function(str) {
+$.json.deserialize.unsafe = function(str, isTimeZoneAgnostic) {
+    var datePattern = /\d{4}\-\d{2}\-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z/;
     try {
         var obj = ($.isString(str)) ? eval("(" + json_deserializeString(str) + ")") : str;
         if($.isFunction(obj)) obj = str;
@@ -37,16 +38,15 @@ $.json.deserialize.unsafe = function(str) {
             ($.isObject(obj) || $.isArray(obj))) {
             for (var n in obj) {
                 var value = $.obj.ownProp(obj, n);
-                if ($.isObject(value) || $.isArray(value)) obj[n] = $.json.deserialize(value);
-                if(/\d{4}\-\d{2}\-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z/.test(value)) {
-                    obj[n] = new Date(value);
+                if ($.isObject(value) || $.isArray(value)) obj[n] = $.json.deserialize(value, isTimeZoneAgnostic);
+                if(datePattern.test(value)) {
+                    obj[n] = isTimeZoneAgnostic ? $.dayPoint.parse(value).toDate() : new Date(value);
                 }
             }
             return obj;
         }
-        return (/\d{4}\-\d{2}\-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z/.test(obj))
-                ? new Date(obj)
-                : obj;
+        if(datePattern.test(obj)) return isTimeZoneAgnostic ? $.dayPoint.parse(obj).toDate() : new Date(obj);
+        return obj;
     }
     catch (e) { return str; }
 };

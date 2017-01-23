@@ -407,13 +407,13 @@ $.cookie.serialize = function(obj, params) {
     return I + E + P + D + S;
 };
 
-$.cookie.deserialize = function(cookie) {
+$.cookie.deserialize = function(cookie, isTimeZoneAgnostic) {
     try {
         var ck = (/;/.test(cookie))
             ? cookie.substring(0, cookie.search(";")).split("=")
             : cookie.split("="),
             kv = { key: ck[0], value: ck[1] };
-        return $.json.deserialize(decodeURIComponent(kv.value));
+        return $.json.deserialize(decodeURIComponent(kv.value), isTimeZoneAgnostic);
     }
     catch(e){ throw $.exception("arg", $.str.format("Cannot deserialize {0}", cookie)); }
 };
@@ -424,6 +424,7 @@ var cookie_defaultParams = $.hash({name:$.uid("COOKIE"),
                 domain:null,
                 isSecure:false });
 var cookie_buildInfoPair = function(k, v) { return k + "=" + v; };
+
 
 function dto(obj) {
     this._isArray = ($.isArray(obj) || obj instanceof $.list.Class);
@@ -473,12 +474,13 @@ $.Class.extend(dto, $.hash.Class);
 $.dto = function(obj){ return new dto(obj); };
 $.dto.Class = dto;
 
-$.dto.parseJson = function(str) { return $.dto($.json.deserialize(str)); };
-$.dto.parseQueryString = function(str) { return $.dto($.queryString.deserialize(str)); };
+$.dto.parseJson = function(str, isTimeZoneAgnostic) { return $.dto($.json.deserialize(str, isTimeZoneAgnostic)); };
+$.dto.parseQueryString = function(str, isTimeZoneAgnostic) { return $.dto($.queryString.deserialize(str, isTimeZoneAgnostic)); };
 $.dto.serialize = function(name) {
     try { return new dto($.cookie.deserialize($.cookie.find(name))).name(name); }
     catch(e) { return null; }
 };
+
 
 if(!$.exists($.json)) $.json = {};
 $.json.serialize = function(obj) {
@@ -506,11 +508,12 @@ $.json.serialize = function(obj) {
     return $.str.format(f, r);
 };
 
-$.json.deserialize = function(str) {
-    return (/function|(=$)/i.test(str)) ? str : $.json.deserialize.unsafe(str);
+$.json.deserialize = function(str, isTimeZoneAgnostic) {
+    return (/function|(=$)/i.test(str)) ? str : $.json.deserialize.unsafe(str, isTimeZoneAgnostic);
 };
 
-$.json.deserialize.unsafe = function(str) {
+$.json.deserialize.unsafe = function(str, isTimeZoneAgnostic) {
+    var datePattern = /\d{4}\-\d{2}\-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z/;
     try {
         var obj = ($.isString(str)) ? eval("(" + json_deserializeString(str) + ")") : str;
         if($.isFunction(obj)) obj = str;
@@ -519,16 +522,15 @@ $.json.deserialize.unsafe = function(str) {
             ($.isObject(obj) || $.isArray(obj))) {
             for (var n in obj) {
                 var value = $.obj.ownProp(obj, n);
-                if ($.isObject(value) || $.isArray(value)) obj[n] = $.json.deserialize(value);
-                if(/\d{4}\-\d{2}\-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z/.test(value)) {
-                    obj[n] = new Date(value);
+                if ($.isObject(value) || $.isArray(value)) obj[n] = $.json.deserialize(value, isTimeZoneAgnostic);
+                if(datePattern.test(value)) {
+                    obj[n] = isTimeZoneAgnostic ? $.dayPoint.parse(value).toDate() : new Date(value);
                 }
             }
             return obj;
         }
-        return (/\d{4}\-\d{2}\-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z/.test(obj))
-                ? new Date(obj)
-                : obj;
+        if(datePattern.test(obj)) return isTimeZoneAgnostic ? $.dayPoint.parse(obj).toDate() : new Date(obj);
+        return obj;
     }
     catch (e) { return str; }
 };
@@ -563,7 +565,7 @@ $.queryString.serialize = function(obj) {
     });
     return result.replace(/^\&/, "");
 };
-$.queryString.deserialize = function(str) {
+$.queryString.deserialize = function(str, isTimeZoneAgnostic) {
     if(!/\??\w+=\w+/.test(str)) return;
     var queryString = str.replace(/.*\?/, ""),
         keyValuePairs = queryString.split("&"),
@@ -577,11 +579,12 @@ $.queryString.deserialize = function(str) {
                                 ? value
                                 : '"' + value + '"';
 
-        result.add(decodeURIComponent(key), $.json.deserialize(decodeURIComponent(deserializeValue)));
+        result.add(decodeURIComponent(key), $.json.deserialize(decodeURIComponent(deserializeValue), isTimeZoneAgnostic));
     });
 
     return result.toObject();
 };
+
 
 function binaryFile(byteString) {
     this._byteString = byteString || "";
@@ -1770,8 +1773,8 @@ collection.prototype = {
 $.ku4collection = function(name, obj, isAsync) { return new collection(name, obj, isAsync); };
 $.ku4collection.Class = collection;
 
-$.ku4collection.deserialize = function(serialized) {
-    var obj = $.json.deserialize.unsafe(serialized);
+$.ku4collection.deserialize = function(serialized, isTimeZoneAgnostic) {
+    var obj = $.json.deserialize.unsafe(serialized, isTimeZoneAgnostic);
     return new collection(obj.name, obj.data);
 };
 

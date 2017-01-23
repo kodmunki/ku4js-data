@@ -71,13 +71,13 @@ $.cookie.serialize = function(obj, params) {
     return I + E + P + D + S;
 };
 
-$.cookie.deserialize = function(cookie) {
+$.cookie.deserialize = function(cookie, isTimeZoneAgnostic) {
     try {
         var ck = (/;/.test(cookie))
             ? cookie.substring(0, cookie.search(";")).split("=")
             : cookie.split("="),
             kv = { key: ck[0], value: ck[1] };
-        return $.json.deserialize(decodeURIComponent(kv.value));
+        return $.json.deserialize(decodeURIComponent(kv.value), isTimeZoneAgnostic);
     }
     catch(e){ throw $.exception("arg", $.str.format("Cannot deserialize {0}", cookie)); }
 };

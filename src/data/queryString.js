@@ -8,7 +8,7 @@ $.queryString.serialize = function(obj) {
     });
     return result.replace(/^\&/, "");
 };
-$.queryString.deserialize = function(str) {
+$.queryString.deserialize = function(str, isTimeZoneAgnostic) {
     if(!/\??\w+=\w+/.test(str)) return;
     var queryString = str.replace(/.*\?/, ""),
         keyValuePairs = queryString.split("&"),
@@ -22,7 +22,7 @@ $.queryString.deserialize = function(str) {
                                 ? value
                                 : '"' + value + '"';
 
-        result.add(decodeURIComponent(key), $.json.deserialize(decodeURIComponent(deserializeValue)));
+        result.add(decodeURIComponent(key), $.json.deserialize(decodeURIComponent(deserializeValue), isTimeZoneAgnostic));
     });
 
     return result.toObject();

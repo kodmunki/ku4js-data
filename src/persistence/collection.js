@@ -142,8 +142,8 @@ collection.prototype = {
 $.ku4collection = function(name, obj, isAsync) { return new collection(name, obj, isAsync); };
 $.ku4collection.Class = collection;
 
-$.ku4collection.deserialize = function(serialized) {
-    var obj = $.json.deserialize.unsafe(serialized);
+$.ku4collection.deserialize = function(serialized, isTimeZoneAgnostic) {
+    var obj = $.json.deserialize.unsafe(serialized, isTimeZoneAgnostic);
     return new collection(obj.name, obj.data);
 };
 
